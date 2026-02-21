@@ -11,8 +11,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const schoolService = {
-  getStats: async () => (await api.get('/dashboard/dashboard/escuela')).data,
+export const escuelaService = {
   getAlumnos: async () => (await api.get('/alumnos/')).data,
   
   /**

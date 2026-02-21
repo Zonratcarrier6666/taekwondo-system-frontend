@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginView } from './views/auth/LoginView';
-import { EscuelaDashboard } from './views/escuela/EscuelaDashboard';
+import EscuelaDashboard from './views/escuela/EscuelaDashboard';
 import { Award } from 'lucide-react';
 
 const AppContent = () => {

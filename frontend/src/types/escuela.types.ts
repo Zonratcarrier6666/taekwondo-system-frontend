@@ -43,3 +43,19 @@ export interface Alumno {
   idgradoactual: number;
   fotoalumno?: string;
 }
+export interface EscuelaStats {
+  total_alumnos: number;
+  ingresos_semanales: number;           // nota: es "ingresos_semanales" no "ingresos_semanaLes"
+  pagos_pendientes_count: number;
+  alumnos_torneo_count: number;         // probablemente "alumnos_torneo_count"
+  distribucion_cintas: Array<{
+    color: string;
+    count: number;
+  }>;
+  finanzas_semana: Array<{
+    dia: string;
+    monto: number;                      // o string si viene como "$1,200"
+  }>;
+  proximos_torneos: Array<any>;         // ajusta según lo que traiga
+  // [key: string]: any;                // opcional para campos extras
+}
