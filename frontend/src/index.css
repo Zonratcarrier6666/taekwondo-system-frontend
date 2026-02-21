@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/* Definimos una paleta base (fallback) */
+@theme {
+  --color-background: #121212;
+  --color-card: #1e1e1e;
+  --color-modal: #2c2c2c;
+  --color-text: #e0e0e0;
+  --color-text-muted: #a0a0a0;
+  --color-primary: #1867fd;
+  --color-secondary: #1e1e1e;
+  --color-danger: #c00000;
+  --color-success: #00c853;
+}
+
+/* Modo Claro (light) */
+[data-theme="light"] {
+  @theme {
+    --color-background: #f8fafc;
+    --color-card: #cdd5ff;
+    --color-modal: #deecfe;
+    --color-text: #0f172a;
+    --color-text-muted: #64748b;
+    --color-primary: #3b82f6;
+    --color-secondary: #2563eb;
+    --color-danger: #ef4444;
+    --color-success: #10b981;
+  }
+}
+
+/* Modo P-Default (el de tu Figma con pasteles) */
+[data-theme="default"] {
+  @theme {
+    --color-background: #fbfaff;
+    --color-card: #eafoff;
+    --color-modal: #ddeeff;
+    --color-text: #1e293b;
+    --color-text-muted: #64748b;
+    --color-primary: #8b5cf6;
+    --color-secondary: #3b82f6;
+    --color-danger: #f87171;
+    --color-success: #4ade80;
+  }
+}
+
+/* Tema Rojo-Dragon (ejemplo para dragón negro con acentos rojos fuertes) */
+[data-theme="rojo-dragon"] {
+  @theme {
+    --color-background: #0f0f17;
+    --color-card: #1a1a2e;
+    --color-modal: #2c2c3e;
+    --color-text: #f1f5f9;
+    --color-text-muted: #94a3b8;
+    --color-primary: #c8102e;     /* rojo taekwondo */
+    --color-secondary: #7c0a1e;
+    --color-danger: #ff4d4d;
+    --color-success: #22c55e;
+  }
+}
+
+/* Agrega más temas: verde-esmeralda, azul-corporativo, negro-puro, etc. */
+/* [data-theme="verde-esmeralda"] { ... } */
+
+/* Variantes dark/light si quieres mezclar con prefers-color-scheme más adelante */
+@custom-variant dark (&:where([data-theme*="dark"], [data-theme*="dark"] *));
