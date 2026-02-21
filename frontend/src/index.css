@@ -1,65 +1,227 @@
 @import "tailwindcss";
 
-/* Definimos una paleta base (fallback) */
+/* Definición de variables globales para Tailwind v4 */
 @theme {
-  --color-background: #121212;
-  --color-card: #1e1e1e;
-  --color-modal: #2c2c2c;
-  --color-text: #e0e0e0;
-  --color-text-muted: #a0a0a0;
-  --color-primary: #1867fd;
-  --color-secondary: #1e1e1e;
-  --color-danger: #c00000;
-  --color-success: #00c853;
+  --color-background: var(--bg);
+  --color-card: var(--card);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-primary: var(--primary);
+  --color-border: var(--border);
+  --color-danger: #ef4444;
+  --color-success: #10b981;
 }
 
-/* Modo Claro (light) */
+/* --- TEMAS CLAROS --- */
+
+:root, [data-theme="blue-ocean"], [data-theme="default"] {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --primary: #2563eb;
+  --border: #e2e8f0;
+}
+
 [data-theme="light"] {
-  @theme {
-    --color-background: #f8fafc;
-    --color-card: #cdd5ff;
-    --color-modal: #deecfe;
-    --color-text: #0f172a;
-    --color-text-muted: #64748b;
-    --color-primary: #3b82f6;
-    --color-secondary: #2563eb;
-    --color-danger: #ef4444;
-    --color-success: #10b981;
-  }
+  --bg: #ffffff;
+  --card: #f1f5f9;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --primary: #3b82f6;
+  --border: #cbd5e1;
 }
 
-/* Modo P-Default (el de tu Figma con pasteles) */
-[data-theme="default"] {
-  @theme {
-    --color-background: #fbfaff;
-    --color-card: #eafoff;
-    --color-modal: #ddeeff;
-    --color-text: #1e293b;
-    --color-text-muted: #64748b;
-    --color-primary: #8b5cf6;
-    --color-secondary: #3b82f6;
-    --color-danger: #f87171;
-    --color-success: #4ade80;
-  }
+[data-theme="sakura-dojo"] {
+  --bg: #fff5f7;
+  --card: #ffffff;
+  --text: #500724;
+  --text-muted: #be185d;
+  --primary: #f472b6;
+  --border: #fbcfe8;
 }
 
-/* Tema Rojo-Dragon (ejemplo para dragón negro con acentos rojos fuertes) */
+[data-theme="forest-dojo"] {
+  --bg: #f0fdf4;
+  --card: #ffffff;
+  --text: #064e3b;
+  --text-muted: #15803d;
+  --primary: #059669;
+  --border: #dcfce7;
+}
+
+[data-theme="orange-tiger"] {
+  --bg: #fff7ed;
+  --card: #ffffff;
+  --text: #7c2d12;
+  --text-muted: #c2410c;
+  --primary: #f97316;
+  --border: #ffedd5;
+}
+
+[data-theme="golden-sun"] {
+  --bg: #fefce8;
+  --card: #ffffff;
+  --text: #422006;
+  --text-muted: #a16207;
+  --primary: #eab308;
+  --border: #fef9c3;
+}
+
+[data-theme="brown-earth"] {
+  --bg: #fffbeb;
+  --card: #ffffff;
+  --text: #451a03;
+  --text-muted: #92400e;
+  --primary: #78350f;
+  --border: #fef3c7;
+}
+
+/* --- TEMAS OSCUROS --- */
+
+[data-theme="dark-martial"] {
+  --bg: #020617;
+  --card: #0f172a;
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --primary: #3b82f6;
+  --border: #1e293b;
+}
+
 [data-theme="rojo-dragon"] {
-  @theme {
-    --color-background: #0f0f17;
-    --color-card: #1a1a2e;
-    --color-modal: #2c2c3e;
-    --color-text: #f1f5f9;
-    --color-text-muted: #94a3b8;
-    --color-primary: #c8102e;     /* rojo taekwondo */
-    --color-secondary: #7c0a1e;
-    --color-danger: #ff4d4d;
-    --color-success: #22c55e;
-  }
+  --bg: #0f0f17;
+  --card: #1a1a2e;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --primary: #c8102e;
+  --border: #2c2c3e;
 }
 
-/* Agrega más temas: verde-esmeralda, azul-corporativo, negro-puro, etc. */
-/* [data-theme="verde-esmeralda"] { ... } */
+[data-theme="black-gold"] {
+  --bg: #0a0a0a;
+  --card: #181818;
+  --text: #f3f3f3;
+  --text-muted: #d4af37;
+  --primary: #d4af37;
+  --border: #d4af3733;
+}
 
-/* Variantes dark/light si quieres mezclar con prefers-color-scheme más adelante */
-@custom-variant dark (&:where([data-theme*="dark"], [data-theme*="dark"] *));
+[data-theme="black-red"] {
+  --bg: #0d0d0d;
+  --card: #1a1a1a;
+  --text: #ffffff;
+  --text-muted: #991b1b;
+  --primary: #ef4444;
+  --border: #ef444422;
+}
+
+[data-theme="black-green"] {
+  --bg: #050505;
+  --card: #0f1a0f;
+  --text: #f0fdf4;
+  --text-muted: #22c55e;
+  --primary: #22c55e;
+  --border: #14532d;
+}
+
+[data-theme="black-orange"] {
+  --bg: #070402;
+  --card: #1a0f0a;
+  --text: #fff7ed;
+  --text-muted: #f97316;
+  --primary: #f97316;
+  --border: #7c2d12;
+}
+
+[data-theme="purple-ninja"] {
+  --bg: #0f001a;
+  --card: #1a0029;
+  --text: #f5f3ff;
+  --text-muted: #d8b4fe;
+  --primary: #a855f7;
+  --border: #3b0764;
+}
+
+[data-theme="midnight-void"] {
+  --bg: #030014;
+  --card: #05011a;
+  --text: #e0e7ff;
+  --text-muted: #818cf8;
+  --primary: #6366f1;
+  --border: #1e1b4b;
+}
+
+[data-theme="samurai-armor"] {
+  --bg: #0c0202;
+  --card: #1a0505;
+  --text: #fee2e2;
+  --text-muted: #ef4444;
+  --primary: #991b1b;
+  --border: #450a0a;
+}
+
+[data-theme="obsidian-flame"] {
+  --bg: #050201;
+  --card: #0f0502;
+  --text: #fff7ed;
+  --text-muted: #fb923c;
+  --primary: #ea580c;
+  --border: #431407;
+}
+
+[data-theme="royal-spirit"] {
+  --bg: #0f001a;
+  --card: #1a0b2e;
+  --text: #f5f3ff;
+  --text-muted: #c084fc;
+  --primary: #8b5cf6;
+  --border: #4c1d95;
+}
+
+[data-theme="desert-wind"] {
+  --bg: #0c0a09;
+  --card: #1c1917;
+  --text: #f5f5f4;
+  --text-muted: #d6d3d1;
+  --primary: #d97706;
+  --border: #44403c;
+}
+
+[data-theme="cyan-glacier"] {
+  --bg: #083344;
+  --card: #155e75;
+  --text: #ecfeff;
+  --text-muted: #22d3ee;
+  --primary: #06b6d4;
+  --border: #164e63;
+}
+
+[data-theme="silver-moon"] {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --primary: #94a3b8;
+  --border: #334155;
+}
+
+/* --- ESTILOS BASE --- */
+
+body {
+  @apply transition-colors duration-700 ease-in-out;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
+}
