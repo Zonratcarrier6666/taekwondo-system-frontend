@@ -1,61 +1,57 @@
 /**
- * Definiciones de tipos globales para el sistema TKW.
- * Asegúrate de que este archivo contenga todos los exports necesarios.
+ * Estructura para el desglose de deudas en el detalle del alumno.
  */
-
-export type Role = 'SuperAdmin' | 'Escuela' | 'Profesor' | 'Juez';
-export type ThemeName = 'default' | 'light' | 'dark' | 'rojo-dragon' | 'auto';
-
-export interface User {
-  username: string;
-  rol: Role;
-  tema: ThemeName;
+export interface PagoPendienteDetalle {
+  idpago: number;
+  monto: number;
+  concepto: string;
+  fecharegistro: string;
+  id_tipo_pago: number;
 }
 
 /**
- * Interfaz Escuela: Asegúrate de que esté exportada así.
+ * Interfaz principal del Alumno integrada con lógica técnica y financiera.
  */
-export interface Escuela {
-  idescuela: number;
-  idusuario: number;
-  nombreescuela: string;
-  direccion?: string;
-  lema?: string;
-  logo_url?: string;
-  correo_escuela?: string;
-  telefono_oficina?: string;
-  color_paleta: string;
-}
-
-export interface AuthContextType {
-  user: User | null;
-  login: (token: string, role: Role, username: string) => void;
-  logout: () => void;
-  isInitializing: boolean;
-  setTheme: (theme: ThemeName) => void;
-  currentTheme: ThemeName;
-}
-
 export interface Alumno {
   idalumno: number;
   nombres: string;
   apellidopaterno: string;
+  apellidomaterno: string;
+  fechanacimiento: string;
+  fotoalumno: string;
   idgradoactual: number;
-  fotoalumno?: string;
+  idprofesor: number | null;
+  idescuela: number;
+  tipo_sangre: string;
+  alergias: string;
+  nombretutor: string;
+  telefonocontacto: string;
+  // Campos financieros calculados en el backend
+  total_deuda: number;
+  conteo_pendientes: number;
+  pagos_pendientes_detalle: PagoPendienteDetalle[];
 }
-export interface EscuelaStats {
-  total_alumnos: number;
-  ingresos_semanales: number;           // nota: es "ingresos_semanales" no "ingresos_semanaLes"
-  pagos_pendientes_count: number;
-  alumnos_torneo_count: number;         // probablemente "alumnos_torneo_count"
-  distribucion_cintas: Array<{
-    color: string;
-    count: number;
-  }>;
-  finanzas_semana: Array<{
-    dia: string;
-    monto: number;                      // o string si viene como "$1,200"
-  }>;
-  proximos_torneos: Array<any>;         // ajusta según lo que traiga
-  // [key: string]: any;                // opcional para campos extras
+
+/**
+ * DTO para la creación de nuevos registros.
+ */
+export interface AlumnoCreateDTO {
+  nombres: string;
+  apellidopaterno: string;
+  apellidomaterno: string;
+  fechanacimiento: string;
+  idgradoactual: number;
+  idprofesor: number | null;
+  nombretutor: string;
+  telefonocontacto: string;
+  direcciondomicilio: string;
+  contacto_emergencia_nombre: string;
+  contacto_emergencia_tel: string;
+  tipo_sangre: string;
+  alergias: string;
 }
+
+/**
+ * DTO para actualizaciones parciales.
+ */
+export type AlumnoUpdateDTO = Partial<AlumnoCreateDTO>;
