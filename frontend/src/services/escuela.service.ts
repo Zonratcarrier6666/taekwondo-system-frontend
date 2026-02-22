@@ -1,31 +1,28 @@
-import axios from 'axios';
-
-const API_URL = "https://taekwondo-system-api.onrender.com";
-
-const api = axios.create({ baseURL: API_URL });
-
-// Interceptor para inyectar el token en cada petición
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+import api from '../api/axios';
+import { Escuela } from '../types/escuela.types';
 
 export const escuelaService = {
   getAlumnos: async () => (await api.get('/alumnos/')).data,
   
   /**
-   * RUTAS ACTUALIZADAS SEGÚN TUS CURLS (Prefijo duplicado /escuelas/escuelas/)
+   * Obtiene la información de la escuela del usuario actual
    */
-  getMiEscuela: async () => (await api.get('/escuelas/escuelas/mi-escuela')).data,
+  getMiEscuela: async (): Promise<Escuela> => {
+    const response = await api.get('/escuelas/escuelas/mi-escuela');
+    return response.data;
+  },
   
-  updatePerfil: async (data: any) => (await api.put('/escuelas/escuelas/mi-escuela', data)).data,
+  updatePerfil: async (data: Partial<Escuela>): Promise<Escuela> => {
+    const response = await api.put('/escuelas/escuelas/mi-escuela', data);
+    return response.data;
+  },
   
   uploadLogo: async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    return (await api.post('/escuelas/escuelas/upload-logo', formData, {
+    const response = await api.post('/escuelas/escuelas/upload-logo', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
-    })).data;
+    });
+    return response.data;
   }
 };

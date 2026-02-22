@@ -1,6 +1,5 @@
 /**
  * ARCHIVO: src/types/profesor.types.ts
- * Definiciones de interfaces para la gestión de profesores.
  */
 
 export interface Profesor {
@@ -24,15 +23,10 @@ export interface RegistroProfesorDTO {
   idgradodan: number;
 }
 
-/**
- * Interfaz para actualizaciones parciales.
- * Asegúrate de que esta exportación esté presente en tu archivo local.
- */
 export interface ActualizarProfesorDTO {
   nombrecompleto?: string;
   email?: string;
   telefono?: string;
   idgradodan?: number;
   estatus?: number;
-  foto_url?: string;
 }

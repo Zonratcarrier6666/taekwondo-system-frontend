@@ -1,15 +1,14 @@
-// src/services/dashboard.service.ts
-
-import api from '../api/axios';  // o la ruta que uses
+import api from '../api/axios';
 
 export const dashboardService = {
-  // Obtiene datos para el rol Escuela → ¡este es el path correcto!
+  /**
+   * Obtiene estadísticas para el rol Escuela
+   */
   getEscuelaStats: async () => {
     const response = await api.get('/dashboard/dashboard/escuela');
     return response.data;
   },
 
-  // Los otros métodos quedan igual si los usas
   getSuperAdminStats: async (idEscuela?: string) => {
     const url = idEscuela ? `/dashboard/superadmin?idescuela=${idEscuela}` : '/dashboard/superadmin';
     const response = await api.get(url);
