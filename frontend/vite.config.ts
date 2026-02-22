@@ -8,4 +8,5 @@ export default defineConfig({
     react(),
     tailwindcss(),           // ← este es el cambio clave
   ],
+  
 })
