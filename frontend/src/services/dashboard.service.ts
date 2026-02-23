@@ -9,8 +9,14 @@ export const dashboardService = {
     return response.data;
   },
 
+  /**
+   * Estadísticas globales para el rol Superadmin
+   * @param idEscuela  ID opcional para filtrar por escuela específica
+   */
   getSuperAdminStats: async (idEscuela?: string) => {
-    const url = idEscuela ? `/dashboard/superadmin?idescuela=${idEscuela}` : '/dashboard/superadmin';
+    const url = idEscuela
+      ? `/dashboard/dashboard/superadmin?idescuela=${idEscuela}`
+      : '/dashboard/dashboard/superadmin';
     const response = await api.get(url);
     return response.data;
   },

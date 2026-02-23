@@ -35,6 +35,8 @@ import PerfilConfiguracion from './PerfilConfiguracion';
 import GestionProfesores from './GestionProfesores';
 // @ts-ignore
 import GestionAlumnos from './GestionAlumnos';
+// @ts-ignore
+import CajaFinanzas from './CajaFinanzas';
 
 /**
  * Mapeo de colores para cintas (Utilizado en las gráficas de Inicio)
@@ -257,9 +259,10 @@ export const EscuelaDashboard: React.FC = () => {
             )}
             {activeTab === 'profesores' && <GestionProfesores />}
             {activeTab === 'alumnos' && <GestionAlumnos />}
+            {activeTab === 'caja' && <CajaFinanzas />}
 
             {/* Módulos en construcción */}
-            {['torneos', 'caja'].includes(activeTab) && (
+            {['torneos'].includes(activeTab) && (
               <div className="py-20 text-center bg-[var(--color-card)]/40 rounded-[2.5rem] border-2 border-dashed border-[var(--color-border)] opacity-30 shadow-inner">
                 <PieIcon size={48} className="mx-auto mb-3 text-[var(--color-text-muted)]" />
                 <p className="text-[10px] font-black uppercase italic tracking-[0.2em] text-[var(--color-text-muted)]">Módulo en sincronización</p>

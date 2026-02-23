@@ -1,57 +1,75 @@
-/**
- * Interfaz para el desglose interno de un pago (Ejem: Parte en efectivo, parte transferencia)
- */
-export interface DesglosePago {
-  monto: number;
-  metodo: string; // 'Efectivo', 'Transferencia', 'Tarjeta'
-}
+// ============================================================
+//  src/types/finanzas.types.ts
+// ============================================================
 
-/**
- * Información del alumno vinculada al pago
- */
-export interface AlumnoResumen {
+export interface AlumnoPago {
   nombres: string;
   apellidopaterno: string;
-  apellidomaterno: string;
+  nombre_completo?: string;
+  id_interno?: number;
 }
 
-/**
- * Interfaz principal de un Registro Financiero (Pago/Cargo)
- */
+export interface DesgloseItem {
+  monto: number;
+  metodo: 'Efectivo' | 'Transferencia' | 'Tarjeta';
+}
+
 export interface Pago {
   idpago: number;
   idalumno: number;
-  idescuela: number;
-  monto: number;
   concepto: string;
-  id_tipo_pago: number; // 1: Mensualidad, 2: Examen, 3: Equipo, etc.
-  id_referencia_evento?: number | null;
-  notas_adicionales?: string;
-  folio_recibo?: string;
-  estatus: number; // 0: Pendiente, 1: Pagado, 2: Cancelado
+  monto: number;
+  estatus: 0 | 1;           // 0: pendiente | 1: pagado
+  id_tipo_pago: number;
   metodo_pago?: string;
-  fecha_pago?: string;
   fecharegistro: string;
   url_comprobante?: string;
-  desglose_interno?: DesglosePago[] | null;
-  alumno?: AlumnoResumen;
+  alumno?: AlumnoPago;
+  desglose?: DesgloseItem[];
 }
 
-/**
- * DTO para registrar un cobro
- */
+// ---- DTOs de request ----
+
 export interface CobroRequestDTO {
-  desglose_pagos: DesglosePago[];
+  desglose_pagos: DesgloseItem[];
   notas: string;
 }
 
-/**
- * DTO para generación masiva de mensualidades
- */
 export interface GenerarMensualidadDTO {
   mes: number;
   anio: number;
   monto_estandar: number;
-  concepto_prefijo: string; // Ejem: "Mensualidad"
+  concepto_prefijo: string;
   dia_corte: number;
+}
+
+// ---- Recibo / Ticket ----
+
+export interface EscuelaTicket {
+  nombre: string;
+  logo_url?: string;
+}
+
+export interface AlumnoTicket {
+  nombre_completo: string;
+  id_interno: number;
+}
+
+export interface PagoTicket {
+  concepto: string;
+  monto: number;
+  desglose?: DesgloseItem[];
+}
+
+export interface MetadataTicket {
+  folio: string;
+  status_texto: 'PENDIENTE' | 'PAGADO';
+  fecha_impresion: string;
+}
+
+export interface ReciboImpresion {
+  escuela: EscuelaTicket;
+  alumno: AlumnoTicket;
+  pago: PagoTicket;
+  metadata: MetadataTicket;
 }

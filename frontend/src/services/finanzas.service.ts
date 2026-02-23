@@ -1,12 +1,16 @@
-import axios from 'axios';
-import { Pago, CobroRequestDTO, GenerarMensualidadDTO } from '../types/finanzas.types';
+// ============================================================
+//  src/service/finanzas.service.ts
+// ============================================================
 
-const api = axios.create({
-  baseURL: 'https://taekwondo-system-api.onrender.com',
-  headers: { 'Content-Type': 'application/json' }
-});
+import api from '../api/axios';
+import {
+  Pago,
+  CobroRequestDTO,
+  GenerarMensualidadDTO,
+  ReciboImpresion,
+} from '../types/finanzas.types';
 
-// Interceptor de seguridad (usando la clave access_token verificada en Storage)
+// Interceptor de seguridad — se aplica una sola vez al cliente axios compartido
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token');
   if (token) {
@@ -17,8 +21,8 @@ api.interceptors.request.use((config) => {
 
 export const finanzasService = {
   /**
-   * Obtiene la lista de pagos filtrada por estatus
-   * @param estatus 0: Pendientes, 1: Pagados
+   * Obtiene la lista de pagos filtrada por estatus.
+   * @param estatus 0 = Pendientes | 1 = Pagados
    */
   listarPagos: async (estatus: number = 0): Promise<Pago[]> => {
     const res = await api.get<Pago[]>(`/finanzas/?estatus=${estatus}`);
@@ -26,7 +30,7 @@ export const finanzasService = {
   },
 
   /**
-   * Obtiene el detalle de un pago específico
+   * Obtiene el detalle completo de un pago.
    */
   obtenerDetalle: async (idpago: number): Promise<Pago> => {
     const res = await api.get<Pago>(`/finanzas/${idpago}`);
@@ -34,7 +38,7 @@ export const finanzasService = {
   },
 
   /**
-   * Registra el cobro completo de un cargo pendiente
+   * Registra el cobro de un cargo pendiente con desglose de métodos de pago.
    */
   registrarCobro: async (idpago: number, data: CobroRequestDTO): Promise<Pago> => {
     const res = await api.post<Pago>(`/finanzas/cobrar/${idpago}`, data);
@@ -42,22 +46,29 @@ export const finanzasService = {
   },
 
   /**
-   * Sube un comprobante de pago (Imagen/PDF)
+   * Obtiene los datos necesarios para imprimir el recibo/ticket de un pago.
+   */
+  obtenerReciboImpresion: async (idpago: number): Promise<ReciboImpresion> => {
+    const res = await api.get<ReciboImpresion>(`/finanzas/${idpago}/recibo-impresion`);
+    return res.data;
+  },
+
+  /**
+   * Sube un comprobante de pago (imagen o PDF).
    */
   subirComprobante: async (idpago: number, file: File): Promise<Pago> => {
     const formData = new FormData();
     formData.append('file', file);
     const res = await api.post<Pago>(`/finanzas/comprobante/${idpago}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     return res.data;
   },
 
   /**
-   * Generación masiva de mensualidades para toda la escuela
+   * Genera cargos de mensualidad de forma masiva para todos los alumnos activos.
    */
-  generarMensualidadesMes: async (data: GenerarMensualidadDTO): Promise<any> => {
-    const res = await api.post('/mensualidades/mensualidades/generar-mes', data);
-    return res.data;
-  }
+  generarMensualidadesMes: async (data: GenerarMensualidadDTO): Promise<void> => {
+    await api.post('/mensualidades/mensualidades/generar-mes', data);
+  },
 };
