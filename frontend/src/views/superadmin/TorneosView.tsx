@@ -1,25 +1,23 @@
 // ============================================================
 //  src/views/superadmin/TorneosView.tsx
-//  Módulo completo de torneos para SuperAdmin
+//  Lista, creación y detalle de torneos — SIN brackets
+//  (los brackets están en CombatesView)
 // ============================================================
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Trophy, Plus, ChevronRight, Calendar, MapPin, Users,
-  Swords, CheckCircle, Clock, AlertCircle, RotateCcw,
-  Shield, X, Eye, Play, Award, Target, Zap, Crown,
-  ChevronLeft, Search,
+  CheckCircle, AlertCircle, RotateCcw, X, Play,
+  ChevronLeft, Search, Target, DollarSign, Clock,
+  FileText, Zap,
 } from 'lucide-react';
 
 import { torneoService } from '../../services/torneo.service';
-import type {
-  Torneo, TorneoCategoria, BracketCategoria,
-  BracketLive, CerrarCheckinResponse, CrearTorneoDTO,
-} from '../../types/torneo.types';
+import type { Torneo, CrearTorneoDTO, InscripcionTorneo } from '../../types/torneo.types';
 
 // ─────────────────────────────────────────────────────────────
-//  TEMA — recibe T del padre (SuperAdminDashboard)
+//  TEMA
 // ─────────────────────────────────────────────────────────────
 type Tema = {
   bg: string; surface: string; card: string; cardHover: string;
@@ -48,7 +46,24 @@ function fmtFecha(iso: string) {
 }
 
 // ─────────────────────────────────────────────────────────────
-//  MODAL — Crear Torneo
+//  BADGE ESTATUS
+// ─────────────────────────────────────────────────────────────
+const EstatusBadge: React.FC<{ estatus: number; T: Tema }> = ({ estatus, T }) => {
+  const info = ESTATUS_LABEL[estatus] ?? { label: 'Desconocido', color: T.textDim, icon: AlertCircle };
+  const Icon = info.icon;
+  return (
+    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl"
+      style={{ background: `${info.color}18`, border: `1px solid ${info.color}30` }}>
+      <Icon size={9} style={{ color: info.color }} />
+      <span className="text-[8px] font-black uppercase tracking-widest" style={{ color: info.color }}>
+        {info.label}
+      </span>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────
+//  MODAL CREAR TORNEO
 // ─────────────────────────────────────────────────────────────
 const ModalCrearTorneo: React.FC<{
   T: Tema;
@@ -84,40 +99,27 @@ const ModalCrearTorneo: React.FC<{
   };
 
   const inputStyle: React.CSSProperties = {
-    background: T.surface,
-    border: `1px solid ${T.border}`,
-    borderRadius: 14,
-    padding: '10px 14px',
-    color: T.text,
-    fontSize: 12,
-    width: '100%',
-    outline: 'none',
+    background: T.surface, border: `1px solid ${T.border}`,
+    borderRadius: 14, padding: '10px 14px',
+    color: T.text, fontSize: 12, width: '100%', outline: 'none',
   };
-
   const labelStyle: React.CSSProperties = {
-    color: T.textDim,
-    fontSize: 9,
-    fontWeight: 900,
-    textTransform: 'uppercase',
-    letterSpacing: '0.2em',
-    marginBottom: 4,
-    display: 'block',
+    color: T.textDim, fontSize: 9, fontWeight: 900,
+    textTransform: 'uppercase', letterSpacing: '0.2em',
+    marginBottom: 4, display: 'block',
   };
 
   return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4"
+    <motion.div className="fixed inset-0 z-50 flex items-center justify-center px-4"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }}
+      onClick={onClose}>
+      <motion.div initial={{ scale: 0.9, y: 30 }} animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 30 }}
         className="w-full max-w-lg rounded-[2rem] p-6 overflow-y-auto max-h-[90vh]"
         style={{ background: T.card, border: `1px solid ${T.border}` }}
-        onClick={e => e.stopPropagation()}
-      >
+        onClick={e => e.stopPropagation()}>
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -143,14 +145,11 @@ const ModalCrearTorneo: React.FC<{
 
         {/* Campos */}
         <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <label style={labelStyle}>Nombre del torneo *</label>
-              <input style={inputStyle} placeholder="Ej: Torneo Regional Guanajuato 2025"
-                value={form.nombre} onChange={e => set('nombre', e.target.value)} />
-            </div>
+          <div>
+            <label style={labelStyle}>Nombre del torneo *</label>
+            <input style={inputStyle} placeholder="Ej: Torneo Regional Guanajuato 2026"
+              value={form.nombre} onChange={e => set('nombre', e.target.value)} />
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label style={labelStyle}>Fecha *</label>
@@ -163,7 +162,6 @@ const ModalCrearTorneo: React.FC<{
                 value={form.hora_inicio} onChange={e => set('hora_inicio', e.target.value)} />
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label style={labelStyle}>Sede *</label>
@@ -176,7 +174,6 @@ const ModalCrearTorneo: React.FC<{
                 value={form.ciudad} onChange={e => set('ciudad', e.target.value)} />
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label style={labelStyle}>Costo inscripción ($)</label>
@@ -191,7 +188,6 @@ const ModalCrearTorneo: React.FC<{
                 onChange={e => set('max_participantes', Number(e.target.value))} />
             </div>
           </div>
-
           <div>
             <label style={labelStyle}>Género</label>
             <select style={{ ...inputStyle, cursor: 'pointer' }}
@@ -201,7 +197,6 @@ const ModalCrearTorneo: React.FC<{
               <option value="F">Femenino</option>
             </select>
           </div>
-
           <div>
             <label style={labelStyle}>Descripción</label>
             <textarea style={{ ...inputStyle, resize: 'none', height: 72 }}
@@ -224,30 +219,13 @@ const ModalCrearTorneo: React.FC<{
           </motion.button>
           <motion.button whileTap={{ scale: 0.95 }} onClick={handleSubmit} disabled={loading}
             className="flex-1 h-11 rounded-2xl text-[10px] font-black uppercase tracking-widest"
-            style={{ background: `linear-gradient(135deg, ${T.violet}, ${T.violetHi})`, color: '#fff',
-              opacity: loading ? 0.7 : 1 }}>
+            style={{ background: `linear-gradient(135deg, ${T.violet}, ${T.violetHi})`,
+              color: '#fff', opacity: loading ? 0.7 : 1 }}>
             {loading ? 'Creando...' : 'Crear Torneo'}
           </motion.button>
         </div>
       </motion.div>
     </motion.div>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────
-//  BADGE DE ESTATUS
-// ─────────────────────────────────────────────────────────────
-const EstatusBadge: React.FC<{ estatus: number; T: Tema }> = ({ estatus, T }) => {
-  const info = ESTATUS_LABEL[estatus] ?? { label: 'Desconocido', color: T.textDim, icon: AlertCircle };
-  const Icon = info.icon;
-  return (
-    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl"
-      style={{ background: `${info.color}18`, border: `1px solid ${info.color}30` }}>
-      <Icon size={9} style={{ color: info.color }} />
-      <span className="text-[8px] font-black uppercase tracking-widest" style={{ color: info.color }}>
-        {info.label}
-      </span>
-    </div>
   );
 };
 
@@ -262,7 +240,7 @@ const TorneoCard: React.FC<{
     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
     transition={{ delay, duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
     whileHover={{ y: -3 }}
-    className="rounded-[2rem] p-5 cursor-pointer group"
+    className="rounded-[2rem] p-5 cursor-pointer"
     style={{
       background: `linear-gradient(135deg, ${T.card}, ${T.surface})`,
       border: `1px solid ${T.border}`,
@@ -270,7 +248,6 @@ const TorneoCard: React.FC<{
     }}
     onClick={() => onVerDetalle(torneo)}
   >
-    {/* Header de la card */}
     <div className="flex items-start justify-between mb-4">
       <div className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
         style={{ background: T.violetLo, border: `1px solid ${T.violet}30` }}>
@@ -279,23 +256,16 @@ const TorneoCard: React.FC<{
       <EstatusBadge estatus={torneo.estatus} T={T} />
     </div>
 
-    {/* Nombre */}
     <p className="text-sm font-black uppercase italic tracking-tighter leading-tight mb-1"
-      style={{ color: T.text }}>
-      {torneo.nombre}
-    </p>
+      style={{ color: T.text }}>{torneo.nombre}</p>
     <p className="text-[8px] font-black uppercase tracking-widest mb-4"
-      style={{ color: T.textDim }}>
-      ID #{torneo.idtorneo}
-    </p>
+      style={{ color: T.textDim }}>ID #{torneo.idtorneo}</p>
 
-    {/* Info */}
     <div className="space-y-2 mb-4">
       <div className="flex items-center gap-2">
         <Calendar size={10} style={{ color: T.cyan }} />
         <span className="text-[10px] font-bold" style={{ color: T.textMid }}>
-          {fmtFecha(torneo.fecha)}
-          {torneo.hora_inicio && ` · ${torneo.hora_inicio}`}
+          {fmtFecha(torneo.fecha)}{torneo.hora_inicio && ` · ${torneo.hora_inicio}`}
         </span>
       </div>
       <div className="flex items-center gap-2">
@@ -304,7 +274,7 @@ const TorneoCard: React.FC<{
           {torneo.sede}{torneo.ciudad ? `, ${torneo.ciudad}` : ''}
         </span>
       </div>
-      {torneo.max_participantes && torneo.max_participantes > 0 && (
+      {(torneo.max_participantes ?? 0) > 0 && (
         <div className="flex items-center gap-2">
           <Users size={10} style={{ color: T.green }} />
           <span className="text-[10px] font-bold" style={{ color: T.textMid }}>
@@ -314,12 +284,11 @@ const TorneoCard: React.FC<{
       )}
     </div>
 
-    {/* Footer */}
     <div className="flex items-center justify-between pt-3"
       style={{ borderTop: `1px solid ${T.border}` }}>
-      {torneo.costo_inscripcion && torneo.costo_inscripcion > 0 ? (
+      {(torneo.monto_inscripcion ?? 0) > 0 ? (
         <span className="text-sm font-black" style={{ color: T.green }}>
-          ${torneo.costo_inscripcion.toLocaleString('es-MX')}
+          ${torneo.monto_inscripcion?.toLocaleString('es-MX')}
         </span>
       ) : (
         <span className="text-[9px] font-black uppercase tracking-wider"
@@ -334,278 +303,121 @@ const TorneoCard: React.FC<{
 );
 
 // ─────────────────────────────────────────────────────────────
-//  BRACKET VISUALIZER — árbol de eliminación
-// ─────────────────────────────────────────────────────────────
-const BracketVisualizer: React.FC<{
-  bracket: BracketCategoria; T: Tema;
-}> = ({ bracket, T }) => {
-  if (!bracket.rondas.length) return (
-    <p className="text-center text-[10px] font-black uppercase tracking-wider py-8"
-      style={{ color: T.textDim }}>Sin combates generados</p>
-  );
-
-  return (
-    <div className="overflow-x-auto pb-4">
-      <div className="flex gap-4 min-w-max">
-        {bracket.rondas.map((ronda) => (
-          <div key={ronda.ronda} className="flex flex-col gap-3" style={{ minWidth: 200 }}>
-            {/* Header ronda */}
-            <div className="text-center">
-              <p className="text-[8px] font-black uppercase tracking-widest"
-                style={{ color: T.violetHi }}>{ronda.nombre_ronda}</p>
-              <p className="text-[7px] font-black uppercase tracking-wider"
-                style={{ color: T.textDim }}>{ronda.combates.length} combate(s)</p>
-            </div>
-
-            {/* Combates de esta ronda */}
-            {ronda.combates.map((combate) => (
-              <div key={combate.idcombate}
-                className="rounded-2xl p-3 space-y-2"
-                style={{
-                  background: T.surface,
-                  border: `1px solid ${combate.estatus === 'finalizado' ? T.green + '40' : T.border}`,
-                }}>
-                {/* Estatus */}
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[7px] font-black uppercase tracking-widest"
-                    style={{ color: combate.estatus === 'finalizado' ? T.green : T.textDim }}>
-                    {combate.es_bye ? 'BYE' : combate.estatus}
-                  </span>
-                  {combate.area_asignada && (
-                    <span className="text-[7px] font-black" style={{ color: T.cyan }}>
-                      {combate.area_asignada}
-                    </span>
-                  )}
-                </div>
-
-                {/* Competidor 1 */}
-                <CompetidorSlot
-                  comp={combate.competidor_1}
-                  puntos={combate.puntos_c1}
-                  esGanador={combate.ganador?.idinscripcion === combate.competidor_1?.idinscripcion}
-                  T={T}
-                />
-
-                {/* VS divider */}
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 h-px" style={{ background: T.border }} />
-                  <span className="text-[7px] font-black uppercase" style={{ color: T.textDim }}>vs</span>
-                  <div className="flex-1 h-px" style={{ background: T.border }} />
-                </div>
-
-                {/* Competidor 2 */}
-                <CompetidorSlot
-                  comp={combate.competidor_2}
-                  puntos={combate.puntos_c2}
-                  esGanador={combate.ganador?.idinscripcion === combate.competidor_2?.idinscripcion}
-                  T={T}
-                />
-              </div>
-            ))}
-          </div>
-        ))}
-
-        {/* Campeón */}
-        {bracket.campeon && (
-          <div className="flex flex-col items-center justify-center" style={{ minWidth: 160 }}>
-            <motion.div
-              animate={{ scale: [1, 1.05, 1], rotate: [0, 2, -2, 0] }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="rounded-[2rem] p-5 text-center"
-              style={{
-                background: `linear-gradient(135deg, ${T.yellow}20, ${T.orange}15)`,
-                border: `1px solid ${T.yellow}40`,
-                boxShadow: `0 0 30px ${T.yellow}20`,
-              }}>
-              <Crown size={28} style={{ color: T.yellow, margin: '0 auto 8px' }} />
-              <p className="text-[7px] font-black uppercase tracking-widest mb-2" style={{ color: T.yellow }}>
-                Campeón
-              </p>
-              <p className="text-xs font-black uppercase italic tracking-tighter" style={{ color: T.text }}>
-                {bracket.campeon.nombre}
-              </p>
-              <p className="text-[8px] font-bold mt-1" style={{ color: T.textMid }}>
-                {bracket.campeon.escuela}
-              </p>
-            </motion.div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const CompetidorSlot: React.FC<{
-  comp: any; puntos: number; esGanador: boolean; T: Tema;
-}> = ({ comp, puntos, esGanador, T }) => (
-  <div className="flex items-center gap-2 p-2 rounded-xl transition-all"
-    style={{
-      background: esGanador ? `${T.green}15` : T.card,
-      border: `1px solid ${esGanador ? T.green + '40' : T.border}`,
-    }}>
-    {/* Avatar inicial */}
-    <div className="w-6 h-6 rounded-lg flex items-center justify-center text-[8px] font-black flex-shrink-0"
-      style={{
-        background: comp ? `${T.violet}25` : T.surface,
-        color: T.violetHi,
-        border: `1px solid ${T.violet}20`,
-      }}>
-      {comp ? comp.nombre[0] : '?'}
-    </div>
-    <div className="flex-1 min-w-0">
-      {comp ? (
-        <>
-          <p className="text-[9px] font-black uppercase italic tracking-tighter truncate" style={{ color: T.text }}>
-            {comp.nombre}
-          </p>
-          <p className="text-[7px] font-bold truncate" style={{ color: T.textDim }}>
-            {comp.escuela}
-          </p>
-        </>
-      ) : (
-        <p className="text-[9px] font-black uppercase tracking-wider" style={{ color: T.textDim }}>
-          Por definir
-        </p>
-      )}
-    </div>
-    {puntos > 0 && (
-      <span className="text-sm font-black flex-shrink-0" style={{ color: esGanador ? T.green : T.textMid }}>
-        {puntos}
-      </span>
-    )}
-    {esGanador && <Award size={10} style={{ color: T.green, flexShrink: 0 }} />}
-  </div>
-);
-
-// ─────────────────────────────────────────────────────────────
-//  VISTA DETALLE TORNEO
+//  DETALLE TORNEO — info + inscritos + cerrar checkin
 // ─────────────────────────────────────────────────────────────
 const DetalleTorneo: React.FC<{
-  torneo: Torneo; T: Tema;
-  onVolver: () => void;
+  torneo: Torneo; T: Tema; onVolver: () => void;
 }> = ({ torneo, T, onVolver }) => {
-  const [categorias, setCategorias]       = useState<TorneoCategoria[]>([]);
-  const [catActiva, setCatActiva]         = useState<number | null>(null);
-  const [bracket, setBracket]             = useState<BracketCategoria | null>(null);
-  const [loadingCats, setLoadingCats]     = useState(true);
-  const [loadingBracket, setLoadingBracket] = useState(false);
+  const [inscritos, setInscritos]         = useState<any[]>([]);
+  const [loadingInsc, setLoadingInsc]     = useState(true);
   const [loadingCheckin, setLoadingCheckin] = useState(false);
-  const [checkinResult, setCheckinResult] = useState<CerrarCheckinResponse | null>(null);
-  const [errorBracket, setErrorBracket]   = useState('');
+  const [checkinResult, setCheckinResult] = useState<any>(null);
+  const [errorCheckin, setErrorCheckin]   = useState('');
 
-  // Cargar bracket live (trae todas las categorías con brackets generados)
   useEffect(() => {
     (async () => {
       try {
-        const live = await torneoService.bracketLive(torneo.idtorneo);
-        const cats = (live.categorias ?? []).map((c: any) => ({
-          idcategoria:      c.idcategoria,
-          idtorneo:         torneo.idtorneo,
-          nombre_categoria: c.nombre,
-          bracket_generado: true,
-          total_inscritos:  (c.finalizados ?? 0) + (c.pendientes ?? 0),
-        }));
-        setCategorias(cats);
-        if (cats.length) {
-          setCatActiva(cats[0].idcategoria);
-          // Construir BracketCategoria desde la primera categoría live
-          const primera = live.categorias[0];
-          setBracket({
-            ok: true,
-            idtorneo: torneo.idtorneo,
-            categoria: { idcategoria: primera.idcategoria, nombre: primera.nombre },
-            resumen: {
-              total_combates: (primera.finalizados ?? 0) + (primera.pendientes ?? 0),
-              finalizados: primera.finalizados ?? 0,
-              pendientes:  primera.pendientes ?? 0,
-              total_rondas: primera.rondas?.length ?? 0,
-            },
-            campeon: primera.campeon ?? null,
-            rondas:  primera.rondas ?? [],
-          });
-        }
+        const data = await torneoService.listarInscritos(torneo.idtorneo);
+        setInscritos(data);
       } catch {
-        // Sin brackets generados aún — estado vacío
+        // silencioso
       } finally {
-        setLoadingCats(false);
+        setLoadingInsc(false);
       }
     })();
   }, [torneo.idtorneo]);
-
-  // Cambiar bracket cuando se selecciona otra categoría
-  useEffect(() => {
-    if (!catActiva) return;
-    (async () => {
-      try {
-        setLoadingBracket(true);
-        setErrorBracket('');
-        const b = await torneoService.verBracket(torneo.idtorneo, catActiva);
-        setBracket(b);
-      } catch {
-        setBracket(null);
-        setErrorBracket('Sin bracket generado para esta categoría.');
-      } finally {
-        setLoadingBracket(false);
-      }
-    })();
-  }, [catActiva, torneo.idtorneo]);
 
   const handleCerrarCheckin = async () => {
     if (!confirm('¿Cerrar check-in y generar brackets? Esta acción no se puede deshacer.')) return;
     try {
       setLoadingCheckin(true);
+      setErrorCheckin('');
       const res = await torneoService.cerrarCheckin(torneo.idtorneo);
       setCheckinResult(res);
-      // Recargar categorías y bracket
-      const cats = await torneoService.listarCategorias(torneo.idtorneo);
-      setCategorias(cats);
-      if (cats.length) setCatActiva(cats[0].idcategoria);
     } catch (e: any) {
-      alert(e?.response?.data?.detail || 'Error al cerrar check-in');
+      setErrorCheckin(e?.response?.data?.detail || 'Error al cerrar check-in');
     } finally {
       setLoadingCheckin(false);
     }
   };
 
+  const pagados   = inscritos.filter(i => i.estatus_pago === 'pagado').length;
+  const checkin   = inscritos.filter(i => i.estatus_checkin).length;
+  const pendientes = inscritos.filter(i => i.estatus_pago !== 'pagado').length;
+
   return (
     <div className="space-y-6">
 
-      {/* Header con volver */}
+      {/* Header */}
       <div className="flex items-center gap-3">
         <motion.button whileTap={{ scale: 0.9 }} onClick={onVolver}
           className="w-10 h-10 flex items-center justify-center rounded-2xl flex-shrink-0"
           style={{ background: T.surface, border: `1px solid ${T.border}` }}>
           <ChevronLeft size={16} style={{ color: T.textDim }} />
         </motion.button>
-        <div>
-          <p className="text-sm font-black uppercase italic tracking-tighter" style={{ color: T.text }}>
-            {torneo.nombre}
-          </p>
-          <p className="text-[8px] font-black uppercase tracking-widest" style={{ color: T.textDim }}>
-            {fmtFecha(torneo.fecha)} · {torneo.sede}
-          </p>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-black uppercase italic tracking-tighter truncate"
+            style={{ color: T.text }}>{torneo.nombre}</p>
+          <p className="text-[8px] font-black uppercase tracking-widest"
+            style={{ color: T.textDim }}>{fmtFecha(torneo.fecha)} · {torneo.sede}</p>
         </div>
-        <div className="ml-auto">
-          <EstatusBadge estatus={torneo.estatus} T={T} />
-        </div>
+        <EstatusBadge estatus={torneo.estatus} T={T} />
       </div>
 
-      {/* KPI cards rápidas */}
+      {/* Info general */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+        className="rounded-[2rem] p-5 space-y-3"
+        style={{ background: `linear-gradient(135deg, ${T.card}, ${T.surface})`, border: `1px solid ${T.border}` }}>
+        <p className="text-[9px] font-black uppercase tracking-widest mb-3" style={{ color: T.textDim }}>
+          Información del evento
+        </p>
+        {[
+          { icon: Calendar,    label: 'Fecha',        value: `${fmtFecha(torneo.fecha)} · ${torneo.hora_inicio ?? '—'}`, color: T.cyan   },
+          { icon: MapPin,      label: 'Sede',         value: `${torneo.sede}${torneo.ciudad ? ', ' + torneo.ciudad : ''}`,  color: T.orange },
+          { icon: Users,       label: 'Participantes',value: `Máx. ${torneo.max_participantes ?? '∞'}`,                    color: T.green  },
+          { icon: DollarSign,  label: 'Inscripción',  value: torneo.monto_inscripcion ? `$${torneo.monto_inscripcion}` : 'Sin costo', color: T.violet },
+          { icon: Target,      label: 'Género',       value: torneo.genero === 'M' ? 'Masculino' : torneo.genero === 'F' ? 'Femenino' : 'Ambos', color: T.yellow },
+        ].map((item, i) => (
+          <div key={i} className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: `${item.color}18`, border: `1px solid ${item.color}25` }}>
+              <item.icon size={12} style={{ color: item.color }} />
+            </div>
+            <div className="flex-1 flex items-center justify-between">
+              <span className="text-[8px] font-black uppercase tracking-wider" style={{ color: T.textDim }}>
+                {item.label}
+              </span>
+              <span className="text-[10px] font-bold" style={{ color: T.text }}>{item.value}</span>
+            </div>
+          </div>
+        ))}
+        {torneo.descripcion && (
+          <div className="pt-3 mt-1" style={{ borderTop: `1px solid ${T.border}` }}>
+            <p className="text-[9px] font-bold leading-relaxed" style={{ color: T.textMid }}>
+              {torneo.descripcion}
+            </p>
+          </div>
+        )}
+      </motion.div>
+
+      {/* KPIs inscritos */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Categorías', value: categorias.length,        icon: Target, accent: T.violet, accentLo: T.violetLo },
-          { label: 'Con Bracket', value: categorias.filter(c => c.bracket_generado).length, icon: Swords, accent: T.cyan, accentLo: T.cyanLo },
-          { label: 'Inscritos',  value: categorias.reduce((a, c) => a + (c.total_inscritos ?? 0), 0), icon: Users, accent: T.green, accentLo: T.greenLo },
+          { label: 'Inscritos',  value: inscritos.length, icon: FileText, accent: T.violet, accentLo: T.violetLo },
+          { label: 'Pagados',    value: pagados,           icon: CheckCircle, accent: T.green,  accentLo: T.greenLo  },
+          { label: 'Check-in',   value: checkin,           icon: Zap,        accent: T.cyan,   accentLo: T.cyanLo   },
         ].map((item, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
+          <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.08 }}
             className="rounded-[1.5rem] p-4"
             style={{ background: `linear-gradient(135deg, ${T.card}, ${T.surface})`, border: `1px solid ${T.border}` }}>
             <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-3"
               style={{ background: item.accentLo, border: `1px solid ${item.accent}30` }}>
               <item.icon size={14} style={{ color: item.accent }} />
             </div>
-            <p className="text-2xl font-black tracking-tighter" style={{ color: T.text }}>{item.value}</p>
+            <p className="text-2xl font-black tracking-tighter" style={{ color: T.text }}>
+              {loadingInsc ? '—' : item.value}
+            </p>
             <p className="text-[8px] font-black uppercase tracking-widest mt-1" style={{ color: T.textDim }}>
               {item.label}
             </p>
@@ -613,7 +425,7 @@ const DetalleTorneo: React.FC<{
         ))}
       </div>
 
-      {/* Botón cerrar check-in */}
+      {/* Botón cerrar check-in — solo si el torneo está Activo */}
       {torneo.estatus === 1 && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
           className="rounded-[2rem] p-5"
@@ -630,20 +442,25 @@ const DetalleTorneo: React.FC<{
                   Cerrar Check-In
                 </p>
                 <p className="text-[8px] font-black uppercase tracking-wider" style={{ color: T.textDim }}>
-                  Genera brackets automáticamente
+                  Genera brackets automáticamente · {checkin} con check-in
                 </p>
               </div>
             </div>
             <motion.button whileTap={{ scale: 0.95 }} onClick={handleCerrarCheckin}
-              disabled={loadingCheckin}
+              disabled={loadingCheckin || checkin < 2}
               className="h-10 px-5 rounded-2xl text-[10px] font-black uppercase tracking-widest"
-              style={{ background: `linear-gradient(135deg, ${T.orange}, ${T.yellow})`,
-                color: '#fff', opacity: loadingCheckin ? 0.7 : 1 }}>
-              {loadingCheckin ? 'Generando...' : '🚀 Generar Brackets'}
+              style={{
+                background: checkin >= 2 ? `linear-gradient(135deg, ${T.orange}, ${T.yellow})` : T.surface,
+                color: checkin >= 2 ? '#fff' : T.textDim,
+                border: checkin < 2 ? `1px solid ${T.border}` : 'none',
+                opacity: loadingCheckin ? 0.7 : 1,
+                cursor: checkin < 2 ? 'not-allowed' : 'pointer',
+              }}>
+              {loadingCheckin ? 'Generando...' : checkin < 2 ? 'Mín. 2 check-in' : '🚀 Generar Brackets'}
             </motion.button>
           </div>
 
-          {/* Resultado checkin */}
+          {/* Resultado */}
           <AnimatePresence>
             {checkinResult && (
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
@@ -651,7 +468,7 @@ const DetalleTorneo: React.FC<{
                 <p className="text-[9px] font-black uppercase tracking-wider" style={{ color: T.green }}>
                   ✅ {checkinResult.mensaje} — {checkinResult.combates_creados} combates creados
                 </p>
-                {checkinResult.categorias.map(cat => (
+                {checkinResult.categorias?.map((cat: any) => (
                   <div key={cat.idcategoria} className="flex items-center justify-between">
                     <span className="text-[9px] font-bold" style={{ color: T.textMid }}>{cat.nombre}</span>
                     <span className="text-[9px] font-black" style={{ color: cat.nota ? T.red : T.green }}>
@@ -659,100 +476,94 @@ const DetalleTorneo: React.FC<{
                     </span>
                   </div>
                 ))}
+                <p className="text-[8px] font-bold mt-2" style={{ color: T.textDim }}>
+                  Ve a la sección <span style={{ color: T.cyan }}>Combates</span> para ver los brackets en vivo.
+                </p>
               </motion.div>
+            )}
+            {errorCheckin && (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                className="mt-3 text-[9px] font-black uppercase tracking-wider"
+                style={{ color: T.red }}>⚠️ {errorCheckin}</motion.p>
             )}
           </AnimatePresence>
         </motion.div>
       )}
 
-      {/* Selector de categorías + bracket */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+      {/* Lista de inscritos */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="rounded-[2rem] p-6"
+        className="rounded-[2rem] p-5"
         style={{ background: `linear-gradient(135deg, ${T.card}, ${T.surface})`, border: `1px solid ${T.border}` }}>
-
-        <div className="flex items-center gap-2 mb-5">
+        <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center"
             style={{ background: T.cyanLo, border: `1px solid ${T.cyan}30` }}>
-            <Swords size={14} style={{ color: T.cyan }} />
+            <Users size={14} style={{ color: T.cyan }} />
           </div>
           <div>
             <p className="text-xs font-black uppercase italic tracking-tighter" style={{ color: T.text }}>
-              Brackets por Categoría
+              Inscritos
             </p>
             <p className="text-[7px] font-black uppercase tracking-widest" style={{ color: T.textDim }}>
-              Árbol de eliminación directa
+              {inscritos.length} registros
             </p>
           </div>
         </div>
 
-        {/* Tabs categorías */}
-        {loadingCats ? (
-          <div className="flex items-center justify-center py-8">
+        {loadingInsc ? (
+          <div className="flex justify-center py-8">
             <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
               className="w-8 h-8 rounded-full"
-              style={{ border: `2px solid ${T.border}`, borderTop: `2px solid ${T.violet}` }} />
+              style={{ border: `2px solid ${T.border}`, borderTop: `2px solid ${T.cyan}` }} />
           </div>
-        ) : categorias.length === 0 ? (
-          <p className="text-center text-[10px] font-black uppercase tracking-wider py-8"
-            style={{ color: T.textDim }}>Sin categorías registradas</p>
+        ) : inscritos.length === 0 ? (
+          <p className="text-center text-[10px] font-black uppercase tracking-wider py-6"
+            style={{ color: T.textDim }}>Sin inscritos aún</p>
         ) : (
-          <>
-            <div className="flex flex-wrap gap-2 mb-5">
-              {categorias.map(cat => (
-                <motion.button key={cat.idcategoria} whileTap={{ scale: 0.93 }}
-                  onClick={() => setCatActiva(cat.idcategoria)}
-                  className="px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider"
-                  style={{
-                    background: catActiva === cat.idcategoria ? T.violetLo : T.surface,
-                    border: `1px solid ${catActiva === cat.idcategoria ? T.violet + '60' : T.border}`,
-                    color: catActiva === cat.idcategoria ? T.violetHi : T.textMid,
-                  }}>
-                  {cat.nombre_categoria}
-                  {cat.bracket_generado && (
-                    <span className="ml-1.5 inline-block w-1.5 h-1.5 rounded-full align-middle"
-                      style={{ background: T.green }} />
-                  )}
-                </motion.button>
-              ))}
-            </div>
-
-            {/* Bracket */}
-            {loadingBracket ? (
-              <div className="flex items-center justify-center py-10">
-                <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
-                  className="w-8 h-8 rounded-full"
-                  style={{ border: `2px solid ${T.border}`, borderTop: `2px solid ${T.cyan}` }} />
-              </div>
-            ) : bracket ? (
-              <>
-                {/* Resumen */}
-                <div className="flex items-center gap-4 mb-5 flex-wrap">
-                  {[
-                    { label: 'Combates', value: bracket.resumen.total_combates, color: T.violet },
-                    { label: 'Finalizados', value: bracket.resumen.finalizados, color: T.green },
-                    { label: 'Pendientes', value: bracket.resumen.pendientes, color: T.orange },
-                    { label: 'Rondas', value: bracket.resumen.total_rondas, color: T.cyan },
-                  ].map(item => (
-                    <div key={item.label} className="text-center">
-                      <p className="text-xl font-black" style={{ color: item.color }}>{item.value}</p>
-                      <p className="text-[7px] font-black uppercase tracking-widest" style={{ color: T.textDim }}>
-                        {item.label}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-                <BracketVisualizer bracket={bracket} T={T} />
-              </>
-            ) : (
-              <div className="text-center py-8">
-                <Swords size={32} style={{ color: T.textDim, margin: '0 auto 12px' }} />
-                <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: T.textDim }}>
-                  {errorBracket || 'Selecciona una categoría'}
-                </p>
-              </div>
-            )}
-          </>
+          <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+            {inscritos.map((insc: any, i: number) => {
+              const al = insc.alumnos ?? insc;
+              const nombre = al.nombres
+                ? `${al.nombres} ${al.apellidopaterno}`
+                : insc.nombre_completo ?? `Inscripción #${insc.idinscripcion}`;
+              const pagado = insc.estatus_pago === 'pagado';
+              const chk    = insc.estatus_checkin;
+              return (
+                <motion.div key={insc.idinscripcion ?? i}
+                  initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="flex items-center gap-3 p-3 rounded-2xl"
+                  style={{ background: T.surface, border: `1px solid ${T.border}` }}>
+                  {/* Avatar */}
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center font-black text-[10px] flex-shrink-0"
+                    style={{ background: `${T.violet}20`, color: T.violetHi, border: `1px solid ${T.violet}20` }}>
+                    {nombre[0]?.toUpperCase() ?? '?'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-black uppercase italic tracking-tighter truncate"
+                      style={{ color: T.text }}>{nombre}</p>
+                    <p className="text-[7px] font-bold" style={{ color: T.textDim }}>
+                      {insc.peso_declarado ? `${insc.peso_declarado} kg` : '—'}
+                      {insc.edad_al_momento ? ` · ${insc.edad_al_momento} años` : ''}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <span className="px-1.5 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-wider"
+                      style={{ background: pagado ? `${T.green}20` : `${T.red}20`,
+                        color: pagado ? T.green : T.red }}>
+                      {pagado ? 'Pagado' : 'Pendiente'}
+                    </span>
+                    {chk && (
+                      <span className="px-1.5 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-wider"
+                        style={{ background: `${T.cyan}20`, color: T.cyan }}>
+                        ✓ Check
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
         )}
       </motion.div>
     </div>
@@ -760,7 +571,7 @@ const DetalleTorneo: React.FC<{
 };
 
 // ─────────────────────────────────────────────────────────────
-//  VISTA PRINCIPAL TORNEOS
+//  VISTA PRINCIPAL
 // ─────────────────────────────────────────────────────────────
 const TorneosView: React.FC<{ T: Tema }> = ({ T }) => {
   const [torneos, setTorneos]             = useState<Torneo[]>([]);
@@ -796,7 +607,6 @@ const TorneosView: React.FC<{ T: Tema }> = ({ T }) => {
     return matchFiltro && matchBusqueda;
   });
 
-  // Vista detalle
   if (torneoDetalle) {
     return (
       <DetalleTorneo
@@ -827,8 +637,7 @@ const TorneosView: React.FC<{ T: Tema }> = ({ T }) => {
           <motion.button whileTap={{ scale: 0.95 }} onClick={() => setShowModal(true)}
             className="flex items-center gap-2 h-10 px-4 rounded-2xl text-[10px] font-black uppercase tracking-widest"
             style={{ background: `linear-gradient(135deg, ${T.violet}, ${T.violetHi})`, color: '#fff' }}>
-            <Plus size={14} />
-            Nuevo
+            <Plus size={14} /> Nuevo
           </motion.button>
         </div>
       </div>
@@ -837,13 +646,10 @@ const TorneosView: React.FC<{ T: Tema }> = ({ T }) => {
       <div className="relative">
         <Search size={12} className="absolute left-4 top-1/2 -translate-y-1/2"
           style={{ color: T.textDim }} />
-        <input
-          placeholder="Buscar torneo..."
-          value={busqueda}
+        <input placeholder="Buscar torneo..." value={busqueda}
           onChange={e => setBusqueda(e.target.value)}
           className="w-full h-11 pl-9 pr-4 rounded-2xl text-xs font-bold outline-none"
-          style={{ background: T.surface, border: `1px solid ${T.border}`, color: T.text }}
-        />
+          style={{ background: T.surface, border: `1px solid ${T.border}`, color: T.text }} />
       </div>
 
       {/* Filtros */}
@@ -856,8 +662,7 @@ const TorneosView: React.FC<{ T: Tema }> = ({ T }) => {
               border: `1px solid ${filtro === f ? T.violet + '60' : T.border}`,
               color: filtro === f ? T.violetHi : T.textMid,
             }}>
-            {f === 'todos' ? 'Todos' : f === 'en_curso' ? 'En Curso' :
-              f.charAt(0).toUpperCase() + f.slice(1)}
+            {f === 'todos' ? 'Todos' : f === 'en_curso' ? 'En Curso' : f.charAt(0).toUpperCase() + f.slice(1)}
           </motion.button>
         ))}
       </div>
@@ -865,8 +670,7 @@ const TorneosView: React.FC<{ T: Tema }> = ({ T }) => {
       {/* Contenido */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-32 gap-4">
-          <motion.div animate={{ rotate: 360 }}
-            transition={{ duration: 1.4, repeat: Infinity, ease: 'linear' }}
+          <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.4, repeat: Infinity, ease: 'linear' }}
             className="w-12 h-12 rounded-full"
             style={{ border: `3px solid ${T.border}`, borderTop: `3px solid ${T.violet}`,
               boxShadow: `0 0 20px ${T.violet}40` }} />
@@ -914,7 +718,6 @@ const TorneosView: React.FC<{ T: Tema }> = ({ T }) => {
         </div>
       )}
 
-      {/* Modal crear */}
       <AnimatePresence>
         {showModal && (
           <ModalCrearTorneo

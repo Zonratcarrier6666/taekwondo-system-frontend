@@ -16,6 +16,8 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { dashboardService } from '../../services/dashboard.service';
 import TorneosView from './TorneosView';
+import CombatesView from './CombatesView';
+import UsuariosView from './UsuariosView';
 // ─────────────────────────────────────────────────────────────
 //  TIPOS basados en la respuesta real de la API
 // ─────────────────────────────────────────────────────────────
@@ -861,9 +863,9 @@ export const SuperAdminDashboard: React.FC = () => {
             transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}>
             {activeTab === 'dashboard' && <DashboardHome T={T} />}
             {activeTab === 'torneos'   && <TorneosView T={T}  />}
-            {activeTab === 'usuarios'  && <ComingSoon label="Gestión Usuarios"  icon={UserPlus}   T={T} />}
+            {activeTab === 'usuarios'  && <UsuariosView T={T} />}
             {activeTab === 'finanzas'  && <ComingSoon label="Finanzas"          icon={DollarSign} T={T} />}
-            {activeTab === 'combates'  && <ComingSoon label="Combates"          icon={Swords}     T={T} />}
+            {activeTab === 'combates'  && <CombatesView T={T} />}
             {activeTab === 'config'    && <ComingSoon label="Configuración"     icon={Settings}   T={T} />}
           </motion.div>
         </AnimatePresence>
