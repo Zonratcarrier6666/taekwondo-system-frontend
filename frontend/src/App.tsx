@@ -9,6 +9,7 @@ import { LoginView } from './views/auth/LoginView';
 import { EscuelaDashboard } from './views/escuela/EscuelaDashboard';
 // @ts-ignore
 import { SuperAdminDashboard } from './views/superadmin/SuperAdminDashboard';
+import {ProfesorDashboard} from "./views/profesor/ProfesorDashboard";
 
 // ─────────────────────────────────────────────────────────────
 //  HELPERS
@@ -103,6 +104,14 @@ const AppContent = () => {
         element={
           <PrivateRoute role="Superadmin">
             <SuperAdminDashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/profesor/*"
+        element={
+          <PrivateRoute role="Profesor">
+            <ProfesorDashboard />
           </PrivateRoute>
         }
       />

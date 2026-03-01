@@ -12,13 +12,15 @@ import {
   PhoneCall,
   Globe,
   Sparkles,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 // Servicios y Tipos
 import { escuelaService } from '../../services/escuela.service';
 import { useAuth } from '../../context/AuthContext';
 import type { Escuela, ThemeName } from '../../types/escuela.types';
-import { LISTA_TEMAS } from '../../constants/themes';
+import { LISTA_TEMAS, TEMAS_CLAROS, TEMAS_OSCUROS } from '../../constants/themes';
 
 interface Props {
   initialEscuela?: Escuela;
@@ -61,9 +63,108 @@ const ThemeBackground = ({ theme }: { theme: string }) => {
   );
 };
 
+// ─────────────────────────────────────────
+//  SUBCOMPONENTE: Tarjeta de tema individual
+// ─────────────────────────────────────────
+const ThemeCard = ({
+  tema,
+  selected,
+  onClick,
+}: {
+  tema: typeof LISTA_TEMAS[0];
+  selected: boolean;
+  onClick: () => void;
+}) => (
+  <motion.button
+    type="button"
+    onClick={onClick}
+    whileTap={{ scale: 0.92 }}
+    className={`relative flex flex-col items-center justify-center gap-1.5 p-2 rounded-2xl border-2 transition-all ${
+      selected
+        ? 'border-[var(--color-text)] shadow-lg ring-4 ring-[var(--color-primary)]/20 scale-105'
+        : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'
+    }`}
+    style={{ backgroundColor: `${tema.color}22` }}
+  >
+    {/* Círculo de color */}
+    <div
+      className="w-8 h-8 rounded-xl flex items-center justify-center shadow-md relative overflow-hidden"
+      style={{ backgroundColor: tema.color }}
+    >
+      <AnimatePresence>
+        {selected && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            className="absolute inset-0 flex items-center justify-center bg-black/20"
+          >
+            <Check size={14} className="text-white" strokeWidth={3.5} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {!selected && (
+        <span style={{ fontSize: 13, lineHeight: 1 }}>{tema.icon}</span>
+      )}
+    </div>
+
+    {/* Label */}
+    <span
+      className={`text-[7px] font-black uppercase tracking-wide leading-none text-center truncate w-full ${
+        selected ? 'text-[var(--color-text)]' : 'text-[var(--color-text-muted)]'
+      }`}
+    >
+      {tema.label}
+    </span>
+  </motion.button>
+);
+
+// ─────────────────────────────────────────
+//  SUBCOMPONENTE: Grupo de temas con título
+// ─────────────────────────────────────────
+const ThemeGroup = ({
+  title,
+  icon: Icon,
+  temas,
+  selectedId,
+  onSelect,
+}: {
+  title: string;
+  icon: React.ElementType;
+  temas: typeof LISTA_TEMAS;
+  selectedId: string;
+  onSelect: (id: string) => void;
+}) => (
+  <div className="space-y-3">
+    <div className="flex items-center gap-2">
+      <Icon size={12} className="text-[var(--color-primary)]" />
+      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-[var(--color-text-muted)] opacity-60">
+        {title}
+      </span>
+      <div className="flex-1 h-px bg-[var(--color-border)]/30" />
+      <span className="text-[7px] font-black text-[var(--color-text-muted)] opacity-40">
+        {temas.length}
+      </span>
+    </div>
+    <div className="grid grid-cols-5 sm:grid-cols-7 gap-2">
+      {temas.map(t => (
+        <ThemeCard
+          key={t.id}
+          tema={t}
+          selected={selectedId === t.id}
+          onClick={() => onSelect(t.id)}
+        />
+      ))}
+    </div>
+  </div>
+);
+
+// ─────────────────────────────────────────
+//  COMPONENTE PRINCIPAL
+// ─────────────────────────────────────────
 export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
   const { setTheme } = useAuth();
-  
+
   const [formData, setFormData] = useState<Partial<Escuela>>(initialEscuela || {
     nombreescuela: '',
     lema: '',
@@ -75,6 +176,7 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
 
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [fadingOut, setFadingOut] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,14 +184,24 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleThemeSelect = (id: string) => {
+    setFormData(p => ({ ...p, color_paleta: id }));
+    setTheme(id as ThemeName);
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
       await escuelaService.updatePerfil(formData);
       setTheme(formData.color_paleta as ThemeName);
+
+      // Fade out suave → reload sin que se note el corte
+      setFadingOut(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 600);
     } catch (err) {
       console.error("Error al guardar perfil:", err);
-    } finally {
       setSaving(false);
     }
   };
@@ -108,14 +220,20 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
     }
   };
 
+  const temaActivo = LISTA_TEMAS.find(t => t.id === formData.color_paleta);
+
   return (
-    <div className="space-y-8 pb-44">
+    <motion.div
+      className="space-y-8 pb-44"
+      animate={{ opacity: fadingOut ? 0 : 1, scale: fadingOut ? 0.98 : 1 }}
+      transition={{ duration: 0.5, ease: 'easeInOut' }}
+    >
       <ThemeBackground theme={formData.color_paleta || 'blue-ocean'} />
 
       {/* SECCIÓN: CABECERA */}
       <div className="flex flex-col items-center">
         <div className="relative group">
-          <motion.div 
+          <motion.div
             whileTap={{ scale: 0.95 }}
             className="w-32 h-32 rounded-[2.5rem] bg-[var(--color-card)] shadow-2xl border-4 border-[var(--color-background)] overflow-hidden flex items-center justify-center transition-all"
           >
@@ -174,26 +292,23 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
           </div>
         </div>
 
-        {/* BLOQUE: LOCALIZACIÓN (Lista Vertical) */}
+        {/* BLOQUE: LOCALIZACIÓN */}
         <div className="bg-[var(--color-card)]/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-[var(--color-border)] shadow-xl">
           <div className="flex items-center gap-2 mb-5 pb-2 border-b border-[var(--color-border)]/30">
             <Globe size={16} className="text-[var(--color-primary)]" />
             <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Localización y Contacto</span>
           </div>
           <div className="space-y-4">
-            {/* Teléfono */}
             <div className="relative">
               <PhoneCall className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" size={16} />
               <input
                 name="telefono_oficina"
                 value={formData.telefono_oficina || ''}
-                onChange={e => setFormData(p => ({ ...p, telefono_oficina: e.target.value.replace(/\D/g, '').slice(0,10) }))}
+                onChange={e => setFormData(p => ({ ...p, telefono_oficina: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
                 placeholder="Teléfono (10 dígitos)"
                 className="w-full h-12 pl-11 pr-4 rounded-2xl bg-[var(--color-background)]/50 border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] transition-all"
               />
             </div>
-            
-            {/* Dirección */}
             <div className="relative">
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" size={18} />
               <input
@@ -204,8 +319,6 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
                 className="w-full h-12 pl-12 pr-5 rounded-2xl bg-[var(--color-background)]/50 border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-xs text-[var(--color-text)] transition-all"
               />
             </div>
-
-            {/* Correo */}
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" size={16} />
               <input
@@ -219,38 +332,56 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
           </div>
         </div>
 
-        {/* BLOQUE: AMBIENTE VISUAL */}
+        {/* BLOQUE: AMBIENTE VISUAL — Selector mejorado */}
         <div className="bg-[var(--color-card)]/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-[var(--color-border)] shadow-xl">
-          <div className="flex items-center gap-2 mb-5">
-            <Palette size={16} className="text-[var(--color-primary)]" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Ambiente Visual</span>
-          </div>
-          <div className="grid grid-cols-5 sm:grid-cols-7 gap-3 h-44 overflow-y-auto pr-2 custom-scrollbar">
-            {LISTA_TEMAS.map(t => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => {
-                  setFormData(p => ({ ...p, color_paleta: t.id }));
-                  setTheme(t.id as ThemeName);
-                }}
-                className={`aspect-square rounded-xl border-2 transition-all flex items-center justify-center relative ${
-                  formData.color_paleta === t.id
-                    ? 'border-[var(--color-text)] scale-110 shadow-lg ring-4 ring-[var(--color-primary)]/10'
-                    : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'
-                }`}
-                style={{ backgroundColor: t.color }}
+          {/* Header con tema activo */}
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2">
+              <Palette size={16} className="text-[var(--color-primary)]" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">
+                Ambiente Visual
+              </span>
+            </div>
+            {/* Badge del tema seleccionado */}
+            {temaActivo && (
+              <motion.div
+                key={temaActivo.id}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--color-border)]"
+                style={{ backgroundColor: `${temaActivo.color}22` }}
               >
-                {/* ICONO CHECK PERFECTAMENTE CENTRADO */}
-                {formData.color_paleta === t.id && (
-                  <Check size={20} className="text-white drop-shadow-md" strokeWidth={4} />
-                )}
-              </button>
-            ))}
+                <span style={{ fontSize: 12 }}>{temaActivo.icon}</span>
+                <span
+                  className="text-[8px] font-black uppercase tracking-wider"
+                  style={{ color: temaActivo.color }}
+                >
+                  {temaActivo.label}
+                </span>
+              </motion.div>
+            )}
+          </div>
+
+          {/* Scroll con dos secciones */}
+          <div className="space-y-5 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
+            <ThemeGroup
+              title="Temas Claros"
+              icon={Sun}
+              temas={TEMAS_CLAROS}
+              selectedId={formData.color_paleta || 'blue-ocean'}
+              onSelect={handleThemeSelect}
+            />
+            <ThemeGroup
+              title="Temas Oscuros"
+              icon={Moon}
+              temas={TEMAS_OSCUROS}
+              selectedId={formData.color_paleta || 'blue-ocean'}
+              onSelect={handleThemeSelect}
+            />
           </div>
         </div>
 
-        {/* ACCIÓN PRINCIPAL: Integrada al flujo (no fija) */}
+        {/* ACCIÓN PRINCIPAL */}
         <div className="pt-4">
           <motion.button
             whileTap={{ scale: 0.95 }}
@@ -272,7 +403,7 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
           </motion.button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

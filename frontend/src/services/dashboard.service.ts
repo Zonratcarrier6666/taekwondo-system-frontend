@@ -1,28 +1,31 @@
 import api from '../api/axios';
+import type {
+  DashboardEscuela,
+  DashboardSuperAdmin,
+  DashboardProfesor,
+} from '../types/dashboard.types';
 
+/**
+ * Servicio de Dashboard optimizado para usar la instancia global de Axios.
+ * Se mantienen las rutas indicadas por el backend (incluyendo prefijos si son necesarios).
+ */
 export const dashboardService = {
-  /**
-   * Obtiene estadísticas para el rol Escuela
-   */
-  getEscuelaStats: async () => {
-    const response = await api.get('/dashboard/dashboard/escuela');
+  /** Dashboard para rol Escuela */
+  getEscuelaStats: async (): Promise<DashboardEscuela> => {
+    const response = await api.get<DashboardEscuela>('/dashboard/dashboard/escuela');
     return response.data;
   },
 
-  /**
-   * Estadísticas globales para el rol Superadmin
-   * @param idEscuela  ID opcional para filtrar por escuela específica
-   */
-  getSuperAdminStats: async (idEscuela?: string) => {
-    const url = idEscuela
-      ? `/dashboard/dashboard/superadmin?idescuela=${idEscuela}`
-      : '/dashboard/dashboard/superadmin';
-    const response = await api.get(url);
+  /** Dashboard para rol SuperAdmin — opcionalmente filtrado por escuela */
+  getSuperAdminStats: async (idescuela?: number): Promise<DashboardSuperAdmin> => {
+    const qs = idescuela ? `?idescuela=${idescuela}` : '';
+    const response = await api.get<DashboardSuperAdmin>(`/dashboard/dashboard/superadmin${qs}`);
     return response.data;
   },
 
-  getProfesorStats: async () => {
-    const response = await api.get('/dashboard/profesor');
+  /** Dashboard para rol Profesor */
+  getProfesorStats: async (): Promise<DashboardProfesor> => {
+    const response = await api.get<DashboardProfesor>('/dashboard/dashboard/profesor');
     return response.data;
-  }
+  },
 };
