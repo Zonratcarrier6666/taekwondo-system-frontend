@@ -16,8 +16,8 @@ export interface Torneo {
   descripcion?: string;
   hora_inicio?: string;
   estatus: number;               // 1=activo, 2=en_curso, 3=finalizado
-  costo_inscripcion?: number;
-  monto_inscripcion?: number;
+  costo_inscripcion?: number;   // campo interno del form
+  monto_inscripcion?: number;   // campo que espera el backend
   max_participantes?: number;
   genero?: string;               // 'M' | 'F' | 'A'
   cinta_minima?: number;
@@ -31,24 +31,43 @@ export interface Torneo {
   creado_por?: number;
 }
 
-export interface CrearTorneoDTO {
-  nombre: string;
-  fecha: string;
-  sede: string;
-  ciudad?: string;
-  descripcion?: string;
-  hora_inicio?: string;
-  costo_inscripcion?: number;
-  monto_inscripcion?: number;
-  max_participantes?: number;
-  genero?: string;
-  cinta_minima?: number;
-  cinta_maxima?: number;
-  edad_minima?: number;
-  edad_maxima?: number;
-  peso_minimo?: number;
-  peso_maximo?: number;
+// ─── NUEVO: tipo para cada categoría ──────────────────────────
+export interface CategoriaInput {
+  nombre_categoria: string;
+  edad_min?:        number | null;
+  edad_max?:        number | null;
+  peso_min?:        number | null;
+  peso_max?:        number | null;
+  genero?:          'M' | 'F' | 'A';
+  grados_permitidos?: number[] | null;
+  orden_ejecucion?: number;
 }
+
+// ─── MODIFICADO: CrearTorneoDTO — agrega los campos nuevos ────
+//  Busca tu interfaz CrearTorneoDTO y agrégale estos campos:
+export interface CrearTorneoDTO {
+  nombre:             string;
+  fecha:              string;
+  hora_inicio?:       string;
+  sede:               string;
+  ciudad?:            string;
+  descripcion?:       string;
+  tipo_torneo?:       'competencia' | 'local';  // ← NUEVO (si no lo tenías)
+  monto_inscripcion?: number;
+  costo_inscripcion?: number;
+  cinta_minima?:      number | null;
+  cinta_maxima?:      number | null;
+  edad_minima?:       number | null;
+  edad_maxima?:       number | null;
+  peso_minimo?:       number | null;
+  peso_maximo?:       number | null;
+  genero?:            string;
+  max_participantes?: number | null;
+  num_areas?:         number;                   // ← NUEVO
+  max_combates_por_competidor?: number;         // ← NUEVO
+  categorias?:        CategoriaInput[];         // ← NUEVO ⭐
+}
+
 
 // ─────────────────────────────────────────────────────────────
 //  CATEGORÍAS

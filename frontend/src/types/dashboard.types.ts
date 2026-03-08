@@ -10,6 +10,7 @@
 export interface BeltStat {
   idgrado?: number;
   color: string;
+  color_stripe?: string | null;  // franja secundaria (cintas con dos colores)
   nivelkupdan?: string;
   count: number;
 }

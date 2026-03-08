@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Search, Plus, UserPlus, X, Loader2, Smartphone, 
   ShieldCheck, User as UserIcon, Calendar, Phone, Activity, 
   Briefcase, CameraIcon, Eye, Save, Info, HeartPulse, 
   Hash, AlertTriangle, Edit3, DollarSign, ImagePlus, CheckCircle2,
-  GraduationCap, RotateCcw, MapPin, Heart, BookOpen, ShieldAlert, Mail, tempFile, UserCircle, CalendarDays,PhoneForwarded
+  GraduationCap, RotateCcw, MapPin, Heart, BookOpen, ShieldAlert, Mail, tempFile, UserCircle, CalendarDays, PhoneForwarded,
+  Link2, Copy, CheckCheck, QrCode, ExternalLink, UserPlus as UserPlusIcon
 } from 'lucide-react';
 
 /**
@@ -15,6 +17,7 @@ import {
  * simplemente DESCOMENTA las importaciones reales de abajo y elimina los mocks.
  */
 
+import api from '../../api/axios';
 import { alumnoService } from '../../services/alumno.service';
 import { profesorService } from '../../services/profesor.service';
 import { cintasService } from '../../services/cintas.service';
@@ -23,15 +26,43 @@ import { cintasService } from '../../services/cintas.service';
  * MAPA TÉCNICO DE COLORES DE CINTAS
  */
 const BELT_COLORS: Record<string, string> = {
-  "Blanca": "#ffffff", 
-  "Amarilla": "#ffe135", 
-  "Naranja": "#ff8c00",
-  "Verde": "#00a86b", 
-  "Azul": "#0047ab", 
-  "Roja": "#d2122e",
-  "Marrón": "#5c4033", 
-  "Negra": "#0a0a0a"
+  "Blanca": "#f8f8f8", "Crema": "#fffde7", "Marfil": "#fffff0",
+  "Amarilla": "#facc15", "Dorada": "#d97706", "Naranja": "#f97316",
+  "Verde": "#16a34a", "Verde Claro": "#4ade80", "Verde Oscuro": "#14532d",
+  "Celeste": "#38bdf8", "Azul": "#2563eb", "Azul Marino": "#1e40af", "Cian": "#06b6d4",
+  "Coral": "#ff6b6b", "Roja": "#dc2626", "Guinda": "#881337", "Granate": "#991b1b",
+  "Lila": "#c084fc", "Morada": "#7c3aed", "Purpura": "#9333ea",
+  "Rosa": "#ec4899", "Fucsia": "#db2777",
+  "Cafe Claro": "#a16207", "Cafe": "#7c2d12", "Vino": "#7f1d1d",
+  "Gris": "#6b7280", "Plateada": "#d1d5db", "Negra": "#111111",
+  // aliases
+  "Marrón": "#7c2d12", "Café": "#7c2d12", "Negro": "#111111",
 };
+
+// Helper para obtener hex de cualquier nombre de color (case-insensitive)
+function getBeltHex(colorName: string): string {
+  if (!colorName) return "#f8f8f8";
+  const direct = BELT_COLORS[colorName];
+  if (direct) return direct;
+  // case-insensitive fallback
+  const key = Object.keys(BELT_COLORS).find(k => k.toLowerCase() === colorName.toLowerCase());
+  return key ? BELT_COLORS[key] : "#888888";
+}
+// Mini visual de cinta para tarjetas de alumno
+function MiniCintaBelt({ colorName, stripeName }: { colorName: string; stripeName?: string | null }) {
+  const bg = getBeltHex(colorName);
+  const stripeBg = stripeName ? getBeltHex(stripeName) : null;
+  return (
+    <div className="relative w-10 h-3 rounded-sm overflow-hidden border border-white/10 shadow-inner shrink-0"
+         style={{ background: bg }}>
+      {stripeBg && (
+        <div className="absolute right-1 top-0 bottom-0 w-[20%]" style={{ background: stripeBg }} />
+      )}
+    </div>
+  );
+}
+
+
 /**
  * COMPONENTE HELPER: InputField
  * Definido fuera del componente principal para evitar pérdida de foco y lag al escribir.
@@ -76,6 +107,97 @@ const InputField: React.FC<InputProps> = ({
   </div>
 );
 
+// ─── Modal compartir link de inscripción ──────────────────────
+function ModalCompartirLink({ onClose }: { onClose: () => void }) {
+  const [copiado, setCopiado]         = useState(false);
+  const [verQR, setVerQR]             = useState(false);
+  const [nombreEscuela, setNombre]    = useState('');
+  const [loadingSlug, setLoadingSlug] = useState(true);
+
+  // Cargar nombre real de la escuela desde el API (igual que EscuelaDashboard)
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.get<any>('/escuelas/escuelas/mi-escuela');
+        const d = res.data;
+        const nombre = d?.nombreescuela ?? d?.escuela?.nombreescuela ?? '';
+        if (nombre) setNombre(nombre);
+      } catch {}
+      finally { setLoadingSlug(false); }
+    })();
+  }, []);
+
+  const slug = nombreEscuela
+    .toLowerCase().trim()
+    .replace(/[áàä]/g,'a').replace(/[éèë]/g,'e')
+    .replace(/[íìï]/g,'i').replace(/[óòö]/g,'o')
+    .replace(/[úùü]/g,'u').replace(/[ñ]/g,'n')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+
+  const url = `${window.location.origin}/registro/${slug}`;
+
+  const copiar = async () => {
+    try { await navigator.clipboard.writeText(url); }
+    catch { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); }
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2500);
+  };
+
+  const compartirNativo = async () => {
+    if (navigator.share) {
+      await navigator.share({ title: 'Formulario de Inscripción', text: 'Regístrate en nuestra escuela de Taekwondo', url });
+    } else { copiar(); }
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-2 p-3 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)]">
+        <Link2 size={13} className="text-[var(--color-primary)] shrink-0"/>
+        {loadingSlug
+          ? <span className="text-[11px] text-[var(--color-text-muted)] italic">Cargando...</span>
+          : <span className="text-[11px] text-[var(--color-text)] font-mono truncate flex-1">{url}</span>
+        }
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        <motion.button whileTap={{scale:0.95}} onClick={copiar}
+          className="flex flex-col items-center gap-1.5 py-3 rounded-xl border border-[var(--color-border)] transition-all"
+          style={{ background: copiado ? 'rgba(34,197,94,0.1)' : 'var(--color-background)', color: copiado ? '#22c55e' : 'var(--color-text-muted)', borderColor: copiado ? '#22c55e44' : undefined }}>
+          {copiado ? <CheckCheck size={18}/> : <Copy size={18}/>}
+          <span className="text-[9px] font-bold">{copiado ? '¡Copiado!' : 'Copiar'}</span>
+        </motion.button>
+        <motion.button whileTap={{scale:0.95}} onClick={compartirNativo}
+          className="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 text-[var(--color-primary)] transition-all hover:bg-[var(--color-primary)]/20">
+          <Smartphone size={18}/>
+          <span className="text-[9px] font-bold">Compartir</span>
+        </motion.button>
+        <motion.button whileTap={{scale:0.95}} onClick={() => setVerQR(v => !v)}
+          className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border transition-all ${verQR ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' : 'bg-[var(--color-background)] border-[var(--color-border)] text-[var(--color-text-muted)]'}`}>
+          <QrCode size={18}/>
+          <span className="text-[9px] font-bold">QR</span>
+        </motion.button>
+      </div>
+      <AnimatePresence>
+        {verQR && (
+          <motion.div initial={{opacity:0,height:0}} animate={{opacity:1,height:'auto'}} exit={{opacity:0,height:0}} className="overflow-hidden">
+            <div className="flex flex-col items-center gap-3 pt-1">
+              <div className="p-3 bg-white rounded-2xl border border-gray-200 shadow-sm">
+                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url)}&margin=4`} alt="QR" className="w-[160px] h-[160px]"/>
+              </div>
+              <button onClick={() => { const a = document.createElement('a'); a.href = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(url)}&margin=10`; a.download = `qr-inscripcion-${slug}.png`; a.click(); }}
+                className="text-[10px] font-bold text-[var(--color-primary)] flex items-center gap-1">
+                Descargar QR
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <p className="text-[9px] text-[var(--color-text-muted)] text-center leading-relaxed">
+        Comparte este link para que los alumnos llenen su registro. Los datos se guardan automáticamente.
+      </p>
+    </div>
+  );
+}
+
 /**
  * COMPONENTE PRINCIPAL: GESTIÓN DE ALUMNOS
  */
@@ -89,11 +211,17 @@ export const App: React.FC = () => {
   const [filterCinta, setFilterCinta] = useState<number | 'all'>('all');
   
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalLink, setModalLink]     = useState(false);
   const [step, setStep] = useState<'form' | 'detail' | 'photo_choice' | 'camera' | 'preview'>('form');
   const [isEditing, setIsEditing] = useState(false);
   const [selectedAlumno, setSelectedAlumno] = useState<any | null>(null);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Modal asignar profesor (alumnos sin profesor)
+  const [modalAsignar, setModalAsignar] = useState<{ open: boolean; alumno: any | null }>({ open: false, alumno: null });
+  const [asignandoProf, setAsignandoProf] = useState(false);
+  const [profSeleccionado, setProfSeleccionado] = useState<number | ''>('');
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -134,11 +262,13 @@ export const App: React.FC = () => {
       const [aluRes, profRes, cintaRes] = await Promise.all([
         alumnoService?.getAlumnos?.() || Promise.resolve([]),
         profesorService?.listarProfesores?.() || Promise.resolve([]),
-        cintasService?.listarGrados?.() || Promise.resolve([])
+        cintasService.listarGrados(),   // /grados/mi-escuela — cintas de la escuela
       ]);
       setAlumnos(aluRes || []);
       setProfesores(profRes || []);
-      setCintas(cintaRes || []);
+      // Ordenar por campo `orden` ASC (menor orden = grado más alto, o viceversa según tu BD)
+      const sorted = (cintaRes || []).slice().sort((a: any, b: any) => (a.orden ?? 99) - (b.orden ?? 99));
+      setCintas(sorted);
     } catch (err) { 
       console.error("Error al sincronizar datos:", err);
     } 
@@ -146,6 +276,28 @@ export const App: React.FC = () => {
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  // --- ASIGNAR / REASIGNAR PROFESOR ---
+  const handleAsignarProfesor = async () => {
+    if (!profSeleccionado || !modalAsignar.alumno) return;
+    setAsignandoProf(true);
+    try {
+      const { data } = await api.put(
+        `/alumnos/${modalAsignar.alumno.idalumno}/asignar-profesor`,
+        null,
+        { params: { idprofesor: Number(profSeleccionado) } }
+      );
+      setAlumnos(prev => prev.map(a =>
+        a.idalumno === modalAsignar.alumno.idalumno ? { ...a, idprofesor: Number(profSeleccionado) } : a
+      ));
+      setModalAsignar({ open: false, alumno: null });
+      setProfSeleccionado('');
+    } catch (e: any) {
+      console.error('Error al asignar profesor:', e?.response?.data?.detail ?? e);
+    } finally {
+      setAsignandoProf(false);
+    }
+  };
 
   // --- VALIDACIONES ---
   const validateForm = () => {
@@ -310,6 +462,7 @@ export const App: React.FC = () => {
   }, [alumnos, searchTerm]);
 
   return (
+    <>
     <div className="space-y-3 pb-40 text-[var(--color-text)]">
       
       {/* HEADER ULTRA SLIM */}
@@ -329,18 +482,19 @@ export const App: React.FC = () => {
             <div className="hidden xs:flex px-2.5 py-1 bg-[var(--color-primary)]/10 rounded-lg border border-[var(--color-primary)]/20">
               <span className="text-[8px] font-black text-[var(--color-primary)] uppercase tracking-widest leading-none">{filtered.length} Alumnos</span>
             </div>
-            <motion.button 
-              whileTap={{ scale: 0.9 }} 
-              onClick={handleOpenAdd}
+            <motion.button
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setModalLink(true)}
+              title="Link de inscripción"
               className="w-9 h-9 bg-[var(--color-primary)] text-white rounded-xl flex items-center justify-center shadow-lg active:brightness-110 border border-white/10"
             >
-              <Plus size={20} strokeWidth={3} />
+              <UserPlusIcon size={18} strokeWidth={2.5} />
             </motion.button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-2">
-          <div className="relative group">
+        <div className="flex gap-2 items-center">
+          <div className="relative group flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] group-focus-within:text-[var(--color-primary)] transition-colors" size={12} />
             <input 
               type="text" placeholder="Buscar alumno..." 
@@ -348,6 +502,19 @@ export const App: React.FC = () => {
               value={searchTerm} onChange={e => setSearchTerm(e.target.value)} 
             />
           </div>
+          <motion.button
+            whileTap={{ scale: 0.88, rotate: -180 }}
+            transition={{ duration: 0.35 }}
+            onClick={loadData}
+            disabled={loading}
+            title="Recargar lista"
+            className="h-9 w-9 flex items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-background)]/50 text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)]/40 transition-all shadow-sm flex-shrink-0"
+          >
+            {loading
+              ? <Loader2 size={14} className="animate-spin" />
+              : <RotateCcw size={14} />
+            }
+          </motion.button>
         </div>
       </div>
 
@@ -359,50 +526,106 @@ export const App: React.FC = () => {
           filtered.map(alumno => {
             const beltInfo = getCintaInfo(alumno.idgradoactual);
             const beltColorName = beltInfo?.color || "Blanca";
-            const beltHex = BELT_COLORS[beltColorName] || "#fff";
+            const beltHex = getBeltHex(beltColorName);
             const tieneDeuda = (alumno.total_deuda || 0) > 0;
 
             return (
-              <motion.div 
-                layout 
-                key={alumno.idalumno} 
+              <motion.div
+                layout
+                key={alumno.idalumno}
                 className={`relative bg-[var(--color-card)]/40 backdrop-blur-xl p-3 rounded-[1.8rem] border border-[var(--color-border)] shadow-xl overflow-hidden transition-all hover:bg-[var(--color-card)]/60 ${tieneDeuda ? 'border-red-500/20 shadow-red-500/5' : ''}`}
               >
+                {/* Barra de color de cinta */}
                 <div className="absolute left-0 top-0 bottom-0 w-[4px] opacity-30" style={{ backgroundColor: beltHex }} />
 
-                <div className="flex gap-3.5 items-center ml-1">
+                {/* Fila principal: foto + info + botones */}
+                <div className="flex items-center gap-3 ml-1">
+
+                  {/* Foto */}
                   <div className="relative flex-shrink-0">
-                     <div 
-                       className="w-13 h-13 rounded-2xl bg-black/20 border-[3px] overflow-hidden flex items-center justify-center transition-all duration-500 group-hover:scale-105"
-                       style={{ borderColor: beltHex, boxShadow: `0 0 10px -2px ${beltHex}44` }}
-                     >
-                       {alumno.fotoalumno ? <img src={alumno.fotoalumno} className="w-full h-full object-cover" alt="" /> : <UserIcon size={20} className="text-[var(--color-text-muted)] opacity-30" />}
-                     </div>
-                     <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-lg border-2 shadow-lg flex items-center justify-center text-[7px] font-black italic z-20 transition-transform group-hover:scale-110" style={{ backgroundColor: beltHex, color: beltColorName === 'Blanca' || beltColorName === 'Amarilla' ? '#000' : '#fff', borderColor: 'var(--color-background)' }}>{alumno.idgradoactual}G</div>
+                    <div
+                      className="w-12 h-12 rounded-2xl bg-black/20 border-[3px] overflow-hidden flex items-center justify-center"
+                      style={{ borderColor: beltHex, boxShadow: `0 0 10px -2px ${beltHex}44` }}
+                    >
+                      {alumno.fotoalumno
+                        ? <img src={alumno.fotoalumno} className="w-full h-full object-cover" alt="" />
+                        : <UserIcon size={20} className="text-[var(--color-text-muted)] opacity-30" />}
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 border-2 rounded-md shadow-lg z-20 overflow-hidden" style={{ borderColor: 'var(--color-background)' }}>
+                      <MiniCintaBelt colorName={beltColorName} stripeName={beltInfo?.color_stripe} />
+                    </div>
                   </div>
 
+                  {/* Info */}
                   <div className="flex-1 min-w-0 text-left">
-                    <div className="flex items-center gap-2 mb-1">
+                    {/* Nombre + deuda */}
+                    <div className="flex items-center gap-2 mb-0.5">
                       <h3 className="text-[13px] font-black uppercase italic tracking-tighter text-[var(--color-text)] truncate leading-none">
                         {alumno.nombres} {alumno.apellidopaterno}
                       </h3>
                       {tieneDeuda && (
-                        <div className="px-1.5 py-0.5 bg-red-500/10 text-red-500 rounded-md text-[6px] font-black border border-red-500/10 shadow-sm animate-pulse">
+                        <span className="px-1.5 py-0.5 bg-red-500/10 text-red-400 rounded-md text-[6px] font-black border border-red-500/20 animate-pulse flex-shrink-0">
                           ${alumno.total_deuda}
-                        </div>
+                        </span>
                       )}
                     </div>
-                    <div className="flex flex-col gap-0.5 opacity-60">
-                        <span className="text-[8px] font-bold uppercase truncate flex items-center gap-1 text-[var(--color-text)]"><Briefcase size={8} className="text-[var(--color-primary)]"/> {profesores.find(p => p.idprofesor === alumno.idprofesor)?.nombrecompleto || 'Sin Asignar'}</span>
-                        <span className="text-[8px] font-bold flex items-center gap-1 text-[var(--color-text)]"><Phone size={8} className="text-emerald-500"/> {alumno.telefonocontacto || 'S/T'}</span>
+
+                    {/* Cinta */}
+                    {beltInfo && (
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <MiniCintaBelt colorName={beltColorName} stripeName={beltInfo?.color_stripe} />
+                        <span className="text-[8px] font-black uppercase tracking-wide" style={{ color: beltHex === '#f8f8f8' ? 'var(--color-text-muted)' : beltHex }}>
+                          {beltInfo.nivelkupdan}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Profesor + teléfono */}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {alumno.idprofesor ? (
+                        <span className="text-[8px] font-bold uppercase flex items-center gap-1 text-[var(--color-text-muted)]">
+                          <Briefcase size={8} className="text-[var(--color-primary)] flex-shrink-0"/>
+                          <span className="truncate max-w-[120px]">
+                            {profesores.find(p => p.idprofesor === alumno.idprofesor)?.nombrecompleto || 'Sin Asignar'}
+                          </span>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={e => { e.stopPropagation(); setProfSeleccionado(''); setModalAsignar({ open: true, alumno }); }}
+                          className="text-[7px] font-black uppercase flex items-center gap-1 px-2 py-0.5 rounded-lg border border-orange-500/40 text-orange-400 bg-orange-500/10 hover:bg-orange-500/20 transition-all flex-shrink-0"
+                        >
+                          <Briefcase size={7}/> Sin profesor
+                        </button>
+                      )}
+                      <span className="text-[8px] font-bold flex items-center gap-1 text-[var(--color-text-muted)]">
+                        <Phone size={8} className="text-emerald-500 flex-shrink-0"/>
+                        {alumno.telefonocontacto || 'S/T'}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex gap-1">
-                     <button onClick={() => handleOpenDetail(alumno.idalumno)} title="Ver detalles" className="p-2 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] text-[var(--color-primary)] active:scale-90 transition-all hover:bg-[var(--color-primary)] hover:text-white shadow-sm"><Eye size={14} /></button>
-                     <button onClick={() => handleOpenEdit(alumno)} title="Editar datos" className="p-2 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] text-emerald-500 active:scale-90 transition-all hover:bg-emerald-500 hover:text-white shadow-sm"><Edit3 size={14} /></button>
-                     <button onClick={() => handleOpenPhotoUpload(alumno)} title="Actualizar foto" className="p-2 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] text-orange-400 active:scale-90 transition-all hover:bg-orange-500 hover:text-white shadow-sm"><CameraIcon size={14} /></button>
+                  {/* Botones de acción — fila horizontal derecha */}
+                  <div className="flex flex-row gap-1 flex-shrink-0 self-center">
+                    <button onClick={() => handleOpenDetail(alumno.idalumno)} title="Ver detalles"
+                      className="p-2 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] text-[var(--color-primary)] active:scale-90 transition-all hover:bg-[var(--color-primary)] hover:text-white shadow-sm">
+                      <Eye size={13} />
+                    </button>
+                    <button onClick={() => handleOpenEdit(alumno)} title="Editar datos"
+                      className="p-2 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] text-emerald-500 active:scale-90 transition-all hover:bg-emerald-500 hover:text-white shadow-sm">
+                      <Edit3 size={13} />
+                    </button>
+                    <button
+                      onClick={e => { e.stopPropagation(); setProfSeleccionado(alumno.idprofesor || ''); setModalAsignar({ open: true, alumno }); }}
+                      title={alumno.idprofesor ? 'Reasignar profesor' : 'Asignar profesor'}
+                      className={`p-2 rounded-xl border active:scale-90 transition-all shadow-sm ${alumno.idprofesor ? 'bg-[var(--color-background)] border-[var(--color-border)] text-indigo-400 hover:bg-indigo-500 hover:text-white' : 'bg-orange-500/10 border-orange-500/40 text-orange-400 hover:bg-orange-500 hover:text-white'}`}>
+                      <Briefcase size={13} />
+                    </button>
+                    <button onClick={() => handleOpenPhotoUpload(alumno)} title="Actualizar foto"
+                      className="p-2 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] text-orange-400 active:scale-90 transition-all hover:bg-orange-500 hover:text-white shadow-sm">
+                      <CameraIcon size={13} />
+                    </button>
                   </div>
+
                 </div>
               </motion.div>
             );
@@ -449,8 +672,35 @@ export const App: React.FC = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
                                     <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Grado Dojo Actual</label>
-                                    <select required className="w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-black text-[9px] uppercase text-[var(--color-text)] appearance-none cursor-pointer shadow-inner" value={formData.idgradoactual} onChange={e => handleInputChange('idgradoactual', e.target.value)}>
-                                        {cintas.map((c: any) => <option key={c.idgrado} value={c.idgrado}>{c.nivelkupdan} - {c.color}</option>)}
+                                    {/* Preview visual de la cinta seleccionada */}
+                                    {formData.idgradoactual && (() => {
+                                      const sel = cintas.find((c: any) => c.idgrado === Number(formData.idgradoactual));
+                                      return sel ? (
+                                        <div className="flex items-center gap-2 px-3 py-1.5 mb-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)]/50">
+                                          <MiniCintaBelt colorName={sel.color} stripeName={sel.color_stripe} />
+                                          <span className="text-[9px] font-black uppercase tracking-wider" style={{ color: getBeltHex(sel.color) === '#f8f8f8' ? 'var(--color-text-muted)' : getBeltHex(sel.color) }}>
+                                            {sel.nivelkupdan}
+                                          </span>
+                                          {sel.color_stripe && (
+                                            <span className="text-[8px] font-bold text-[var(--color-text-muted)]">· franja {sel.color_stripe}</span>
+                                          )}
+                                        </div>
+                                      ) : null;
+                                    })()}
+                                    <select
+                                      required
+                                      className="w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-black text-[9px] uppercase text-[var(--color-text)] appearance-none cursor-pointer shadow-inner"
+                                      value={formData.idgradoactual}
+                                      onChange={e => handleInputChange('idgradoactual', e.target.value)}
+                                    >
+                                      {cintas.length === 0 && (
+                                        <option disabled value="">Cargando grados...</option>
+                                      )}
+                                      {cintas.map((c: any) => (
+                                        <option key={c.idgrado} value={c.idgrado}>
+                                          {c.nivelkupdan} — {c.color}{c.color_stripe ? ` / ${c.color_stripe}` : ''}
+                                        </option>
+                                      ))}
                                     </select>
                                 </div>
                                 {isEditing && (
@@ -545,12 +795,20 @@ export const App: React.FC = () => {
                      <div className="flex items-center gap-5 p-5 bg-[var(--color-background)] rounded-[2.2rem] border border-[var(--color-border)] shadow-sm">
                         <div 
                           className="w-24 h-24 rounded-[1.8rem] bg-black/20 border-4 shadow-2xl flex items-center justify-center overflow-hidden flex-shrink-0" 
-                          style={{ borderColor: BELT_COLORS[getCintaInfo(selectedAlumno.idgradoactual)?.color || "Blanca"] }}
+                          style={{ borderColor: getBeltHex(getCintaInfo(selectedAlumno.idgradoactual)?.color || "Blanca") }}
                         >
                            {selectedAlumno.fotoalumno ? <img src={selectedAlumno.fotoalumno} className="w-full h-full object-cover" alt="" /> : <UserIcon size={36} className="text-[var(--color-text-muted)] opacity-30" />}
                         </div>
                         <div className="flex-1 min-w-0">
-                           <span className="text-[9px] font-black uppercase text-[var(--color-primary)] tracking-widest">{getCintaInfo(selectedAlumno.idgradoactual)?.nivelkupdan}</span>
+                           <div className="flex items-center gap-2 mb-1">
+                             {getCintaInfo(selectedAlumno.idgradoactual) && (
+                               <MiniCintaBelt
+                                 colorName={getCintaInfo(selectedAlumno.idgradoactual)?.color || "Blanca"}
+                                 stripeName={getCintaInfo(selectedAlumno.idgradoactual)?.color_stripe}
+                               />
+                             )}
+                             <span className="text-[9px] font-black uppercase text-[var(--color-primary)] tracking-widest">{getCintaInfo(selectedAlumno.idgradoactual)?.nivelkupdan}</span>
+                           </div>
                            <h2 className="text-2xl font-black italic uppercase tracking-tighter text-[var(--color-text)] leading-tight truncate">{selectedAlumno.nombres}</h2>
                            <h3 className="text-sm font-bold text-[var(--color-text-muted)] uppercase tracking-tighter">{selectedAlumno.apellidopaterno} {selectedAlumno.apellidomaterno}</h3>
                         </div>
@@ -661,6 +919,117 @@ export const App: React.FC = () => {
         )}
       </AnimatePresence>
     </div>
+
+      {/* Modal link inscripción — portal */}
+      {createPortal(
+        <AnimatePresence>
+          {modalLink && (
+              <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
+                className="fixed inset-0 bg-black/70 backdrop-blur-md z-[200] flex items-center justify-center p-4"
+                onClick={() => setModalLink(false)}>
+                <motion.div initial={{opacity:0,scale:0.93}} animate={{opacity:1,scale:1}} exit={{opacity:0,scale:0.93}}
+                  transition={{type:'spring',bounce:0.2,duration:0.3}}
+                  className="bg-[var(--color-card)] rounded-3xl border border-[var(--color-border)] p-6 w-full max-w-sm shadow-2xl"
+                  onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center">
+                        <Link2 size={16} className="text-[var(--color-primary)]"/>
+                      </div>
+                      <h2 className="text-sm font-black text-[var(--color-text)]">Inscribir Alumno</h2>
+                    </div>
+                    <button onClick={() => setModalLink(false)} className="w-7 h-7 rounded-xl bg-[var(--color-border)]/50 flex items-center justify-center text-[var(--color-text-muted)] hover:bg-[var(--color-border)] transition-colors">
+                      <X size={14}/>
+                    </button>
+                  </div>
+                  <ModalCompartirLink onClose={() => setModalLink(false)}/>
+                </motion.div>
+              </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
+      {/* ── MODAL ASIGNAR PROFESOR ─────────────────────────────── */}
+      {modalAsignar.open && createPortal(
+        <AnimatePresence>
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+            onClick={() => setModalAsignar({ open: false, alumno: null })}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="w-full max-w-sm rounded-[2rem] p-6 space-y-5"
+              style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)' }}
+            >
+              <div>
+                <p className="text-[8px] font-black uppercase tracking-widest text-orange-400 mb-1">
+                  {modalAsignar.alumno?.idprofesor ? 'Reasignación' : 'Acción requerida'}
+                </p>
+                <h3 className="text-lg font-black uppercase italic tracking-tighter text-[var(--color-text)]">
+                  {modalAsignar.alumno?.idprofesor ? 'Reasignar Profesor' : 'Asignar Profesor'}
+                </h3>
+                <p className="text-[10px] font-bold text-[var(--color-text-muted)] mt-1">
+                  {modalAsignar.alumno?.idprofesor
+                    ? `Cambiar el instructor de ${modalAsignar.alumno?.nombres} ${modalAsignar.alumno?.apellidopaterno}. El profesor actual es ${profesores.find(p => p.idprofesor === modalAsignar.alumno?.idprofesor)?.nombrecompleto ?? 'desconocido'}.`
+                    : `${modalAsignar.alumno?.nombres} ${modalAsignar.alumno?.apellidopaterno} no tiene instructor. Asígnalo para poder generar pagos e inscribirlo a torneos.`
+                  }
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[8px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">
+                  Selecciona instructor
+                </label>
+                <select
+                  value={profSeleccionado}
+                  onChange={e => setProfSeleccionado(e.target.value ? Number(e.target.value) : '')}
+                  className="w-full h-12 px-4 rounded-2xl text-[11px] font-black uppercase outline-none appearance-none cursor-pointer"
+                  style={{ background: 'var(--color-background)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
+                >
+                  <option value="">— Elige un profesor —</option>
+                  {profesores.filter(p => p.estatus === 1 || p.estatus === undefined).map(p => (
+                    <option key={p.idprofesor} value={p.idprofesor}>
+                      {p.nombrecompleto}{p.idprofesor === modalAsignar.alumno?.idprofesor ? ' (actual)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setModalAsignar({ open: false, alumno: null })}
+                  className="flex-1 h-12 rounded-2xl text-[10px] font-black uppercase tracking-wider"
+                  style={{ background: 'var(--color-background)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}
+                >
+                  Cancelar
+                </button>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleAsignarProfesor}
+                  disabled={!profSeleccionado || asignandoProf}
+                  className="flex-1 h-12 rounded-2xl text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-2"
+                  style={{
+                    background: profSeleccionado ? 'var(--color-primary)' : 'var(--color-border)',
+                    color: '#fff',
+                    opacity: asignandoProf ? 0.7 : 1,
+                  }}
+                >
+                  {asignandoProf
+                    ? <><Loader2 size={14} className="animate-spin"/> Guardando...</>
+                    : <><Briefcase size={14}/> Asignar</>
+                  }
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>,
+        document.body
+      )}
+    </>
   );
 };
 

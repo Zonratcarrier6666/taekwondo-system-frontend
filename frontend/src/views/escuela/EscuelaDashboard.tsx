@@ -33,11 +33,29 @@ import GestionProfesores from './GestionProfesores';
 import GestionAlumnos from './GestionAlumnos';
 // @ts-ignore
 import CajaFinanzas from './CajaFinanzas';
+import TorneosEscuelaView from './TorneosEscuelaView';
+// @ts-ignore
+import CheckinTorneoView from './CheckinTorneoView';
+// @ts-ignore
+import MisCombatesView from './MisCombatesView';
+// @ts-ignore
+import EscaneoQRView from '../juez/EscaneoQRView';
 
-const BELT_COLORS: Record<string, string> = {
+// Convierte el nombre de color de la BD al hex CSS correcto.
+// Si la escuela tiene colores personalizados (ej. "Azul Marino"), usa el valor
+// directamente si parece un hex/rgb, o busca en el mapa como fallback.
+const BELT_COLOR_MAP: Record<string, string> = {
   Blanca: '#f8fafc', Amarilla: '#fbbf24', Naranja: '#fb923c',
   Verde: '#22c55e', Azul: '#3b82f6', Roja: '#ef4444',
-  Marrón: '#78350f', Negra: '#1e293b',
+  Marrón: '#92400e', Café: '#92400e', Morada: '#a855f7',
+  Negra: '#1e293b', Gris: '#64748b',
+};
+
+const beltHex = (color: string): string => {
+  if (!color) return '#94a3b8';
+  // Si ya es un valor CSS válido (hex, rgb, hsl) úsalo directo
+  if (/^#[0-9a-f]{3,8}$/i.test(color) || /^rgb/i.test(color)) return color;
+  return BELT_COLOR_MAP[color] ?? '#94a3b8';
 };
 const fmt = (n: number) => n.toLocaleString('es-MX', { minimumFractionDigits: 0 });
 const pctChange = (cur: number, prev: number) =>
@@ -57,7 +75,8 @@ const BeltRingChart = ({ data }: { data: BeltStat[] }) => {
       <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
         {data.map((item, i) => {
           const p = (item.count / total) * 100;
-          const stroke = BELT_COLORS[item.color] || '#94a3b8';
+          // Usa el color real de la cinta; si tiene franja, mezcla visualmente
+          const stroke = beltHex(item.color);
           const off = acc; acc += p;
           return (
             <motion.circle key={i} cx="50" cy="50" r="40" fill="transparent"
@@ -182,10 +201,16 @@ const VistaInicio = ({ stats }: { stats: DashboardEscuela }) => {
           <div className="grid grid-cols-2 gap-x-3 gap-y-1 mt-2">
             {stats.distribucion_cintas.slice(0, 4).map((c, i) => (
               <div key={i} className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: BELT_COLORS[c.color] || '#ccc' }} />
+                {/* Pastilla de cinta: color base + franja si existe */}
+                <div className="relative w-4 h-2 rounded-sm flex-shrink-0 overflow-hidden"
+                  style={{ backgroundColor: beltHex(c.color) }}>
+                  {c.color_stripe && (
+                    <div className="absolute inset-y-0 right-0 w-1"
+                      style={{ backgroundColor: beltHex(c.color_stripe) }} />
+                  )}
+                </div>
                 <span className="text-[8px] font-black uppercase truncate opacity-70 text-[var(--color-text)]">
-                  {c.color}: {c.count}
+                  {c.nivelkupdan || c.color}: {c.count}
                 </span>
               </div>
             ))}
@@ -358,6 +383,15 @@ export const EscuelaDashboard: React.FC = () => {
   const [loading, setLoading]     = useState(true);
   const { currentTheme }          = useAuth();
 
+  // Sub-vistas torneos
+  const [torneoSubVista, setTorneoSubVista] = useState<null | 'checkin'>(null);
+  const [torneoActivoId, setTorneoActivoId] = useState<number | null>(null);
+
+  const handleTabChange = (t: string) => {
+    setActiveTab(t);
+    setTorneoSubVista(null);
+  };
+
   const fetchData = useCallback(async (isRefresh = false) => {
     try {
       if (!isRefresh) setLoading(true);
@@ -431,24 +465,34 @@ export const EscuelaDashboard: React.FC = () => {
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 pt-4 pb-40">
         <AnimatePresence mode="wait">
           <motion.div key={activeTab}
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }} className="space-y-5">
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }} className="space-y-5">
             {activeTab === 'inicio' && stats && <VistaInicio stats={stats} />}
             {activeTab === 'perfil' && escuela && <PerfilConfiguracion initialEscuela={escuela} onUpdate={() => fetchData(true)} />}
             {activeTab === 'profesores' && <GestionProfesores />}
             {activeTab === 'alumnos' && <GestionAlumnos />}
             {activeTab === 'caja' && <CajaFinanzas />}
-            {['torneos'].includes(activeTab) && (
-              <div className="py-20 text-center bg-[var(--color-card)]/40 rounded-[2.5rem] border-2 border-dashed border-[var(--color-border)] opacity-30">
-                <PieIcon size={48} className="mx-auto mb-3 text-[var(--color-text-muted)]" />
-                <p className="text-[10px] font-black uppercase italic tracking-[0.2em] text-[var(--color-text-muted)]">Módulo en sincronización</p>
-              </div>
+            {activeTab === 'torneos' && (
+              torneoSubVista === 'checkin' && torneoActivoId ? (
+                <CheckinTorneoView
+                  idtorneo={torneoActivoId}
+                  onVolver={() => setTorneoSubVista(null)}
+                />
+              ) : (
+                <TorneosEscuelaView
+                  onAbrirCheckin={(id: number) => {
+                    setTorneoActivoId(id);
+                    setTorneoSubVista('checkin');
+                  }}
+                />
+              )
             )}
+            {activeTab === 'combates' && <MisCombatesView />}
           </motion.div>
         </AnimatePresence>
       </main>
 
-      <GlobalNavbar key={currentTheme} activeTab={activeTab} onTabChange={(t: string) => setActiveTab(t)} role="Escuela" />
+      <GlobalNavbar key={currentTheme} activeTab={activeTab} onTabChange={handleTabChange} role="Escuela" />
     </div>
   );
 };

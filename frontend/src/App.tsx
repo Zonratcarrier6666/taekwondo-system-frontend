@@ -10,6 +10,10 @@ import { EscuelaDashboard } from './views/escuela/EscuelaDashboard';
 // @ts-ignore
 import { SuperAdminDashboard } from './views/superadmin/SuperAdminDashboard';
 import {ProfesorDashboard} from "./views/profesor/ProfesorDashboard";
+// @ts-ignore
+import { JuezDashboard } from './views/juez/JuezDashboard';
+// @ts-ignore
+import { FormularioInscripcion } from './pages/FormularioInscripcion';
 
 // ─────────────────────────────────────────────────────────────
 //  HELPERS
@@ -61,6 +65,7 @@ const RootRedirect = () => {
   if (rol === 'escuela')     return <Navigate to="/escuela"     replace />;
   if (rol === 'superadmin')  return <Navigate to="/superadmin"  replace />;
   if (rol === 'profesor')    return <Navigate to="/profesor"    replace />;
+  if (rol === 'juez')        return <Navigate to="/juez"        replace />;
 
   // Rol desconocido → login
   return <Navigate to="/auth/login" replace />;
@@ -115,6 +120,19 @@ const AppContent = () => {
           </PrivateRoute>
         }
       />
+
+      {/* Juez */}
+      <Route
+        path="/juez/*"
+        element={
+          <PrivateRoute role="Juez">
+            <JuezDashboard />
+          </PrivateRoute>
+        }
+      />
+
+      {/* Inscripción pública — sin auth, completamente aislada */}
+      <Route path="/registro/:slug" element={<FormularioInscripcion />} />
 
       {/* Raíz dinámica */}
       <Route path="/" element={<RootRedirect />} />

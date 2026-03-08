@@ -17,6 +17,9 @@ import { useAuth } from '../../context/AuthContext';
 import { dashboardService } from '../../services/dashboard.service';
 import TorneosView from './TorneosView';
 import CombatesView from './CombatesView';
+import AreasMatchmakingView from './AreasMatchmakingView';
+import CheckinTorneoView from '../escuela/CheckinTorneoView';
+import EscaneoQRView from '../juez/EscaneoQRView';
 import UsuariosView from './UsuariosView';
 // ─────────────────────────────────────────────────────────────
 //  TIPOS basados en la respuesta real de la API
@@ -727,6 +730,18 @@ export const SuperAdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isDark, setIsDark] = useState(true);
 
+  // Sub-navegación torneos
+  const [torneoSubVista, setTorneoSubVista] = useState<null | 'areas' | 'checkin'>(null);
+  const [torneoActivoId, setTorneoActivoId] = useState<number | null>(null);
+  // Sub-navegación combates
+  const [combatesSubVista, setCombatesSubVista] = useState<null | 'qr'>(null);
+
+  const handleTabChange = (t: string) => {
+    setActiveTab(t);
+    setTorneoSubVista(null);
+    setCombatesSubVista(null);
+  };
+
   const T = isDark ? DARK : LIGHT;
 
   const handleLogout = () => {
@@ -862,17 +877,47 @@ export const SuperAdminDashboard: React.FC = () => {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}>
             {activeTab === 'dashboard' && <DashboardHome T={T} />}
-            {activeTab === 'torneos'   && <TorneosView T={T}  />}
+            {activeTab === 'torneos' && (
+              torneoSubVista === 'areas' && torneoActivoId ? (
+                <AreasMatchmakingView
+                  idtorneo={torneoActivoId}
+                  onVolver={() => setTorneoSubVista(null)} T={T} 
+                />
+              ) : torneoSubVista === 'checkin' && torneoActivoId ? (
+                <CheckinTorneoView
+                  idtorneo={torneoActivoId}
+                  onVolver={() => setTorneoSubVista(null)} T={T}
+                />
+              ) : (
+                <TorneosView
+                  T={T}
+                  onAbrirAreas={(id: number) => { setTorneoActivoId(id); setTorneoSubVista('areas'); }}
+                  onAbrirCheckin={(id: number) => { setTorneoActivoId(id); setTorneoSubVista('checkin'); }}
+                />
+              )
+            )}
             {activeTab === 'usuarios'  && <UsuariosView T={T} />}
             {activeTab === 'finanzas'  && <ComingSoon label="Finanzas"          icon={DollarSign} T={T} />}
-            {activeTab === 'combates'  && <CombatesView T={T} />}
+            {activeTab === 'combates'  && (
+              combatesSubVista === 'qr' && torneoActivoId ? (
+                <EscaneoQRView
+                  idtorneo={torneoActivoId}
+                  onVolver={() => setCombatesSubVista(null)}
+                />
+              ) : (
+                <CombatesView
+                  T={T}
+                  onAbrirQR={(id: number) => { setTorneoActivoId(id); setCombatesSubVista('qr'); }}
+                />
+              )
+            )}
             {activeTab === 'config'    && <ComingSoon label="Configuración"     icon={Settings}   T={T} />}
           </motion.div>
         </AnimatePresence>
       </main>
 
       {/* ── BOTTOM NAVBAR ── */}
-      <BottomNav active={activeTab} onChange={setActiveTab} T={T} />
+      <BottomNav active={activeTab} onChange={handleTabChange} T={T} />
     </motion.div>
   );
 };

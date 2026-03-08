@@ -22,6 +22,7 @@ const NAV_ITEMS_BY_ROLE: Record<string, NavItem[]> = {
     { id: 'alumnos',     label: 'Alumnos',     icon: Users },
     { id: 'profesores',  label: 'Profesores',  icon: GraduationCap },
     { id: 'torneos',     label: 'Torneos',     icon: Trophy },
+    { id: 'combates',    label: 'Combates',    icon: Swords },
     { id: 'caja',        label: 'Caja',        icon: DollarSign },
     { id: 'perfil',      label: 'Perfil',      icon: School },
   ],

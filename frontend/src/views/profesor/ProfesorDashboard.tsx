@@ -32,6 +32,18 @@ import { themeService } from '../../services/theme.service';
 // @ts-ignore
 import GlobalNavbar from '../../components/common/GlobalNavbar';
 
+const BELT_COLOR_MAP: Record<string, string> = {
+  Blanca: '#f8fafc', Amarilla: '#fbbf24', Naranja: '#fb923c',
+  Verde: '#22c55e', Azul: '#3b82f6', Roja: '#ef4444',
+  Marrón: '#92400e', Café: '#92400e', Morada: '#a855f7',
+  Negra: '#1e293b', Gris: '#64748b',
+};
+const beltHex = (color: string): string => {
+  if (!color) return '#94a3b8';
+  if (/^#[0-9a-f]{3,8}$/i.test(color) || /^rgb/i.test(color)) return color;
+  return BELT_COLOR_MAP[color] ?? '#94a3b8';
+};
+
 /**
  * COMPONENTE: ProfesorDashboard
  * Administra el seguimiento técnico y de asistencia de los alumnos asignados al profesor.
@@ -192,26 +204,38 @@ export const ProfesorDashboard: React.FC = () => {
                   </div>
 
                   <div className="space-y-6">
-                    {stats?.distribucion_cintas_porcentaje && Object.entries(stats.distribucion_cintas_porcentaje).map(([color, pct]: any, idx) => (
-                      <div key={color} className="space-y-2.5">
-                        <div className="flex justify-between text-[10px] font-black uppercase italic tracking-tighter text-[var(--color-text)]">
-                          <span className="flex items-center gap-2">
-                             <div className="w-2.5 h-2.5 rounded-full border border-white/10 shadow-[0_0_10px_rgba(255,255,255,0.1)]" 
-                                  style={{ backgroundColor: color === 'Blanca' ? '#fff' : color === 'Negra' ? '#111' : 'var(--color-primary)' }} />
-                             Cinta {color}
-                          </span>
-                          <span className="text-[var(--color-primary)] font-black">{pct}%</span>
+                    {stats?.distribucion_cintas?.map((c, idx) => {
+                      const total = stats.distribucion_cintas.reduce((a, b) => a + b.count, 0);
+                      const pct = total > 0 ? Math.round((c.count / total) * 100) : 0;
+                      const hex = beltHex(c.color);
+                      return (
+                        <div key={c.idgrado ?? idx} className="space-y-2.5">
+                          <div className="flex justify-between text-[10px] font-black uppercase italic tracking-tighter text-[var(--color-text)]">
+                            <span className="flex items-center gap-2">
+                              {/* Pastilla con color real + franja */}
+                              <div className="relative w-4 h-2.5 rounded-sm overflow-hidden border border-white/10 shadow-[0_0_10px_rgba(255,255,255,0.1)]"
+                                style={{ backgroundColor: hex }}>
+                                {c.color_stripe && (
+                                  <div className="absolute inset-y-0 right-0 w-1"
+                                    style={{ backgroundColor: beltHex(c.color_stripe) }} />
+                                )}
+                              </div>
+                              {c.nivelkupdan || c.color}
+                            </span>
+                            <span style={{ color: hex }} className="font-black">{pct}%</span>
+                          </div>
+                          <div className="h-2.5 bg-[var(--color-background)] rounded-full overflow-hidden border border-[var(--color-border)]/5 shadow-inner">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${pct}%` }}
+                              transition={{ duration: 1.2, delay: idx * 0.05, ease: "circOut" }}
+                              className="h-full rounded-full"
+                              style={{ background: `linear-gradient(90deg, ${hex}cc, ${hex})` }}
+                            />
+                          </div>
                         </div>
-                        <div className="h-2.5 bg-[var(--color-background)] rounded-full overflow-hidden border border-[var(--color-border)]/5 shadow-inner">
-                          <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: `${pct}%` }}
-                            transition={{ duration: 1.2, delay: idx * 0.05, ease: "circOut" }}
-                            className="h-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-hover)] rounded-full shadow-[0_0_15px_var(--color-primary-60)]" 
-                          />
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 

@@ -1,67 +1,93 @@
 /**
  * ARCHIVO: src/services/profesor.service.ts
- * Servicio modular para la gestión del cuerpo técnico (Maestros/Instructores).
  */
 import api from '../api/axios';
-import { 
-  Profesor, 
-  RegistroProfesorDTO, 
-  ActualizarProfesorDTO 
+import type {
+  Profesor,
+  CrearProfesorDTO,
+  ActualizarProfesorDTO,
+  ResetPasswordResponse,
+  ReasignarAlumnosResponse,
 } from '../types/profesor.types';
 
 export const profesorService = {
-  /**
-   * Obtiene la lista de profesores vinculados a la escuela del usuario autenticado.
-   * Endpoint: GET /profesores/
-   */
+
+  // GET /profesores/
   listarProfesores: async (): Promise<Profesor[]> => {
-    const response = await api.get('/profesores/');
-    return response.data;
+    const { data } = await api.get<Profesor[]>('/profesores/');
+    return data;
   },
 
-  /**
-   * Registra un nuevo usuario de acceso y su perfil de instructor Dan.
-   * ROL REQUERIDO: Escuela
-   * Endpoint: POST /usuarios/registrar-profesor
-   */
-  registrarProfesor: async (data: RegistroProfesorDTO): Promise<any> => {
-    const response = await api.post('/usuarios/registrar-profesor', data);
-    return response.data;
-  },
-
-  /**
-   * Actualiza la información técnica, de contacto o estatus de un profesor.
-   * Endpoint: PUT /profesores/{idprofesor}
-   */
-  actualizarProfesor: async (id: number, data: ActualizarProfesorDTO): Promise<Profesor> => {
-    const response = await api.put(`/profesores/${id}`, data);
-    return response.data;
-  },
-
-  /**
-   * Sube o actualiza la fotografía oficial del profesor al almacenamiento.
-   * Endpoint: POST /profesores/{idprofesor}/upload-foto
-   */
-  subirFoto: async (id: number, file: File): Promise<Profesor> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    const response = await api.post(`/profesores/${id}/upload-foto`, formData, {
-      headers: {
-        // Al enviar FormData, no definimos Content-Type manualmente
-        // para permitir que Axios inserte el boundary correspondiente.
-        'Accept': 'application/json'
-      }
-    });
-    return response.data;
-  },
-
-  /**
-   * Obtiene el perfil del profesor que ha iniciado sesión.
-   * Endpoint: GET /profesores/mi-perfil
-   */
+  // GET /profesores/mi-perfil
   getMiPerfil: async (): Promise<Profesor> => {
-    const response = await api.get('/profesores/mi-perfil');
-    return response.data;
-  }
+    const { data } = await api.get<Profesor>('/profesores/mi-perfil');
+    return data;
+  },
+
+  // GET /profesores/:id
+  obtenerProfesor: async (id: number): Promise<Profesor> => {
+    const { data } = await api.get<Profesor>(`/profesores/${id}`);
+    return data;
+  },
+
+  // POST /profesores/ — crea usuario + perfil, devuelve perfil + _password_temporal
+  crearProfesor: async (datos: CrearProfesorDTO): Promise<Profesor> => {
+    const { data } = await api.post<Profesor>('/profesores/', datos);
+    return data;
+  },
+
+  // PUT /profesores/:id
+  actualizarProfesor: async (id: number, datos: ActualizarProfesorDTO): Promise<Profesor> => {
+    const { data } = await api.put<Profesor>(`/profesores/${id}`, datos);
+    return data;
+  },
+
+  // POST /profesores/:id/upload-foto
+  subirFoto: async (id: number, file: File): Promise<Profesor> => {
+    const fd = new FormData();
+    fd.append('file', file);
+    const { data } = await api.post<Profesor>(`/profesores/${id}/upload-foto`, fd);
+    return data;
+  },
+
+  // POST /profesores/upload-foto (el propio profesor sube su foto)
+  subirFotoPropia: async (file: File): Promise<Profesor> => {
+    const fd = new FormData();
+    fd.append('file', file);
+    const { data } = await api.post<Profesor>('/profesores/upload-foto', fd);
+    return data;
+  },
+
+  // PATCH /profesores/:id/estatus?estatus=0|1
+  cambiarEstatus: async (id: number, estatus: 0 | 1): Promise<Profesor> => {
+    const { data } = await api.patch<Profesor>(`/profesores/${id}/estatus`, null, {
+      params: { estatus },
+    });
+    return data;
+  },
+
+  // DELETE /profesores/:id
+  eliminarProfesor: async (id: number): Promise<void> => {
+    await api.delete(`/profesores/${id}`);
+  },
+
+  // POST /profesores/:id/reset-password
+  resetPassword: async (id: number): Promise<ResetPasswordResponse> => {
+    const { data } = await api.post<ResetPasswordResponse>(`/profesores/${id}/reset-password`);
+    return data;
+  },
+
+  // POST /profesores/:id/reasignar-alumnos?idprofesor_destino=X&solo_activos=true
+  reasignarAlumnos: async (
+    id: number,
+    idprofesorDestino: number,
+    soloActivos = true,
+  ): Promise<ReasignarAlumnosResponse> => {
+    const { data } = await api.post<ReasignarAlumnosResponse>(
+      `/profesores/${id}/reasignar-alumnos`,
+      null,
+      { params: { idprofesor_destino: idprofesorDestino, solo_activos: soloActivos } },
+    );
+    return data;
+  },
 };

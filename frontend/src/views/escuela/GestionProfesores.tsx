@@ -3,15 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   GraduationCap, Plus, User, Camera, Save, X, Loader2, 
   ShieldCheck, Search, ChevronRight, ImagePlus, UserPlus, 
-  AlertCircle, Eye, EyeOff, Smartphone, CheckCircle2, 
-  RotateCcw, CameraIcon
+  AlertCircle, Smartphone, CheckCircle2, 
+  RotateCcw, CameraIcon, KeyRound, PowerOff, Trash2, Power
 } from 'lucide-react';
 
 // --- IMPORTACIONES MODULARES (Configuradas para tu estructura de carpetas) ---
 import { profesorService } from '../../services/profesor.service';
 import { cintasService } from '../../services/cintas.service';
 import { themeService } from '../../services/theme.service';
-import type { Profesor, RegistroProfesorDTO } from '../../types/profesor.types';
+import type { Profesor, CrearProfesorDTO } from '../../types/profesor.types';
 
 /**
  * VISTA: GESTIÓN DE PROFESORES
@@ -24,6 +24,11 @@ export const GestionProfesores: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   
+  // Acciones de tarjeta
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [resetPassResult, setResetPassResult] = useState<{id: number; pass: string} | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
+
   // Modal y Control de Pasos
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [step, setStep] = useState<'form' | 'photo_choice' | 'camera_live' | 'preview'>('form'); 
@@ -39,15 +44,15 @@ export const GestionProfesores: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
+  // Password temporal recibida del backend tras crear profesor
+  const [passwordTemporal, setPasswordTemporal] = useState<string | null>(null);
+
   // Formulario vinculado al DTO
-  const [formData, setFormData] = useState<RegistroProfesorDTO>({
-    nombre_completo: '',
+  const [formData, setFormData] = useState<CrearProfesorDTO>({
+    nombrecompleto: '',
     username: '',
-    password: '',
-    rol: 'Profesor',
-    idgradodan: 11 // Valor inicial: 1er Dan
+    idgradodan: 11, // Valor inicial: 1er Dan
   });
-  const [confirmPassword, setConfirmPassword] = useState('');
 
   // --- CARGA DE DATOS ---
   const loadInitialData = useCallback(async () => {
@@ -72,8 +77,8 @@ export const GestionProfesores: React.FC = () => {
 
   // --- MANEJADORES DE INTERFAZ ---
   const handleOpenRegistration = () => {
-    setFormData({ nombre_completo: '', username: '', password: '', rol: 'Profesor', idgradodan: 11 });
-    setConfirmPassword('');
+    setFormData({ nombrecompleto: '', username: '', idgradodan: 11 });
+    setPasswordTemporal(null);
     setFormError(null);
     setStep('form');
     setIsModalOpen(true);
@@ -83,27 +88,17 @@ export const GestionProfesores: React.FC = () => {
     e.preventDefault();
     setFormError(null);
 
-    // Validaciones de negocio
-    if (formData.nombre_completo.length < 5) return setFormError("Ingresa el nombre completo del profesor.");
-    if (formData.password.length < 8) return setFormError("La contraseña debe tener mínimo 8 caracteres.");
-    if (formData.password !== confirmPassword) return setFormError("Las contraseñas no coinciden.");
+    if (formData.nombrecompleto.length < 5) return setFormError("Ingresa el nombre completo del profesor.");
+    if (!formData.username.trim()) return setFormError("El identificador de acceso es obligatorio.");
 
     setSaving(true);
     try {
-      // 1. Registro en Backend
-      await profesorService.registrarProfesor(formData);
-      
-      // 2. Refrescar lista y buscar el ID del recién creado para el paso de la foto
-      const updated = await profesorService.listarProfesores();
-      setProfesores(updated);
-      
-      const nuevo = updated.find(p => p.nombrecompleto === formData.nombre_completo);
-      if (nuevo) {
-        setSelectedProfId(nuevo.idprofesor);
-        setStep('photo_choice');
-      } else {
-        setIsModalOpen(false);
-      }
+      // El backend genera la contraseña y la devuelve en _password_temporal
+      const nuevo = await profesorService.crearProfesor(formData);
+      setPasswordTemporal(nuevo._password_temporal ?? null);
+      setSelectedProfId(nuevo.idprofesor);
+      await loadInitialData();
+      setStep('photo_choice');
     } catch (err: any) {
       setFormError(err.response?.data?.detail || "Error al registrar. El usuario podría ya existir.");
     } finally {
@@ -182,6 +177,43 @@ export const GestionProfesores: React.FC = () => {
     }
   };
 
+  const handleToggleEstatus = async (prof: Profesor) => {
+    setActionLoading(prof.idprofesor);
+    try {
+      const updated = await profesorService.cambiarEstatus(prof.idprofesor, prof.estatus === 1 ? 0 : 1);
+      setProfesores(prev => prev.map(p => p.idprofesor === prof.idprofesor ? updated : p));
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleResetPassword = async (id: number) => {
+    setActionLoading(id);
+    try {
+      const res = await profesorService.resetPassword(id);
+      setResetPassResult({ id, pass: res.password_temporal });
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleEliminar = async (id: number) => {
+    setActionLoading(id);
+    try {
+      await profesorService.eliminarProfesor(id);
+      setProfesores(prev => prev.filter(p => p.idprofesor !== id));
+      setConfirmDelete(null);
+    } catch (err: any) {
+      alert(err.response?.data?.detail || 'No se puede eliminar: el profesor tiene alumnos asignados.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const closeAndStop = () => {
     stopCamera();
     setIsModalOpen(false);
@@ -234,13 +266,44 @@ export const GestionProfesores: React.FC = () => {
                     <div className="absolute inset-0 bg-yellow-500 opacity-20" />
                     <span className="text-[10px] font-black italic text-white relative z-10">{prof.idgradodan >= 11 ? prof.idgradodan - 10 : prof.idgradodan}°</span>
                   </div>
+                  {prof.estatus === 0 && (
+                    <div className="absolute -top-1 -left-1 bg-red-500 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded-lg leading-none">OFF</div>
+                  )}
                 </div>
                 <div>
                   <h3 className="text-sm font-black uppercase italic tracking-tighter text-[var(--color-text)] leading-tight">{prof.nombrecompleto}</h3>
                   <p className="text-[9px] font-bold text-[var(--color-primary)] uppercase tracking-widest mt-1 flex items-center gap-1.5"><ShieldCheck size={10} className="text-emerald-500" /> Instructor Cinturón Negro</p>
                 </div>
               </div>
-              <button onClick={() => { setSelectedProfId(prof.idprofesor); setStep('photo_choice'); setIsModalOpen(true); }} className="p-3.5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-[var(--color-primary)] active:scale-90 transition-all hover:bg-[var(--color-primary)] hover:text-white shadow-sm"><Camera size={20} /></button>
+              <div className="flex items-center gap-2">
+                {/* Foto */}
+                <button title="Cambiar foto" onClick={() => { setSelectedProfId(prof.idprofesor); setStep('photo_choice'); setIsModalOpen(true); }} className="p-3 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-[var(--color-primary)] active:scale-90 transition-all hover:bg-[var(--color-primary)] hover:text-white shadow-sm">
+                  <Camera size={18} />
+                </button>
+                {/* Reset password */}
+                <button title="Resetear contraseña" onClick={() => handleResetPassword(prof.idprofesor)} disabled={actionLoading === prof.idprofesor} className="p-3 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-amber-500 active:scale-90 transition-all hover:bg-amber-500 hover:text-white shadow-sm disabled:opacity-40">
+                  {actionLoading === prof.idprofesor ? <Loader2 size={18} className="animate-spin" /> : <KeyRound size={18} />}
+                </button>
+                {/* Activar/Desactivar */}
+                <button title={prof.estatus === 1 ? 'Desactivar' : 'Activar'} onClick={() => handleToggleEstatus(prof)} disabled={actionLoading === prof.idprofesor} className={`p-3 rounded-2xl border active:scale-90 transition-all shadow-sm disabled:opacity-40 ${prof.estatus === 1 ? 'bg-[var(--color-background)] border-[var(--color-border)] text-red-500 hover:bg-red-500 hover:text-white' : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-500 hover:text-white'}`}>
+                  {prof.estatus === 1 ? <PowerOff size={18} /> : <Power size={18} />}
+                </button>
+                {/* Eliminar */}
+                {confirmDelete === prof.idprofesor ? (
+                  <div className="flex gap-1">
+                    <button onClick={() => handleEliminar(prof.idprofesor)} disabled={actionLoading === prof.idprofesor} className="p-3 bg-red-500 rounded-2xl text-white active:scale-90 shadow-sm disabled:opacity-40">
+                      {actionLoading === prof.idprofesor ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
+                    </button>
+                    <button onClick={() => setConfirmDelete(null)} className="p-3 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-[var(--color-text)] active:scale-90">
+                      <X size={18} />
+                    </button>
+                  </div>
+                ) : (
+                  <button title="Eliminar profesor" onClick={() => setConfirmDelete(prof.idprofesor)} className="p-3 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-red-400 active:scale-90 transition-all hover:bg-red-500 hover:text-white shadow-sm">
+                    <Trash2 size={18} />
+                  </button>
+                )}
+              </div>
             </motion.div>
           ))
         )}
@@ -273,22 +336,15 @@ export const GestionProfesores: React.FC = () => {
                   <form onSubmit={handleCreateProfesor} className="space-y-5">
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest">Nombre Completo</label>
-                      <input required placeholder="Ej: Kaoru Hanayama" className="w-full h-14 px-6 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] transition-all shadow-inner" value={formData.nombre_completo} onChange={e => setFormData({...formData, nombre_completo: e.target.value})} />
+                      <input required placeholder="Ej: Kaoru Hanayama" className="w-full h-14 px-6 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] transition-all shadow-inner" value={formData.nombrecompleto} onChange={e => setFormData({...formData, nombrecompleto: e.target.value})} />
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest">Identificador de Acceso</label>
                       <input required placeholder="maestro.pro" className="w-full h-14 px-6 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] shadow-inner" value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} />
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-1.5 relative text-left">
-                        <label className="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest">Contraseña</label>
-                        <input required type={showPass ? "text" : "password"} placeholder="••••••••" className="w-full h-14 px-6 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] shadow-inner" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
-                        <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 bottom-4 text-slate-400">{showPass ? <EyeOff size={18} /> : <Eye size={18} />}</button>
-                      </div>
-                      <div className="space-y-1.5 text-left">
-                        <label className="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest">Confirmar</label>
-                        <input required type={showPass ? "text" : "password"} placeholder="••••••••" className="w-full h-14 px-6 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] shadow-inner" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
-                      </div>
+                    <div className="p-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-2xl text-xs text-amber-700 dark:text-amber-400 font-semibold flex items-start gap-2">
+                      <span className="text-base leading-none">🔑</span>
+                      El sistema generará una contraseña segura automáticamente. Se mostrará al completar el registro para que la entregues al profesor.
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest">Grado Dan Actual</label>
@@ -303,6 +359,16 @@ export const GestionProfesores: React.FC = () => {
                   </form>
                 ) : step === 'photo_choice' ? (
                   <div className="text-center space-y-10 py-6">
+                    {passwordTemporal && (
+                      <div className="p-5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-3xl text-left space-y-2">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">✓ Profesor registrado — Contraseña temporal</p>
+                        <div className="flex items-center gap-3 bg-white dark:bg-black/20 rounded-2xl px-4 py-3 border border-emerald-200 dark:border-emerald-500/20">
+                          <code className="text-lg font-black tracking-widest text-[var(--color-text)] flex-1">{passwordTemporal}</code>
+                          <button type="button" onClick={() => navigator.clipboard.writeText(passwordTemporal)} className="text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 transition-colors">Copiar</button>
+                        </div>
+                        <p className="text-[10px] text-slate-500 font-semibold">Entrega esta contraseña al profesor de forma segura. No se volverá a mostrar.</p>
+                      </div>
+                    )}
                     <div className="grid grid-cols-2 gap-5">
                        <button onClick={() => fileGalleryRef.current?.click()} className="flex flex-col items-center justify-center gap-4 p-10 bg-slate-50 dark:bg-black/20 rounded-[3rem] border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all group shadow-xl">
                          <div className="p-5 bg-white dark:bg-slate-800 rounded-3xl shadow-lg group-hover:scale-110 transition-transform"><ImagePlus className="text-[var(--color-primary)]" size={32} /></div>
@@ -345,6 +411,30 @@ export const GestionProfesores: React.FC = () => {
                   </div>
                 )}
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL: Contraseña reseteada */}
+      <AnimatePresence>
+        {resetPassResult && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setResetPassResult(null)} />
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-sm bg-[var(--color-card)] rounded-[3rem] border border-[var(--color-border)] shadow-2xl p-8 space-y-5 text-center">
+              <div className="w-16 h-16 bg-amber-100 dark:bg-amber-500/10 rounded-3xl flex items-center justify-center mx-auto">
+                <KeyRound size={30} className="text-amber-500" />
+              </div>
+              <div>
+                <h3 className="font-black uppercase italic tracking-tighter text-lg text-[var(--color-text)]">Contraseña reseteada</h3>
+                <p className="text-xs text-slate-500 mt-1 font-semibold">Entrégala al profesor de forma segura</p>
+              </div>
+              <div className="flex items-center gap-3 bg-[var(--color-background)] rounded-2xl px-4 py-3 border border-[var(--color-border)]">
+                <code className="text-xl font-black tracking-widest text-[var(--color-text)] flex-1">{resetPassResult.pass}</code>
+                <button onClick={() => navigator.clipboard.writeText(resetPassResult.pass)} className="text-[10px] font-black uppercase tracking-widest text-amber-500 hover:text-amber-600 transition-colors">Copiar</button>
+              </div>
+              <p className="text-[10px] text-slate-400 font-semibold">No se volverá a mostrar.</p>
+              <button onClick={() => setResetPassResult(null)} className="w-full h-12 bg-[var(--color-text)] text-[var(--color-card)] font-black rounded-2xl text-sm uppercase tracking-widest">Entendido</button>
             </motion.div>
           </div>
         )}

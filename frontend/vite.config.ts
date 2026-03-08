@@ -1,4 +1,4 @@
-// vite.config.js  (o .ts si usas typescript)
+// vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -6,7 +6,15 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [
     react(),
-    tailwindcss(),           // ← este es el cambio clave
+    tailwindcss(),
   ],
-  
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://taekwondo-system-api.onrender.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 })
