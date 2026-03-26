@@ -133,7 +133,7 @@ const BottomNav: React.FC<{ active: string; onChange: (id: string) => void; T: T
     transition={{ delay: 0.4, type: 'spring', stiffness: 260, damping: 26 }}
     className="fixed bottom-0 left-0 right-0 z-40 flex justify-center pb-4 px-4 pointer-events-none"
   >
-    <div className="flex items-center gap-1 px-3 py-2 rounded-[2rem] pointer-events-auto"
+    <div className="flex items-center gap-0.5 sm:gap-1 px-2 sm:px-3 py-2 rounded-[2rem] pointer-events-auto"
       style={{
         background: T.navBg,
         backdropFilter: 'blur(24px)',
@@ -145,8 +145,8 @@ const BottomNav: React.FC<{ active: string; onChange: (id: string) => void; T: T
         const isActive = active === id;
         return (
           <motion.button key={id} whileTap={{ scale: 0.88 }} onClick={() => onChange(id)}
-            className="relative flex flex-col items-center justify-center px-4 py-2 rounded-2xl transition-all"
-            style={{ minWidth: 56 }}>
+            className="relative flex flex-col items-center justify-center px-3 sm:px-4 py-2 rounded-2xl transition-all"
+            style={{ minWidth: 52 }}>
             {isActive && (
               <motion.div layoutId="juezNavIndicator"
                 className="absolute inset-0 rounded-2xl"
@@ -327,7 +327,7 @@ const PanelHome: React.FC<{
                     {area.combates_pendientes} combates pendientes
                   </p>
                 </div>
-                <span className="text-[7px] font-black uppercase tracking-widest px-2 py-1 rounded-lg"
+                <span className="text-[8px] font-black uppercase tracking-wide px-2 py-0.5 rounded-lg whitespace-nowrap"
                   style={{ background: `${COLOR}15`, color: COLOR, border: `1px solid ${COLOR}25` }}>
                   {area.estatus.replace('_', ' ')}
                 </span>
@@ -467,7 +467,7 @@ const MisAreas: React.FC<{
                       <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.2, repeat: Infinity }}
                         className="w-1.5 h-1.5 rounded-full" style={{ background: COLOR }} />
                     )}
-                    <span className="text-[7px] font-black uppercase tracking-widest" style={{ color: COLOR }}>
+                    <span className="text-[8px] font-black uppercase tracking-wide" style={{ color: COLOR }}>
                       {area.estatus.replace('_', ' ')}
                     </span>
                   </div>
@@ -479,7 +479,7 @@ const MisAreas: React.FC<{
                     <p className="text-xl font-black tracking-tighter" style={{ color: T.orange }}>
                       {area.combates_pendientes}
                     </p>
-                    <p className="text-[7px] font-black uppercase tracking-widest mt-0.5" style={{ color: T.textDim }}>
+                    <p className="text-[8px] font-black uppercase tracking-widest mt-0.5" style={{ color: T.textDim }}>
                       Pendientes
                     </p>
                   </div>
@@ -490,7 +490,7 @@ const MisAreas: React.FC<{
                         {area.juez_username ?? 'Sin juez'}
                       </p>
                     </div>
-                    <p className="text-[7px] font-black uppercase tracking-widest mt-1" style={{ color: T.textDim }}>
+                    <p className="text-[8px] font-black uppercase tracking-widest mt-1" style={{ color: T.textDim }}>
                       Juez asignado
                     </p>
                   </div>
@@ -505,22 +505,85 @@ const MisAreas: React.FC<{
 };
 
 // ─────────────────────────────────────────────────────────────
-//  RESULTADOS — historial de combates registrados
+//  RESULTADOS — combates registrados del torneo (funcional)
 // ─────────────────────────────────────────────────────────────
+
+// Tipos para los distintos formatos que puede devolver el backend
+interface CombateResultado {
+  idcombate?:             number;
+  nombre_ganador?:        string;
+  nombre_perdedor?:       string;
+  nombre_alumno_ganador?: string;
+  nombre_alumno_perdedor?:string;
+  ganador?:               string;
+  perdedor?:              string;
+  escuela_ganador?:       string;
+  escuela_perdedor?:      string;
+  categoria?:             string;
+  nombre_categoria?:      string;
+  area?:                  string;
+  nombre_area?:           string;
+  fecha?:                 string;
+  created_at?:            string;
+  puntos_ganador?:        number;
+  puntos_perdedor?:       number;
+}
+
+interface CategoriaResultado {
+  nombre_categoria: string;
+  competidores: {
+    lugar_obtenido:          number;
+    nombre_alumno:           string;
+    escuela?:                string;
+    num_combates_realizados?: number;
+    puntos_totales?:         number;
+  }[];
+}
+
+type ResultadoData = CombateResultado | CategoriaResultado;
+
+const MEDAL: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
+
+// Detecta si el backend devuelve lista de categorías con podio
+const esCategorias = (data: ResultadoData[]): data is CategoriaResultado[] =>
+  data.length > 0 && 'competidores' in data[0];
+
 const ResultadosView: React.FC<{
   T: Tema;
   idtorneoActivo: number | null;
 }> = ({ T, idtorneoActivo }) => {
-  const [resultados, setResultados] = useState<any[]>([]);
+  const [resultados, setResultados] = useState<ResultadoData[]>([]);
   const [loading,    setLoading]    = useState(false);
+  const [error,      setError]      = useState<string | null>(null);
+  const [filtro,     setFiltro]     = useState<'todos' | string>('todos');
 
   const cargar = useCallback(async () => {
     if (!idtorneoActivo) return;
     setLoading(true);
+    setError(null);
     try {
-      const data = await torneoAreasService.resultadosLocal(idtorneoActivo);
+      // Intentamos los endpoints más probables en orden
+      let data: ResultadoData[] = [];
+
+      const intentos = [
+        () => torneoAreasService.listarCombates?.(idtorneoActivo),
+        () => torneoAreasService.resultados?.(idtorneoActivo),
+        () => torneoAreasService.historialCombates?.(idtorneoActivo),
+      ];
+
+      for (const intento of intentos) {
+        try {
+          const res = await intento?.();
+          if (res && Array.isArray(res) && res.length >= 0) {
+            data = res;
+            break;
+          }
+        } catch { /* siguiente */ }
+      }
+
       setResultados(data);
-    } catch {
+    } catch (e: any) {
+      setError('No se pudo cargar el historial de resultados.');
       setResultados([]);
     } finally {
       setLoading(false);
@@ -529,95 +592,328 @@ const ResultadosView: React.FC<{
 
   useEffect(() => { cargar(); }, [cargar]);
 
+  // ── Categorías únicas para filtro (combates planos) ──────────
+  const categorias = esCategorias(resultados)
+    ? resultados.map(r => r.nombre_categoria)
+    : [...new Set(
+        (resultados as CombateResultado[])
+          .map(r => r.categoria ?? r.nombre_categoria ?? '')
+          .filter(Boolean)
+      )];
+
+  const combatesFiltrados = esCategorias(resultados)
+    ? []
+    : (resultados as CombateResultado[]).filter(r =>
+        filtro === 'todos' || (r.categoria ?? r.nombre_categoria) === filtro
+      );
+
+  // ── SIN TORNEO ────────────────────────────────────────────────
   if (!idtorneoActivo) return (
-    <div className="flex flex-col items-center py-20 gap-4 rounded-[2rem]"
-      style={{ background: T.card, border: `1px dashed ${T.border}` }}>
-      <Trophy size={28} style={{ color: T.textDim }} />
-      <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: T.textDim }}>
-        Selecciona un torneo activo
-      </p>
-    </div>
-  );
-
-  if (loading) return (
-    <div className="flex justify-center py-20">
-      <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
-        className="w-10 h-10 rounded-full"
-        style={{ border: `2px solid ${T.border}`, borderTop: `2px solid ${T.cyan}` }} />
-    </div>
-  );
-
-  if (resultados.length === 0) return (
     <div className="space-y-5">
-      <p className="text-lg font-black uppercase italic tracking-tighter" style={{ color: T.text }}>
-        Resultados
-      </p>
+      <PageHeader T={T} />
       <div className="flex flex-col items-center py-20 gap-4 rounded-[2rem]"
         style={{ background: T.card, border: `1px dashed ${T.border}` }}>
-        <CheckCircle2 size={28} style={{ color: T.textDim }} />
-        <p className="text-[10px] font-black uppercase tracking-wider" style={{ color: T.textDim }}>
-          Sin resultados registrados aún
+        <Trophy size={32} style={{ color: T.textDim }} />
+        <p className="text-xs font-black uppercase tracking-wider text-center" style={{ color: T.textDim }}>
+          No hay torneo activo
+        </p>
+        <p className="text-[9px] font-bold text-center" style={{ color: T.textDim }}>
+          Espera a que el SuperAdmin inicie el torneo
         </p>
       </div>
     </div>
   );
 
+  // ── CARGANDO ──────────────────────────────────────────────────
+  if (loading) return (
+    <div className="space-y-5">
+      <PageHeader T={T} />
+      <div className="flex flex-col items-center py-20 gap-4">
+        <motion.div animate={{ rotate: 360 }}
+          transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+          className="w-12 h-12 rounded-full"
+          style={{ border: `2px solid ${T.border}`, borderTop: `2px solid ${T.cyan}` }} />
+        <p className="text-[9px] font-black uppercase tracking-widest animate-pulse"
+          style={{ color: T.textDim }}>
+          Cargando resultados…
+        </p>
+      </div>
+    </div>
+  );
+
+  // ── ERROR ─────────────────────────────────────────────────────
+  if (error) return (
+    <div className="space-y-5">
+      <PageHeader T={T} onRefresh={cargar} />
+      <div className="flex flex-col items-center py-16 gap-4 rounded-[2rem]"
+        style={{ background: T.redLo, border: `1px solid ${T.red}30` }}>
+        <AlertCircle size={32} style={{ color: T.red }} />
+        <p className="text-xs font-black uppercase tracking-wider text-center" style={{ color: T.red }}>
+          Error al cargar
+        </p>
+        <p className="text-[9px] font-bold text-center" style={{ color: T.textDim }}>{error}</p>
+        <motion.button whileTap={{ scale: 0.95 }} onClick={cargar}
+          className="flex items-center gap-2 px-4 h-9 rounded-xl text-[9px] font-black uppercase"
+          style={{ background: T.red, color: '#fff' }}>
+          <RotateCcw size={12} /> Reintentar
+        </motion.button>
+      </div>
+    </div>
+  );
+
+  // ── SIN DATOS ─────────────────────────────────────────────────
+  if (resultados.length === 0) return (
+    <div className="space-y-5">
+      <PageHeader T={T} onRefresh={cargar} />
+
+      {/* Banner informativo */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+        className="rounded-[2rem] p-5"
+        style={{ background: `linear-gradient(135deg, ${T.cyanLo}, ${T.violetLo})`, border: `1px solid ${T.cyan}30` }}>
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+            style={{ background: `linear-gradient(135deg, ${T.cyan}, ${T.violet})` }}>
+            <Trophy size={22} color="#fff" />
+          </div>
+          <div>
+            <p className="text-sm font-black uppercase italic tracking-tighter" style={{ color: T.text }}>
+              Resultados en vivo
+            </p>
+            <p className="text-[9px] font-bold mt-1 leading-relaxed" style={{ color: T.textMid }}>
+              Aquí aparecerán los resultados de los combates conforme se registren en el área.
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      <div className="flex flex-col items-center py-16 gap-4 rounded-[2rem]"
+        style={{ background: T.card, border: `1px dashed ${T.border}` }}>
+        <motion.div
+          animate={{ scale: [1, 1.05, 1], opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2.5, repeat: Infinity }}
+          className="w-16 h-16 rounded-[1.5rem] flex items-center justify-center"
+          style={{ background: T.cyanLo, border: `1px solid ${T.cyan}30` }}>
+          <Clock size={28} style={{ color: T.cyan }} />
+        </motion.div>
+        <div className="text-center">
+          <p className="text-xs font-black uppercase tracking-wider" style={{ color: T.textDim }}>
+            Aún no hay combates registrados
+          </p>
+          <p className="text-[9px] font-bold mt-1" style={{ color: T.textDim }}>
+            Regresa a Escaneo para iniciar combates
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── FORMATO PODIO POR CATEGORÍA ───────────────────────────────
+  if (esCategorias(resultados)) {
+    return (
+      <div className="space-y-5">
+        <PageHeader T={T} onRefresh={cargar} count={resultados.length} label="categorías" />
+        {resultados.map((cat, ci) => (
+          <motion.div key={ci}
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: ci * 0.06 }}
+            className="rounded-[1.75rem] overflow-hidden"
+            style={{ background: T.card, border: `1px solid ${T.border}` }}>
+            {/* Header categoría */}
+            <div className="px-5 py-4" style={{ borderBottom: `1px solid ${T.border}`, background: T.cyanLo }}>
+              <p className="text-xs font-black uppercase italic tracking-tighter" style={{ color: T.cyan }}>
+                {cat.nombre_categoria}
+              </p>
+              <p className="text-[9px] font-bold mt-0.5" style={{ color: T.textDim }}>
+                {cat.competidores?.length ?? 0} competidores
+              </p>
+            </div>
+            {/* Podio */}
+            <div className="p-4 space-y-2">
+              {(cat.competidores ?? []).slice(0, 5).map((comp, pi) => {
+                const LUGAR_COLOR: Record<number, string> = { 1: T.yellow, 2: T.textMid, 3: T.orange };
+                const color = LUGAR_COLOR[comp.lugar_obtenido] ?? T.textDim;
+                const isTop3 = comp.lugar_obtenido <= 3;
+                return (
+                  <motion.div key={pi}
+                    initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: pi * 0.04 }}
+                    className="flex items-center gap-3 p-2 rounded-2xl"
+                    style={{ background: isTop3 ? `${color}08` : 'transparent' }}>
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-base"
+                      style={{ background: `${color}18`, border: `1px solid ${color}25` }}>
+                      {MEDAL[comp.lugar_obtenido] ?? comp.lugar_obtenido}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-black uppercase italic tracking-tighter truncate" style={{ color: T.text }}>
+                        {comp.nombre_alumno}
+                      </p>
+                      <p className="text-[9px] font-bold truncate" style={{ color: T.textDim }}>
+                        {comp.escuela}{comp.num_combates_realizados != null ? ` · ${comp.num_combates_realizados} combates` : ''}
+                      </p>
+                    </div>
+                    {isTop3 && <Crown size={14} style={{ color, flexShrink: 0 }} />}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    );
+  }
+
+  // ── FORMATO LISTA DE COMBATES ─────────────────────────────────
   return (
     <div className="space-y-5">
-      <p className="text-lg font-black uppercase italic tracking-tighter" style={{ color: T.text }}>
-        Resultados
-      </p>
-      {resultados.map((cat: any, ci: number) => (
-        <motion.div key={ci}
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: ci * 0.06 }}
-          className="rounded-[1.75rem] overflow-hidden"
-          style={{ background: T.card, border: `1px solid ${T.border}` }}>
+      <PageHeader T={T} onRefresh={cargar} count={resultados.length} label="combates" />
 
-          {/* Header categoría */}
-          <div className="px-5 py-3" style={{ borderBottom: `1px solid ${T.border}`, background: T.cyanLo }}>
-            <p className="text-[10px] font-black uppercase italic tracking-tighter" style={{ color: T.cyan }}>
-              {cat.nombre_categoria}
-            </p>
-            <p className="text-[7px] font-black uppercase tracking-widest mt-0.5" style={{ color: T.textDim }}>
-              {cat.competidores?.length ?? 0} competidores
-            </p>
-          </div>
+      {/* Filtro por categoría */}
+      {categorias.length > 1 && (
+        <div className="flex gap-2 flex-wrap">
+          {['todos', ...categorias].map(cat => (
+            <motion.button key={cat} whileTap={{ scale: 0.94 }}
+              onClick={() => setFiltro(cat)}
+              className="px-3 h-8 rounded-xl text-[9px] font-black uppercase tracking-wide"
+              style={{
+                background: filtro === cat ? T.cyanLo : T.surface,
+                border: `1px solid ${filtro === cat ? T.cyan + '60' : T.border}`,
+                color: filtro === cat ? T.cyan : T.textDim,
+              }}>
+              {cat === 'todos' ? 'Todos' : cat}
+            </motion.button>
+          ))}
+        </div>
+      )}
 
-          {/* Podio */}
-          <div className="p-4 space-y-2">
-            {(cat.competidores ?? []).slice(0, 5).map((comp: any, pi: number) => {
-              const LUGAR_COLOR: Record<number, string> = {
-                1: T.yellow, 2: T.textMid, 3: T.orange,
-              };
-              const color = LUGAR_COLOR[comp.lugar_obtenido] ?? T.textDim;
-              return (
-                <div key={pi} className="flex items-center gap-3 py-2"
-                  style={{ borderBottom: pi < (cat.competidores?.length ?? 1) - 1 ? `1px solid ${T.border}` : 'none' }}>
-                  <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 text-sm font-black"
-                    style={{ background: `${color}18`, color }}>
-                    {comp.lugar_obtenido === 1 ? '🥇' : comp.lugar_obtenido === 2 ? '🥈' : comp.lugar_obtenido === 3 ? '🥉' : comp.lugar_obtenido}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-black uppercase italic tracking-tighter truncate" style={{ color: T.text }}>
-                      {comp.nombre_alumno}
-                    </p>
-                    <p className="text-[8px] font-bold truncate" style={{ color: T.textDim }}>
-                      {comp.escuela} · {comp.num_combates_realizados} combates
-                    </p>
-                  </div>
-                  {comp.lugar_obtenido <= 3 && (
-                    <Crown size={14} style={{ color, flexShrink: 0 }} />
+      {/* Lista de combates */}
+      <div className="space-y-3">
+        {combatesFiltrados.map((c, i) => {
+          const ganador  = c.nombre_ganador  ?? c.nombre_alumno_ganador  ?? c.ganador  ?? '—';
+          const perdedor = c.nombre_perdedor ?? c.nombre_alumno_perdedor ?? c.perdedor ?? '—';
+          const categoria = c.categoria ?? c.nombre_categoria ?? '';
+          const area      = c.area ?? c.nombre_area ?? '';
+          const fecha     = c.fecha ?? c.created_at ?? '';
+          const fechaFmt  = fecha ? new Date(fecha).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) : '';
+          return (
+            <motion.div key={i}
+              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(i * 0.03, 0.3) }}
+              className="rounded-[1.75rem] overflow-hidden"
+              style={{ background: T.card, border: `1px solid ${T.border}` }}>
+
+              {/* Franja superior — categoría y hora */}
+              <div className="px-4 py-2 flex items-center justify-between"
+                style={{ background: T.cyanLo, borderBottom: `1px solid ${T.border}` }}>
+                <div className="flex items-center gap-2">
+                  {area && (
+                    <span className="text-[8px] font-black uppercase tracking-wide" style={{ color: T.textDim }}>
+                      {area}
+                    </span>
+                  )}
+                  {categoria && (
+                    <span className="text-[8px] font-black uppercase tracking-wide" style={{ color: T.cyan }}>
+                      {categoria}
+                    </span>
                   )}
                 </div>
-              );
-            })}
-          </div>
-        </motion.div>
-      ))}
+                {fechaFmt && (
+                  <span className="text-[8px] font-bold" style={{ color: T.textDim }}>{fechaFmt}</span>
+                )}
+              </div>
+
+              {/* Contenido combate */}
+              <div className="p-4">
+                {/* Ganador */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-base"
+                    style={{ background: `${T.yellow}18`, border: `1px solid ${T.yellow}30` }}>
+                    🥇
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-black uppercase italic tracking-tighter truncate" style={{ color: T.text }}>
+                      {ganador}
+                    </p>
+                    {c.escuela_ganador && (
+                      <p className="text-[9px] font-bold truncate" style={{ color: T.textDim }}>{c.escuela_ganador}</p>
+                    )}
+                  </div>
+                  {c.puntos_ganador != null && (
+                    <span className="text-sm font-black" style={{ color: T.yellow }}>{c.puntos_ganador}</span>
+                  )}
+                  <Crown size={14} style={{ color: T.yellow, flexShrink: 0 }} />
+                </div>
+
+                {/* Separador VS */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-px flex-1" style={{ background: T.border }} />
+                  <span className="text-[9px] font-black uppercase tracking-widest px-2" style={{ color: T.textDim }}>vs</span>
+                  <div className="h-px flex-1" style={{ background: T.border }} />
+                </div>
+
+                {/* Perdedor */}
+                <div className="flex items-center gap-3 opacity-60">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: `${T.textDim}18`, border: `1px solid ${T.textDim}20` }}>
+                    <span className="text-sm">❌</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-black uppercase italic tracking-tighter truncate" style={{ color: T.textMid }}>
+                      {perdedor}
+                    </p>
+                    {c.escuela_perdedor && (
+                      <p className="text-[9px] font-bold truncate" style={{ color: T.textDim }}>{c.escuela_perdedor}</p>
+                    )}
+                  </div>
+                  {c.puntos_perdedor != null && (
+                    <span className="text-sm font-black" style={{ color: T.textDim }}>{c.puntos_perdedor}</span>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {combatesFiltrados.length === 0 && (
+        <div className="flex flex-col items-center py-12 gap-3 rounded-[2rem]"
+          style={{ background: T.card, border: `1px dashed ${T.border}` }}>
+          <Trophy size={24} style={{ color: T.textDim }} />
+          <p className="text-[9px] font-black uppercase tracking-wider" style={{ color: T.textDim }}>
+            Sin combates en esta categoría
+          </p>
+        </div>
+      )}
     </div>
   );
 };
+
+// Sub-componente header reutilizable de la sección Resultados
+const PageHeader: React.FC<{
+  T: Tema; onRefresh?: () => void; count?: number; label?: string;
+}> = ({ T, onRefresh, count, label }) => (
+  <div className="flex items-center justify-between">
+    <div>
+      <p className="text-[9px] font-black uppercase tracking-[0.3em]" style={{ color: T.cyan }}>
+        Torneo · Historial
+      </p>
+      <p className="text-lg font-black uppercase italic tracking-tighter mt-0.5" style={{ color: T.text }}>
+        Resultados
+      </p>
+      {count != null && (
+        <p className="text-[9px] font-bold mt-0.5" style={{ color: T.textDim }}>
+          {count} {label ?? 'registros'}
+        </p>
+      )}
+    </div>
+    {onRefresh && (
+      <motion.button whileTap={{ scale: 0.88 }} onClick={onRefresh}
+        className="w-10 h-10 flex items-center justify-center rounded-2xl"
+        style={{ background: T.card, border: `1px solid ${T.border}` }}>
+        <RefreshCw size={14} style={{ color: T.textDim }} />
+      </motion.button>
+    )}
+  </div>
+);
 
 // ─────────────────────────────────────────────────────────────
 //  DASHBOARD PRINCIPAL
@@ -768,36 +1064,36 @@ export const JuezDashboard: React.FC = () => {
           </AnimatePresence>
 
           {/* Right */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
 
             {/* Toggle dark/light */}
             <motion.button whileTap={{ scale: 0.88 }} onClick={() => setIsDark(!isDark)}
-              className="w-10 h-10 flex items-center justify-center rounded-2xl"
+              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl flex-shrink-0"
               style={{ background: T.surface, border: `1px solid ${T.border}` }}
               title={isDark ? 'Modo claro' : 'Modo oscuro'}>
               <AnimatePresence mode="wait">
                 {isDark
                   ? <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }}
                       exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                      <Sun size={16} style={{ color: T.yellow }} />
+                      <Sun size={15} style={{ color: T.yellow }} />
                     </motion.div>
                   : <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }}
                       exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                      <Moon size={16} style={{ color: T.violet }} />
+                      <Moon size={15} style={{ color: T.violet }} />
                     </motion.div>
                 }
               </AnimatePresence>
             </motion.button>
 
-            {/* User badge */}
-            <div className="flex items-center gap-2 px-3 py-2 rounded-2xl"
+            {/* User badge — compacto en móvil */}
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-2xl"
               style={{ background: T.surface, border: `1px solid ${T.border}` }}>
               <div className="w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs flex-shrink-0"
                 style={{ background: `linear-gradient(135deg, ${T.cyan}, ${T.violet})`, color: '#fff' }}>
                 {(user?.nombre || user?.username || 'J')[0].toUpperCase()}
               </div>
               <div className="text-left hidden sm:block">
-                <p className="text-[9px] font-black uppercase italic tracking-tighter leading-none" style={{ color: T.text }}>
+                <p className="text-[9px] font-black uppercase italic tracking-tighter leading-none max-w-[80px] truncate" style={{ color: T.text }}>
                   {user?.nombre || user?.username || 'Juez'}
                 </p>
                 <p className="text-[7px] font-bold uppercase tracking-widest mt-0.5 leading-none" style={{ color: T.cyan }}>
@@ -811,11 +1107,11 @@ export const JuezDashboard: React.FC = () => {
 
             {/* Logout */}
             <motion.button whileTap={{ scale: 0.88 }} onClick={handleLogout}
-              className="w-10 h-10 flex items-center justify-center rounded-2xl"
+              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl flex-shrink-0"
               style={{ background: T.surface, border: `1px solid ${T.border}` }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = T.redLo)}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = T.surface)}>
-              <LogOut size={16} style={{ color: T.textDim }} />
+              <LogOut size={15} style={{ color: T.textDim }} />
             </motion.button>
           </div>
         </div>

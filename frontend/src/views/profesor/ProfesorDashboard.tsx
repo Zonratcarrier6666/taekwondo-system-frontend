@@ -31,6 +31,13 @@ import { escuelaService } from '../../services/escuela.service';
 import { themeService } from '../../services/theme.service';
 // @ts-ignore
 import GlobalNavbar from '../../components/common/GlobalNavbar';
+// @ts-ignore
+import CajaProfesor from './CajaProfesor';
+// @ts-ignore
+// @ts-ignore
+import PaseListaView from './PaseListaView';
+// @ts-ignore
+import ExamenesView from './Examenesview';
 
 const BELT_COLOR_MAP: Record<string, string> = {
   Blanca: '#f8fafc', Amarilla: '#fbbf24', Naranja: '#fb923c',
@@ -282,74 +289,17 @@ export const ProfesorDashboard: React.FC = () => {
 
             {/* LISTADO DE ALUMNOS (ASISTENCIA RÁPIDA) */}
             {activeTab === 'alumnos' && (
-              <div className="space-y-6">
-                <div className="bg-[var(--color-card)] p-4 rounded-[2.2rem] border border-[var(--color-border)] shadow-2xl">
-                  <div className="relative group">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[var(--color-primary)] transition-colors" size={20} />
-                    <input 
-                      type="text" 
-                      placeholder="Identificar alumno para pase..." 
-                      className="w-full h-14 pl-14 pr-6 bg-[var(--color-background)] rounded-[1.8rem] border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] transition-all shadow-inner placeholder:opacity-30"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-3.5">
-                  {filteredAlumnos.map((alumno: any) => (
-                    <motion.div 
-                      key={alumno.idalumno}
-                      layout
-                      className="bg-[var(--color-card)]/40 p-4 rounded-[2.5rem] border border-[var(--color-border)] flex items-center justify-between group hover:bg-[var(--color-card)] transition-colors shadow-lg"
-                    >
-                      <div className="flex items-center gap-5 text-left">
-                        <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-[var(--color-border)] overflow-hidden flex items-center justify-center shadow-inner">
-                          {alumno.fotoalumno ? (
-                            <img src={alumno.fotoalumno} className="w-full h-full object-cover" alt="" />
-                          ) : (
-                            <Users size={24} className="text-slate-800 opacity-20" />
-                          )}
-                        </div>
-                        <div className="text-left space-y-1">
-                          <h4 className="text-base font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">
-                            {alumno.nombres} {alumno.apellidopaterno}
-                          </h4>
-                          <p className="text-[9px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest flex items-center gap-2">
-                             <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }} />
-                             Cinta {alumno.cinta_color}
-                          </p>
-                        </div>
-                      </div>
-                      <button className="p-4 bg-emerald-500/10 text-emerald-500 rounded-3xl border border-emerald-500/20 active:scale-90 transition-all hover:bg-emerald-500 hover:text-white shadow-xl">
-                        <UserCheck size={24} strokeWidth={2.5} />
-                      </button>
-                    </motion.div>
-                  ))}
-                  
-                  {filteredAlumnos.length === 0 && !loading && (
-                    <div className="py-32 text-center opacity-20 font-black uppercase text-[11px] tracking-[0.3em] italic">
-                       Sin coincidencias técnicas
-                    </div>
-                  )}
-                </div>
-              </div>
+              <PaseListaView alumnos={filteredAlumnos} />
             )}
 
-            {/* MÓDULOS EN DESARROLLO (VISTA SMARTPHONE) */}
-            {['pagos', 'examenes'].includes(activeTab) && (
-              <div className="py-40 flex flex-col items-center gap-10 text-center animate-in zoom-in duration-500">
-                 <div className="w-36 h-36 rounded-[3.8rem] bg-zinc-900/50 flex items-center justify-center border border-white/5 shadow-[0_30px_60px_rgba(0,0,0,0.5)] relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-[var(--color-primary)]/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <Smartphone size={54} className="text-[var(--color-primary)]/40 animate-pulse" strokeWidth={1.2} />
-                 </div>
-                 <div className="space-y-4 px-10">
-                    <h3 className="text-3xl font-black italic uppercase tracking-tighter text-[var(--color-text)]">Módulo: {activeTab}</h3>
-                    <p className="text-[11px] font-black uppercase tracking-[0.6em] text-[var(--color-primary)] animate-pulse leading-relaxed">
-                       Cifrando protocolos de red central y sincronización de datos de combate...
-                    </p>
-                 </div>
-              </div>
+            {/* MÓDULO FINANZAS — REAL */}
+            {activeTab === 'pagos' && (
+              <CajaProfesor />
+            )}
+
+            {/* MÓDULO Examenes — REAL */}
+            {activeTab === 'examenes' && (
+              <ExamenesView />
             )}
           </motion.div>
         </AnimatePresence>

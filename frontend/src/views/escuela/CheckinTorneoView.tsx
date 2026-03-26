@@ -1,16 +1,16 @@
 // ============================================================
-//  src/views/escuela/CheckinTorneoView.tsx
+//  src/views/escuela/CheckinTorneoView.tsx  — v2
 //  Staff confirma llegada → genera QR → imprime gafete
 //  Roles: SuperAdmin, Staff, Escuela
 // ============================================================
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   QrCode, UserCheck, Search, X, Check, AlertCircle,
   Printer, ChevronLeft, Users, Clock, Loader2,
-  RefreshCw, Scale, Trophy, Building,
+  RefreshCw, Download,
 } from 'lucide-react';
 import {
   torneoAreasService,
@@ -20,7 +20,7 @@ import {
 import { torneoService } from '../../services/torneo.service';
 import type { Torneo } from '../../types/torneo.types';
 
-// ─── URL del QR (usando api.qrserver.com, sin instalaciones) ─
+// ─── URL del QR (sin dependencias extra) ─────────────────────
 const qrUrl = (token: string, size = 160) =>
   `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(token)}&margin=6`;
 
@@ -38,7 +38,7 @@ const Gafete: React.FC<{ data: GafeteData }> = ({ data }) => (
       fontFamily: 'system-ui, sans-serif',
     }}
   >
-    {/* Header color */}
+    {/* Header */}
     <div className="px-4 py-3 text-center"
       style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81)' }}>
       <p className="text-[8px] font-black uppercase tracking-[0.3em] text-white opacity-70">
@@ -94,9 +94,11 @@ const Gafete: React.FC<{ data: GafeteData }> = ({ data }) => (
 //  MODAL GAFETE
 // ─────────────────────────────────────────────────────────────
 const ModalGafete: React.FC<{
-  gafetes: GafeteData[];
-  onClose: () => void;
-}> = ({ gafetes, onClose }) => {
+  gafetes:  GafeteData[];
+  idtorneo: number;
+  onClose:  () => void;
+}> = ({ gafetes, idtorneo, onClose }) => {
+
   const handleImprimir = () => {
     const contenido = document.getElementById('zona-gafetes');
     if (!contenido) return;
@@ -115,8 +117,14 @@ const ModalGafete: React.FC<{
     win.print();
   };
 
+  const handleDescargarPDF = (g: GafeteData) => {
+    const url = torneoAreasService.gafetePdfUrl(idtorneo, g.idinscripcion);
+    window.open(url, '_blank');
+  };
+
   return createPortal(
-    <motion.div className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+    <motion.div
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(16px)' }}
       onClick={onClose}>
@@ -154,7 +162,7 @@ const ModalGafete: React.FC<{
             <motion.button whileTap={{ scale: 0.9 }} onClick={handleImprimir}
               className="flex items-center gap-2 px-4 h-10 rounded-2xl text-[10px] font-black uppercase tracking-wider"
               style={{ background: 'var(--color-primary)', color: '#fff' }}>
-              <Printer size={13} /> Imprimir
+              <Printer size={13} /> Imprimir todos
             </motion.button>
             <motion.button whileTap={{ scale: 0.9 }} onClick={onClose}
               className="w-10 h-10 flex items-center justify-center rounded-2xl"
@@ -167,7 +175,18 @@ const ModalGafete: React.FC<{
         {/* Gafetes */}
         <div className="flex-1 overflow-y-auto p-6">
           <div id="zona-gafetes" className="flex flex-wrap gap-4 justify-center">
-            {gafetes.map(g => <Gafete key={g.idinscripcion} data={g} />)}
+            {gafetes.map(g => (
+              <div key={g.idinscripcion} className="flex flex-col items-center gap-2">
+                <Gafete data={g} />
+                <motion.button
+                  whileTap={{ scale: 0.93 }}
+                  onClick={() => handleDescargarPDF(g)}
+                  className="flex items-center gap-1.5 px-3 h-7 rounded-xl text-[8px] font-black uppercase tracking-wider"
+                  style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
+                  <Download size={10} /> PDF
+                </motion.button>
+              </div>
+            ))}
           </div>
         </div>
       </motion.div>
@@ -180,13 +199,13 @@ const ModalGafete: React.FC<{
 //  FILA COMPETIDOR
 // ─────────────────────────────────────────────────────────────
 const CompetidorRow: React.FC<{
-  comp:       CompetidorCheckin;
+  comp:         CompetidorCheckin;
   seleccionado: boolean;
-  onToggle:   () => void;
-  peso:       string;
-  onPeso:     (v: string) => void;
-  cargando:   boolean;
-  onCheckin:  () => void;
+  onToggle:     () => void;
+  peso:         string;
+  onPeso:       (v: string) => void;
+  cargando:     boolean;
+  onCheckin:    () => void;
 }> = ({ comp, seleccionado, onToggle, peso, onPeso, cargando, onCheckin }) => (
   <motion.div
     initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
@@ -204,7 +223,7 @@ const CompetidorRow: React.FC<{
       }`,
     }}>
 
-    {/* Checkbox (solo si no tiene checkin) */}
+    {/* Checkbox */}
     {!comp.estatus_checkin ? (
       <motion.button whileTap={{ scale: 0.88 }} onClick={onToggle}
         className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -257,6 +276,9 @@ const CompetidorRow: React.FC<{
           </span>
         )}
       </div>
+      <p className="text-[8px] font-bold mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+        {comp.escuela}
+      </p>
     </div>
 
     {/* Peso + acción individual */}
@@ -281,7 +303,7 @@ const CompetidorRow: React.FC<{
       </div>
     )}
 
-    {/* Si ya tiene QR — mostrar mini QR */}
+    {/* Si ya tiene QR */}
     {comp.estatus_checkin && comp.tiene_qr && (
       <div className="flex-shrink-0 opacity-60">
         <QrCode size={16} style={{ color: '#10b981' }} />
@@ -310,6 +332,7 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
   const [cargandoLote, setCargandoLote]   = useState(false);
   const [tab, setTab]                     = useState<'pendientes' | 'checkin'>('pendientes');
   const [gafetes, setGafetes]             = useState<GafeteData[]>([]);
+  const [modalAbierto, setModalAbierto]   = useState(false);
   const [errorMsg, setErrorMsg]           = useState('');
 
   const cargar = useCallback(async () => {
@@ -320,8 +343,8 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
         torneoAreasService.pendientesCheckin(idtorneo),
       ]);
       setTorneo(torneoData);
-      setPendientes(checkinData.pendientes);
-      setConCheckin(checkinData.con_checkin);
+      setPendientes(checkinData.pendientes ?? []);
+      setConCheckin(checkinData.con_checkin ?? []);
     } catch {
       setErrorMsg('Error al cargar los datos del torneo');
     } finally {
@@ -336,9 +359,18 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
     setCargandoIndiv(p => ({ ...p, [comp.idinscripcion]: true }));
     setErrorMsg('');
     try {
-      const pesoNum = pesos[comp.idinscripcion] ? parseFloat(pesos[comp.idinscripcion]) : undefined;
+      const pesoNum = pesos[comp.idinscripcion]
+        ? parseFloat(pesos[comp.idinscripcion])
+        : undefined;
       const res = await torneoAreasService.hacerCheckin(idtorneo, comp.idinscripcion, pesoNum);
-      setGafetes(prev => [...prev, res.datos_gafete]);
+      if (res.datos_gafete) {
+        setGafetes(prev => {
+          // evitar duplicados
+          const existe = prev.some(g => g.idinscripcion === res.datos_gafete.idinscripcion);
+          return existe ? prev : [...prev, res.datos_gafete];
+        });
+        setModalAbierto(true);
+      }
       await cargar();
     } catch (e: any) {
       setErrorMsg(e?.response?.data?.detail ?? 'Error al hacer check-in');
@@ -353,15 +385,37 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
     setCargandoLote(true);
     setErrorMsg('');
     try {
-      const res = await torneoAreasService.checkinLote(idtorneo, Array.from(seleccionados));
-      // Recargar y mostrar gafetes de los exitosos
+      const ids = Array.from(seleccionados);
+      await torneoAreasService.checkinLote(idtorneo, ids);
       await cargar();
       setSeleccionados(new Set());
-      // Los gafetes del lote no tienen todos los datos — recargar y tomar los nuevos con checkin
+
+      // Obtener lista actualizada y construir gafetes de los que acaban de hacer check-in
       const fresh = await torneoAreasService.pendientesCheckin(idtorneo);
-      const nuevos = fresh.con_checkin.filter(c => seleccionados.has(c.idinscripcion));
-      // No tenemos GafeteData completo del lote, así que solo notificamos
-      setErrorMsg('');
+      const nuevos = (fresh.con_checkin ?? []).filter(c => ids.includes(c.idinscripcion));
+
+      // Construimos GafeteData mínimo con los datos disponibles
+      // (sin token_qr completo — ofrecemos descarga PDF individual)
+      if (nuevos.length > 0) {
+        const gasetesLote: GafeteData[] = nuevos.map(c => ({
+          nombre_alumno: c.nombre_alumno,
+          foto:          c.foto,
+          edad:          c.edad,
+          escuela:       c.escuela,
+          categoria:     c.categoria,
+          torneo:        torneo?.nombre ?? '',
+          fecha_torneo:  torneo?.fecha  ?? '',
+          sede:          torneo?.sede   ?? '',
+          token_qr:      '',          // vacío — usar descarga PDF
+          idinscripcion: c.idinscripcion,
+        }));
+        setGafetes(prev => {
+          const ids_prev = new Set(prev.map(g => g.idinscripcion));
+          const nuevosUnicos = gasetesLote.filter(g => !ids_prev.has(g.idinscripcion));
+          return [...prev, ...nuevosUnicos];
+        });
+        setModalAbierto(true);
+      }
     } catch (e: any) {
       setErrorMsg(e?.response?.data?.detail ?? 'Error al hacer check-in en lote');
     } finally {
@@ -382,8 +436,8 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
     else setSeleccionados(new Set(ids));
   };
 
-  const lista      = tab === 'pendientes' ? pendientes : conCheckin;
-  const filtrados  = lista.filter(c =>
+  const lista     = tab === 'pendientes' ? pendientes : conCheckin;
+  const filtrados = lista.filter(c =>
     c.nombre_alumno.toLowerCase().includes(buscar.toLowerCase()) ||
     c.escuela.toLowerCase().includes(buscar.toLowerCase())
   );
@@ -420,9 +474,9 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Total Pagados', val: totalPagados,        color: 'var(--color-primary)', icon: Users },
-          { label: 'Check-in',      val: conCheckin.length,   color: '#10b981',              icon: UserCheck },
-          { label: 'Pendientes',    val: pendientes.length,   color: '#f97316',              icon: Clock },
+          { label: 'Total Pagados', val: totalPagados,      color: 'var(--color-primary)', icon: Users },
+          { label: 'Check-in',      val: conCheckin.length, color: '#10b981',              icon: UserCheck },
+          { label: 'Pendientes',    val: pendientes.length, color: '#f97316',              icon: Clock },
         ].map(({ label, val, color, icon: Icon }) => (
           <div key={label} className="rounded-[1.5rem] p-3"
             style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
@@ -509,12 +563,16 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
           }} />
       </div>
 
-      {/* Acción en lote (solo en pestaña pendientes) */}
+      {/* Acción en lote (solo pestaña pendientes) */}
       {tab === 'pendientes' && filtrados.length > 0 && (
         <div className="flex items-center gap-3">
           <motion.button whileTap={{ scale: 0.95 }} onClick={toggleTodos}
             className="flex-1 h-9 rounded-2xl text-[9px] font-black uppercase tracking-wider"
-            style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
+            style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              color: 'var(--color-text-muted)',
+            }}>
             {seleccionados.size === filtrados.length ? 'Deseleccionar' : 'Seleccionar todos'}
             {seleccionados.size > 0 && ` (${seleccionados.size})`}
           </motion.button>
@@ -569,14 +627,10 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
           <motion.button
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            onClick={() => {/* abre modal */}}
+            onClick={() => setModalAbierto(true)}
             whileTap={{ scale: 0.96 }}
             className="w-full flex items-center justify-center gap-2 h-12 rounded-2xl text-[10px] font-black uppercase tracking-wider"
-            style={{
-              background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary))',
-              color: '#fff',
-            }}
-            onClick={() => setGafetes(prev => prev.length > 0 ? prev : prev)}>
+            style={{ background: 'var(--color-primary)', color: '#fff' }}>
             <Printer size={14} />
             Ver e Imprimir {gafetes.length} Gafete{gafetes.length !== 1 ? 's' : ''}
           </motion.button>
@@ -585,8 +639,12 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
 
       {/* Modal gafetes */}
       <AnimatePresence>
-        {gafetes.length > 0 && (
-          <ModalGafete gafetes={gafetes} onClose={() => setGafetes([])} />
+        {modalAbierto && gafetes.length > 0 && (
+          <ModalGafete
+            gafetes={gafetes}
+            idtorneo={idtorneo}
+            onClose={() => setModalAbierto(false)}
+          />
         )}
       </AnimatePresence>
     </div>

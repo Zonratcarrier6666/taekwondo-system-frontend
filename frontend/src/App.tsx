@@ -14,24 +14,26 @@ import {ProfesorDashboard} from "./views/profesor/ProfesorDashboard";
 import { JuezDashboard } from './views/juez/JuezDashboard';
 // @ts-ignore
 import { FormularioInscripcion } from './pages/FormularioInscripcion';
-
+// @ts-ignore
+import { StaffTorneoApp } from './views/staff/Stafftorneoapp';
 // ─────────────────────────────────────────────────────────────
 //  HELPERS
 // ─────────────────────────────────────────────────────────────
-
-/** Normaliza el rol sin importar si viene como 'rol' o 'role' */
 const getRol = (user: any): string =>
   (user?.rol || user?.role || '').toLowerCase();
 
 // ─────────────────────────────────────────────────────────────
 //  PRIVATE ROUTE
+//  Acepta un array de roles o un rol único
 // ─────────────────────────────────────────────────────────────
 const PrivateRoute = ({
   children,
   role,
+  roles,
 }: {
   children: React.ReactNode;
-  role?: string;
+  role?:  string;
+  roles?: string[];
 }) => {
   const { user, isInitializing } = useAuth();
 
@@ -48,7 +50,16 @@ const PrivateRoute = ({
 
   if (!user) return <Navigate to="/auth/login" replace />;
 
-  if (role && getRol(user) !== role.toLowerCase())
+  const userRol = getRol(user);
+
+  // Acepta lista de roles o rol único
+  const permitidos = roles
+    ? roles.map(r => r.toLowerCase())
+    : role
+    ? [role.toLowerCase()]
+    : [];
+
+  if (permitidos.length > 0 && !permitidos.includes(userRol))
     return <Navigate to="/" replace />;
 
   return <>{children}</>;
@@ -62,12 +73,12 @@ const RootRedirect = () => {
   if (!user) return <Navigate to="/auth/login" replace />;
 
   const rol = getRol(user);
-  if (rol === 'escuela')     return <Navigate to="/escuela"     replace />;
-  if (rol === 'superadmin')  return <Navigate to="/superadmin"  replace />;
-  if (rol === 'profesor')    return <Navigate to="/profesor"    replace />;
-  if (rol === 'juez')        return <Navigate to="/juez"        replace />;
+  if (rol === 'escuela')    return <Navigate to="/escuela"    replace />;
+  if (rol === 'superadmin') return <Navigate to="/superadmin" replace />;
+  if (rol === 'profesor')   return <Navigate to="/profesor"   replace />;
+  if (rol === 'juez')       return <Navigate to="/juez"       replace />;
+  if (rol === 'staff')      return <Navigate to="/staff"      replace />;
 
-  // Rol desconocido → login
   return <Navigate to="/auth/login" replace />;
 };
 
@@ -87,7 +98,7 @@ const AppContent = () => {
 
   return (
     <Routes>
-      {/* Login — redirige al home si ya hay sesión */}
+      {/* Login */}
       <Route
         path="/auth/login"
         element={user ? <Navigate to="/" replace /> : <LoginView />}
@@ -103,6 +114,16 @@ const AppContent = () => {
         }
       />
 
+      {/* Staff — usa el mismo dashboard que Escuela */}
+      <Route
+        path="/staff/*"
+        element={
+          <PrivateRoute role="Staff">
+            <StaffTorneoApp />
+          </PrivateRoute>
+        }
+      />
+
       {/* Superadmin */}
       <Route
         path="/superadmin/*"
@@ -112,6 +133,8 @@ const AppContent = () => {
           </PrivateRoute>
         }
       />
+
+      {/* Profesor */}
       <Route
         path="/profesor/*"
         element={
@@ -131,7 +154,7 @@ const AppContent = () => {
         }
       />
 
-      {/* Inscripción pública — sin auth, completamente aislada */}
+      {/* Inscripción pública */}
       <Route path="/registro/:slug" element={<FormularioInscripcion />} />
 
       {/* Raíz dinámica */}

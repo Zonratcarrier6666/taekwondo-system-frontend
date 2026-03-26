@@ -1,15 +1,14 @@
 // ============================================================
-//  src/components/CajaFinanzas.tsx
-//  — Todo en un solo archivo —
-//  Incluye: lista de pagos, filtros, ModalDetalleAlumno
-//  (centrado), modal cobro, modal generar mensualidades,
-//  modal ticket, subida de comprobante.
+//  src/views/profesor/CajaProfesor.tsx
+//  Vista de finanzas del Profesor — solo alumnos asignados.
+//  Idéntico a CajaFinanzas, sin: generar mensualidades,
+//  configurar precios, ni notificaciones masivas por lote.
 // ============================================================
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Wallet, Search, ArrowDownLeft, Settings,
+  Wallet, Search, ArrowDownLeft,
   DollarSign, Calendar, CreditCard, PlusCircle,
   Loader2, CheckCircle2, X, History, ShieldAlert,
   UserCircle, Printer, Receipt, BookOpen, RefreshCw,
@@ -20,13 +19,13 @@ import {
 
 import { finanzasService } from '../../services/finanzas.service';
 import type {
-  ConfigPrecios, PreciosResponse, TipoNotificacion, NotificacionLoteResult,
+  TipoNotificacion,
 } from '../../services/finanzas.service';
 import { alumnoService } from '../../services/alumno.service';
-import { ModalReciboImpresion } from './ModalReciboImpresion';
+import { ModalReciboImpresion } from '../../views/escuela/ModalReciboImpresion';
 import type {
   Pago, DesgloseItem, CobroRequestDTO,
-  GenerarMensualidadDTO, ReciboImpresion,
+  ReciboImpresion,
   MetodoPago, ResumenAlumno,
 } from '../../types/finanzas.types';
 import type { PagoHistorial, HistorialResponse } from '../../types/historial.types';
@@ -80,10 +79,6 @@ function useScreenWidth(): number {
   return width;
 }
 
-function getMesActual(): string {
-  const h = new Date();
-  return `${h.getFullYear()}-${String(h.getMonth() + 1).padStart(2, '0')}`;
-}
 function estatusColor(e: number) {
   return e === 0 ? 'var(--color-primary)' : e === 1 ? '#22c55e' : e === 2 ? '#6b7280' : '#ef4444';
 }
@@ -759,7 +754,7 @@ class CajaErrorBoundary extends React.Component<
     return { hasError: true, msg: err?.message ?? 'Error desconocido' };
   }
   componentDidCatch(err: any, info: any) {
-    console.error('[CajaFinanzas]', err, info);
+    console.error('[CajaProfesor]', err, info);
   }
   render() {
     if (this.state.hasError) {
@@ -768,7 +763,7 @@ class CajaErrorBoundary extends React.Component<
           <div className="w-16 h-16 rounded-3xl flex items-center justify-center text-3xl"
             style={{ background: '#ef444415', border: '1px solid rgba(239,68,68,0.3)' }}>⚠️</div>
           <p className="text-sm font-black uppercase tracking-widest" style={{ color: '#ef4444' }}>
-            Algo salió mal en Caja y Finanzas
+            Algo salió mal en Mis Cobros
           </p>
           <p className="text-[10px] opacity-40 max-w-xs">{this.state.msg}</p>
           <button
@@ -786,15 +781,15 @@ class CajaErrorBoundary extends React.Component<
 }
 
 // ─────────────────────────────────────────────────────────────
-//  COMPONENTE PRINCIPAL: CajaFinanzas
+//  COMPONENTE PRINCIPAL: CajaProfesor
 // ─────────────────────────────────────────────────────────────
 
-export const CajaFinanzas: React.FC = () => {
+const CajaProfesor: React.FC = () => {
   const [pagos, setPagos]           = useState<Pago[]>([]);
   const [loading, setLoading]       = useState(true);
   const [tab, setTab]               = useState<0 | 1>(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [idescuela, setIdescuela]   = useState<number | null>(null);
+  const [idescuela]                 = useState<number | null>(null); // no usado — el profesor opera sin idescuela
   const [escuelaInfo, setEscuelaInfo] = useState<{
     nombre: string; logo: string | null; ciudad: string; tel: string;
   }>({ nombre: '', logo: null, ciudad: '', tel: '' });
@@ -807,20 +802,8 @@ export const CajaFinanzas: React.FC = () => {
   const [deudorSeleccionado, setDeudorSeleccionado] = useState<DeudorAgrupado | null>(null);
   const [deudorFiltroTipo, setDeudorFiltroTipo]     = useState<number | null>(null);
 
-  // ── Configuración de precios ─────────────────────────────
-  const [preciosModal, setPreciosModal]         = useState(false);
-  const [precios, setPrecios]                   = useState<ConfigPrecios | null>(null);
-  const [preciosForm, setPreciosForm]           = useState<ConfigPrecios | null>(null);
-  const [preciosHistorial, setPreciosHistorial] = useState<any[]>([]);
-  const [preciosTab, setPreciosTab]             = useState<'config' | 'historial'>('config');
-  const [savingPrecios, setSavingPrecios]       = useState(false);
-  const [preciosError, setPreciosError]         = useState<string | null>(null);
-
-  // ── Notificaciones por lote ──────────────────────────────
-  const [notifLoteModal, setNotifLoteModal]     = useState(false);
-  const [notifTipo, setNotifTipo]               = useState<TipoNotificacion>('pago_pendiente');
-  const [notifEnviando, setNotifEnviando]       = useState(false);
-  const [notifResultado, setNotifResultado]     = useState<NotificacionLoteResult | null>(null);
+  // ── Notificación individual ──────────────────────────────
+  // (sin modal de lote ni config de precios para el profesor)
 
   // ── Historial ───────────────────────────────────────────────
   const [historial, setHistorial]           = useState<HistorialResponse | null>(null);
@@ -856,43 +839,26 @@ export const CajaFinanzas: React.FC = () => {
   const [ticketData, setTicketData]               = useState<ReciboImpresion | null>(null);
   const [comprobanteViewer, setComprobanteViewer] = useState<string | null>(null); // URL imagen comprobante
 
-  // ── Modal generar ───────────────────────────────────────────
-  const [isGenerarModalOpen, setIsGenerarModalOpen] = useState(false);
-  const [genMes, setGenMes]             = useState(getMesActual());
-  const [genMonto, setGenMonto]         = useState('');
-  const [genDiaCobro, setGenDiaCobro]   = useState('1');
-  const [genSobrescribir, setGenSobrescribir] = useState(false);
-  const [genError, setGenError]         = useState<string | null>(null);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ── Bootstrap: obtener escuela ─────────────────────────────
+  // ── Bootstrap: obtener info de la escuela del profesor ──────
   useEffect(() => {
     (async () => {
       try {
         const _axE = (await import('../../api/axios')).default;
-        const res = await _axE.get<any>('/escuelas/escuelas/mi-escuela');
+        // El profesor obtiene su info desde su propio perfil
+        const res = await _axE.get<any>('/profesores/mi-perfil');
         const d = res.data;
-        setIdescuela(d?.idescuela ?? d?.escuela?.idescuela ?? null);
         setEscuelaInfo({
-          nombre: d?.nombreescuela ?? d?.escuela?.nombreescuela ?? 'Mi Escuela',
-          logo:   d?.logo_url      ?? d?.escuela?.logo_url      ?? null,
-          ciudad: d?.ciudad        ?? d?.escuela?.ciudad        ?? '',
-          tel:    d?.telefono_oficina ?? d?.escuela?.telefono_oficina ?? '',
+          nombre: d?.escuela?.nombreescuela ?? d?.nombreescuela ?? 'Mi Escuela',
+          logo:   d?.escuela?.logo_url      ?? null,
+          ciudad: d?.escuela?.ciudad        ?? '',
+          tel:    d?.escuela?.telefono_oficina ?? '',
         });
       } catch {
-        setErrorMsg('No se pudo obtener la escuela. Verifica tu sesión.');
+        // silencioso — la info de escuela es solo para el recibo, no es crítica
       }
     })();
-
-    // Cargar precios vigentes de la escuela
-    finanzasService.obtenerPrecios()
-      .then(r => {
-        setPrecios(r.precios_actuales);
-        setPreciosForm(r.precios_actuales);
-        setPreciosHistorial(r.historial ?? []);
-      })
-      .catch(() => {/* silencioso, usa defaults */});
   }, []);
 
   // ── Cache de nombres por idalumno ─────────────────────────
@@ -900,11 +866,11 @@ export const CajaFinanzas: React.FC = () => {
 
   // ── Carga de pagos ──────────────────────────────────────────
   const loadPagos = useCallback(async () => {
-    if (idescuela === null) return;
     try {
       setLoading(true);
       setErrorMsg(null);
-      const data = await finanzasService.listarPagos(tab === 0 ? 0 : tab, idescuela);
+      // El profesor solo ve los pagos pendientes de sus alumnos asignados
+      const data = await finanzasService.listarPagosProfesor();
       const arr: Pago[] = Array.isArray(data) ? data : [];
       setPagos(arr);
 
@@ -938,33 +904,32 @@ export const CajaFinanzas: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [tab, idescuela]);
+  }, [tab]);
 
   useEffect(() => { loadPagos(); }, [loadPagos]);
 
   // ── Cargar historial (tab 1) ────────────────────────────────
   const loadHistorial = useCallback(async () => {
-    if (!idescuela) return;
     setHistLoading(true);
     try {
-      const p = new URLSearchParams();
-      p.set('pagina',    String(histPagina));
-      p.set('por_pagina', '20');
-      if (histEstatus) p.set('estatus',      histEstatus);
-      if (histTipo)    p.set('id_tipo_pago', histTipo);
-      if (histMetodo)  p.set('metodo_pago',  histMetodo);
-      if (histBuscar)  p.set('buscar',       histBuscar);
-      if (histDesde)   p.set('fecha_desde',  histDesde);
-      if (histHasta)   p.set('fecha_hasta',  histHasta);
-      const _axH = (await import('../../api/axios')).default;
-      const res = await _axH.get<HistorialResponse>(`/finanzas/pagos/escuela/${idescuela}/historial?${p}`);
-      setHistorial(res.data);
+      // El profesor consulta su propio historial de cobros
+      const data = await finanzasService.historialProfesor({
+        buscar:       histBuscar   || undefined,
+        estatus:      histEstatus  !== '' ? Number(histEstatus) : undefined,
+        id_tipo_pago: histTipo     !== '' ? Number(histTipo)    : undefined,
+        metodo_pago:  histMetodo   || undefined,
+        fecha_desde:  histDesde    || undefined,
+        fecha_hasta:  histHasta    || undefined,
+        pagina:       histPagina,
+        por_pagina:   20,
+      });
+      setHistorial(data);
     } catch (e) {
       console.error('Error historial:', e);
     } finally {
       setHistLoading(false);
     }
-  }, [idescuela, histPagina, histEstatus, histTipo, histMetodo, histBuscar, histDesde, histHasta]);
+  }, [histPagina, histEstatus, histTipo, histMetodo, histBuscar, histDesde, histHasta]);
 
   useEffect(() => {
     setSearchTerm('');
@@ -1024,7 +989,8 @@ export const CajaFinanzas: React.FC = () => {
       // Atraso y recargos — SOLO mensualidades (tipo 1)
       const mensPends = pends.filter(p => p.id_tipo_pago === 1);
       if (mensPends.length > 0) {
-        const infos = mensPends.map(p => calcAtraso(p, precios?.recargo_semanal ?? 50, precios?.dias_gracia ?? 5));
+        // El profesor usa los defaults globales — no tiene acceso a config de precios
+        const infos = mensPends.map(p => calcAtraso(p, 50, 5));
         d.maxAtraso = infos.reduce((max, cur) => cur.diasCorridos > max.diasCorridos ? cur : max, infos[0]);
         d.totalConRecargo = d.totalDeuda + infos.reduce((sum, i) => sum + i.recargo, 0);
       } else {
@@ -1243,80 +1209,6 @@ export const CajaFinanzas: React.FC = () => {
     }
   };
 
-  const handleGenerarMes = async () => {
-    if (!idescuela) return;
-    const monto = parseFloat(genMonto);
-    const dia   = parseInt(genDiaCobro, 10);
-    if (!genMes.match(/^\d{4}-\d{2}$/)) { setGenError('Formato de mes inválido'); return; }
-    if (isNaN(monto) || monto <= 0)      { setGenError('El monto debe ser mayor a $0'); return; }
-    if (isNaN(dia) || dia < 1 || dia > 28) { setGenError('El día debe estar entre 1 y 28'); return; }
-    setGenError(null);
-    setSaving(true);
-    try {
-      await finanzasService.generarMensualidadesMes({
-        idescuela, mes_correspondiente: genMes,
-        monto_default: monto, dia_cobro_default: dia,
-        sobrescribir_existentes: genSobrescribir,
-      } as GenerarMensualidadDTO);
-      setIsGenerarModalOpen(false);
-      setSuccessMsg(`Mensualidades generadas para ${genMes}`);
-      loadPagos();
-    } catch (err: any) {
-      setGenError(err?.response?.data?.detail ?? 'Error al generar mensualidades.');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  // ── Notificación por lote ────────────────────────────────
-  const handleNotificarLote = async () => {
-    setNotifEnviando(true);
-    setNotifResultado(null);
-    try {
-      // Obtener todos los alumnos únicos con deuda
-      const ids = deudoresAgrupados.map(d => d.idalumno);
-      if (ids.length === 0) {
-        setSuccessMsg('No hay alumnos con deuda pendiente');
-        setNotifLoteModal(false);
-        return;
-      }
-      const resultado = await finanzasService.notificarLote(ids, notifTipo);
-      setNotifResultado(resultado);
-      if (resultado.enviados > 0) {
-        setSuccessMsg(`${resultado.enviados} notificaciones enviadas correctamente`);
-      }
-    } catch (err: any) {
-      setErrorMsg(err?.response?.data?.detail ?? 'Error al enviar notificaciones');
-    } finally {
-      setNotifEnviando(false);
-    }
-  };
-
-  // ── Guardar precios ──────────────────────────────────────
-  const handleGuardarPrecios = async () => {
-    if (!preciosForm) return;
-    setSavingPrecios(true);
-    setPreciosError(null);
-    try {
-      const res = await finanzasService.actualizarPrecios({
-        mensualidad_default: preciosForm.mensualidad_default,
-        inscripcion_default: preciosForm.inscripcion_default,
-        examen_default:      preciosForm.examen_default,
-        recargo_semanal:     preciosForm.recargo_semanal,
-        dias_gracia:         preciosForm.dias_gracia,
-      });
-      setPrecios(res.precios_actuales);
-      setPreciosForm(res.precios_actuales);
-      setPreciosHistorial(res.historial ?? []);
-      setSuccessMsg('Precios actualizados correctamente');
-      setPreciosModal(false);
-    } catch (err: any) {
-      setPreciosError(err?.response?.data?.detail ?? 'Error al guardar precios');
-    } finally {
-      setSavingPrecios(false);
-    }
-  };
-
   const handleNotificar = async (pago: Pago, tipo: TipoNotificacion = 'pago_pendiente') => {
     if (notificando) return;
     setNotificando(pago.idpago);
@@ -1383,8 +1275,8 @@ export const CajaFinanzas: React.FC = () => {
               <DollarSign size={26} style={{ color: 'var(--color-primary)' }} strokeWidth={2.5} />
             </div>
             <div>
-              <h2 className="text-2xl font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">Caja y Finanzas</h2>
-              <p className="text-[8px] font-black uppercase tracking-[0.4em] mt-2 italic opacity-40 leading-none text-[var(--color-text-muted)]">Gestión Técnica de Ingresos</p>
+              <h2 className="text-2xl font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">Mis Cobros</h2>
+              <p className="text-[8px] font-black uppercase tracking-[0.4em] mt-2 italic opacity-40 leading-none text-[var(--color-text-muted)]">Pagos de tus alumnos</p>
             </div>
           </div>
           <div className="flex flex-col gap-2 w-full md:w-auto">
@@ -1411,57 +1303,32 @@ export const CajaFinanzas: React.FC = () => {
                 />
               </motion.button>
 
-              {/* Notificar */}
+              {/* Notificar a todos (solo alumnos del profesor) */}
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 whileHover={{ scale: 1.03 }}
-                onClick={() => { setNotifResultado(null); setNotifLoteModal(true); }}
+                onClick={() => {
+                  const ids = deudoresAgrupados.map(d => d.idalumno);
+                  if (!ids.length) { setSuccessMsg('No hay alumnos con deuda'); return; }
+                  finanzasService.notificarLote(ids, 'pago_pendiente' as TipoNotificacion)
+                    .then(r => setSuccessMsg(`${r.enviados} notificaciones enviadas`))
+                    .catch(() => setErrorMsg('Error al enviar notificaciones'));
+                }}
                 className="flex-1 h-10 px-4 rounded-xl flex items-center justify-center gap-2 border transition-all"
                 style={{
                   background: 'var(--color-primary)18',
                   borderColor: 'var(--color-primary)35',
                   color: 'var(--color-primary)',
                 }}
-                title="Enviar notificaciones masivas"
+                title="Notificar a todos mis alumnos con adeudo"
               >
                 <Bell size={14} strokeWidth={2.5} />
                 <span className="text-[10px] font-black uppercase italic tracking-tighter">Notificar</span>
               </motion.button>
 
-              {/* Precios */}
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.03 }}
-                onClick={() => { setPreciosError(null); setPreciosTab('config'); setPreciosModal(true); }}
-                className="flex-1 h-10 px-4 rounded-xl flex items-center justify-center gap-2 border transition-all"
-                style={{
-                  background: 'var(--color-background)',
-                  borderColor: 'var(--color-border)',
-                  color: 'var(--color-text-muted)',
-                }}
-                title="Configurar precios de la escuela"
-              >
-                <Settings size={14} strokeWidth={2.5} />
-                <span className="text-[10px] font-black uppercase italic tracking-tighter">Precios</span>
-              </motion.button>
+
             </div>
 
-            {/* Fila inferior — acción principal */}
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.02 }}
-              onClick={() => { setGenError(null); setIsGenerarModalOpen(true); }}
-              className="w-full h-11 rounded-xl flex items-center justify-center gap-2 border transition-all"
-              style={{
-                background: 'var(--color-primary)',
-                borderColor: 'var(--color-primary)',
-                color: '#ffffff',
-                boxShadow: '0 6px 20px -4px var(--color-primary)50',
-              }}
-            >
-              <PlusCircle size={16} strokeWidth={2.5} />
-              <span className="text-[10px] font-black uppercase italic tracking-tighter">Cargar Mensualidades</span>
-            </motion.button>
 
           </div>
         </div>
@@ -2505,373 +2372,17 @@ export const CajaFinanzas: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* ═══════════════════════════════════════════════════════
-          MODAL — CONFIGURAR PRECIOS
-      ═══════════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {preciosModal && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 backdrop-blur-md" style={{ background: 'rgba(0,0,0,0.95)' }}
-              onClick={() => setPreciosModal(false)} />
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 30 }}
-              className="relative w-full max-w-lg bg-[var(--color-card)] rounded-[3rem] border border-[var(--color-border)] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
-            >
-              {/* Header */}
-              <div className="p-6 flex items-center justify-between border-b border-[var(--color-border)]">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                    style={{ background: 'var(--color-primary)15', color: 'var(--color-primary)' }}>
-                    <Settings size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">
-                      Precios del Dojo
-                    </h3>
-                    <p className="text-[8px] font-black uppercase tracking-widest opacity-40 mt-0.5 text-[var(--color-text-muted)]">
-                      {precios?.actualizado_en ? `Actualizado: ${precios.actualizado_en}` : 'Sin configurar — usando defaults'}
-                    </p>
-                  </div>
-                </div>
-                <button onClick={() => setPreciosModal(false)}
-                  className="p-2 rounded-full opacity-40 hover:opacity-100 text-[var(--color-text)]">
-                  <X size={18} />
-                </button>
-              </div>
 
-              {/* Tabs */}
-              <div className="flex p-2 gap-1 border-b border-[var(--color-border)]">
-                {(['config', 'historial'] as const).map(t => (
-                  <button key={t} onClick={() => setPreciosTab(t)}
-                    className="flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
-                    style={preciosTab === t
-                      ? { background: 'var(--color-primary)', color: '#fff' }
-                      : { opacity: 0.4, color: 'var(--color-text)' }
-                    }>
-                    {t === 'config' ? '⚙️ Configuración' : '📋 Historial'}
-                  </button>
-                ))}
-              </div>
 
-              <div className="flex-1 overflow-y-auto p-6">
-                {preciosTab === 'config' && preciosForm && (
-                  <div className="space-y-5">
-                    <p className="text-[9px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)]">
-                      Los precios se aplican al generar nuevos cargos. Los cargos ya creados conservan el precio con el que fueron generados.
-                    </p>
-
-                    {/* Campos de precios */}
-                    {[
-                      { key: 'mensualidad_default', label: 'Mensualidad mensual',    icon: '📅', desc: 'Cobro mensual por alumno' },
-                      { key: 'inscripcion_default', label: 'Inscripción semestral',  icon: '📝', desc: 'Al inicio de cada ciclo' },
-                      { key: 'examen_default',      label: 'Examen de grado',        icon: '🥋', desc: 'Por examen de cinta' },
-                      { key: 'recargo_semanal',     label: 'Recargo por semana',     icon: '⚠️', desc: 'Se suma por cada semana de atraso' },
-                    ].map(({ key, label, icon, desc }) => (
-                      <div key={key} className="space-y-1.5">
-                        <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[var(--color-text)]">
-                          <span>{icon}</span> {label}
-                          <span className="opacity-40 font-bold normal-case tracking-normal">— {desc}</span>
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-[var(--color-primary)]">$</span>
-                          <input
-                            type="number" min="0" step="0.50"
-                            value={(preciosForm as any)[key]}
-                            onChange={e => setPreciosForm(prev => prev ? { ...prev, [key]: parseFloat(e.target.value) || 0 } : prev)}
-                            className="w-full h-12 pl-8 pr-4 rounded-2xl border outline-none font-black text-sm"
-                            style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
-                            onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
-                            onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
-                          />
-                        </div>
-                      </div>
-                    ))}
-
-                    {/* Días de gracia */}
-                    <div className="space-y-1.5">
-                      <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[var(--color-text)]">
-                        <span>⏳</span> Días hábiles de gracia
-                        <span className="opacity-40 font-bold normal-case tracking-normal">— Sin recargo tras vencimiento</span>
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="number" min="0" max="30" step="1"
-                          value={preciosForm.dias_gracia}
-                          onChange={e => setPreciosForm(prev => prev ? { ...prev, dias_gracia: parseInt(e.target.value) || 0 } : prev)}
-                          className="w-full h-12 px-4 rounded-2xl border outline-none font-black text-sm"
-                          style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
-                          onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
-                          onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
-                        />
-                      </div>
-                    </div>
-
-                    {preciosError && (
-                      <div className="flex items-center gap-2 px-4 py-3 rounded-2xl text-xs font-bold"
-                        style={{ background: '#ef444415', color: '#ef4444' }}>
-                        <AlertCircle size={14} /> {preciosError}
-                      </div>
-                    )}
-
-                    <motion.button whileTap={{ scale: 0.96 }} onClick={handleGuardarPrecios}
-                      disabled={savingPrecios}
-                      className="w-full h-14 text-white font-black rounded-[2rem] flex items-center justify-center gap-3 disabled:opacity-40 transition-all"
-                      style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary)cc)', boxShadow: '0 6px 24px -6px var(--color-primary)60' }}>
-                      {savingPrecios ? <Loader2 className="animate-spin" size={20} /> : <><CheckCircle2 size={20} /> Guardar Precios</>}
-                    </motion.button>
-                  </div>
-                )}
-
-                {preciosTab === 'historial' && (
-                  <div className="space-y-3">
-                    {preciosHistorial.length === 0 ? (
-                      <div className="py-16 text-center opacity-30">
-                        <FileText size={28} className="mx-auto mb-2" />
-                        <p className="text-[10px] font-bold uppercase">Sin cambios registrados</p>
-                      </div>
-                    ) : preciosHistorial.map((h, i) => (
-                      <div key={i} className="rounded-2xl p-4 border space-y-2"
-                        style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)' }}>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'var(--color-primary)' }}>
-                            {h.fecha}
-                          </span>
-                          <span className="text-[8px] opacity-50 text-[var(--color-text-muted)]">por {h.actualizado_por}</span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                          {Object.entries(h.precios ?? {}).map(([k, v]) => (
-                            <div key={k} className="flex justify-between text-[9px]">
-                              <span className="opacity-50 capitalize">{k.replace(/_/g,' ')}</span>
-                              <span className="font-black text-[var(--color-text)]">${String(v)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ═══════════════════════════════════════════════════════
-          MODAL — NOTIFICACIONES POR LOTE
-      ═══════════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {notifLoteModal && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 backdrop-blur-md" style={{ background: 'rgba(0,0,0,0.95)' }}
-              onClick={() => !notifEnviando && setNotifLoteModal(false)} />
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 30 }}
-              className="relative w-full max-w-md bg-[var(--color-card)] rounded-[3rem] border border-[var(--color-border)] shadow-2xl p-8 space-y-6"
-            >
-              <button onClick={() => setNotifLoteModal(false)}
-                className="absolute top-5 right-5 p-2 rounded-full opacity-40 hover:opacity-100 text-[var(--color-text)]">
-                <X size={18} />
-              </button>
-
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: '#f9731615', color: '#f97316' }}>
-                  <Bell size={22} />
-                </div>
-                <div>
-                  <h3 className="text-xl font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">
-                    Notificación Masiva
-                  </h3>
-                  <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mt-1 text-[var(--color-text-muted)]">
-                    {deudoresAgrupados.length} alumnos con deuda pendiente
-                  </p>
-                </div>
-              </div>
-
-              {/* Selector de tipo */}
-              <div className="space-y-2">
-                <p className="text-[8px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)]">Tipo de notificación</p>
-                {([
-                  { tipo: 'aviso_previo',   label: '⏰ Aviso previo',        desc: 'Faltan días para el vencimiento' },
-                  { tipo: 'pago_pendiente', label: '📋 Pago pendiente',       desc: 'Recordatorio de cobro pendiente' },
-                  { tipo: 'recargo_activo', label: '💸 Recargo activo',       desc: `+$${precios?.recargo_semanal ?? 50} acumulado por semanas de atraso` },
-                  { tipo: 'torneo',         label: '🏆 Torneo',               desc: 'Confirmación de inscripción' },
-                  { tipo: 'examen',         label: '🎓 Examen',               desc: 'Próximamente', disabled: true },
-                ] as { tipo: TipoNotificacion; label: string; desc: string; disabled?: boolean }[]).map(({ tipo, label, desc, disabled }) => (
-                  <button key={tipo}
-                    disabled={disabled}
-                    onClick={() => !disabled && setNotifTipo(tipo)}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all text-left disabled:opacity-30 disabled:cursor-not-allowed"
-                    style={notifTipo === tipo
-                      ? { background: 'var(--color-primary)15', borderColor: 'var(--color-primary)50', color: 'var(--color-text)' }
-                      : { background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }
-                    }>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-black">{label}{disabled ? ' — Próximamente' : ''}</p>
-                      <p className="text-[9px] opacity-50 mt-0.5">{desc}</p>
-                    </div>
-                    {notifTipo === tipo && !disabled && (
-                      <CheckCircle2 size={14} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
-                    )}
-                  </button>
-                ))}
-              </div>
-
-              {/* Resultado del lote */}
-              {notifResultado && (
-                <div className="rounded-2xl p-4 space-y-2"
-                  style={{ background: notifResultado.fallidos === 0 ? '#10b98115' : '#f9731615', border: `1px solid ${notifResultado.fallidos === 0 ? '#10b98130' : '#f9731630'}` }}>
-                  <p className="text-[10px] font-black uppercase tracking-widest"
-                    style={{ color: notifResultado.fallidos === 0 ? '#10b981' : '#f97316' }}>
-                    {notifResultado.enviados} enviadas · {notifResultado.fallidos} fallidas de {notifResultado.total}
-                  </p>
-                  {notifResultado.fallidos > 0 && (
-                    <p className="text-[9px] opacity-60 text-[var(--color-text-muted)]">
-                      Los fallidos pueden ser alumnos sin correo de tutor registrado.
-                    </p>
-                  )}
-                </div>
-              )}
-
-              <motion.button whileTap={{ scale: 0.96 }}
-                onClick={handleNotificarLote}
-                disabled={notifEnviando}
-                className="w-full h-14 text-white font-black rounded-[2rem] flex items-center justify-center gap-3 disabled:opacity-40 transition-all"
-                style={{ background: 'linear-gradient(135deg, #f97316, #ea580c)', boxShadow: '0 6px 24px -6px #f9731660' }}>
-                {notifEnviando
-                  ? <><Loader2 className="animate-spin" size={20} /> Enviando...</>
-                  : <><Bell size={20} /> Enviar a {deudoresAgrupados.length} alumnos</>
-                }
-              </motion.button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ═══════════════════════════════════════════════════════
-          MODAL — GENERAR MENSUALIDADES
-      ═══════════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {isGenerarModalOpen && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 backdrop-blur-md"
-              style={{ background: "rgba(0,0,0,0.95)" }}
-              onClick={() => setIsGenerarModalOpen(false)}
-            />
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 30 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 30 }}
-              className="relative w-full max-w-lg bg-[var(--color-card)] rounded-[3.5rem] border border-[var(--color-border)] shadow-2xl p-10 space-y-8 flex flex-col overflow-y-auto max-h-[90vh] text-left"
-            >
-              <button onClick={() => setIsGenerarModalOpen(false)}
-                className="absolute top-6 right-6 p-2 rounded-full opacity-40 hover:opacity-100 hover:bg-[var(--color-border)] transition-all text-[var(--color-text)]"
-              >
-                <X size={18} />
-              </button>
-
-              <div className="space-y-4">
-                <div className="w-16 h-16 rounded-[2rem] flex items-center justify-center border shadow-inner"
-                  style={{ backgroundColor: 'var(--color-primary)15', borderColor: 'var(--color-primary)20', color: 'var(--color-primary)' }}
-                >
-                  <Calendar size={32} />
-                </div>
-                <h3 className="text-3xl font-black italic uppercase tracking-tighter text-[var(--color-text)] leading-none">Cargar Mensualidades</h3>
-                <p className="text-sm font-bold text-[var(--color-text-muted)] leading-relaxed opacity-70 italic">
-                  Uso manual para corrección o migración. En operación normal los cargos se generan automáticamente cada mes.
-                </p>
-              </div>
-
-              <div className="space-y-5">
-                <div className="space-y-2">
-                  <label className="text-[8px] font-black uppercase ml-3 opacity-40 tracking-widest text-[var(--color-text)]">Mes</label>
-                  <input type="month"
-                    className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] outline-none font-black text-sm text-[var(--color-text)] shadow-inner"
-                    onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
-                    onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
-                    value={genMes} onChange={e => setGenMes(e.target.value)}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-[8px] font-black uppercase ml-3 opacity-40 tracking-widest text-[var(--color-text)]">Monto por defecto ($)</label>
-                    <input type="number" min="1" step="0.01" placeholder="Ej. 500"
-                      className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] outline-none font-black text-sm text-[var(--color-text)] shadow-inner"
-                      onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
-                      onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
-                      value={genMonto} onChange={e => setGenMonto(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[8px] font-black uppercase ml-3 opacity-40 tracking-widest text-[var(--color-text)]">Día de cobro (1-28)</label>
-                    <input type="number" min="1" max="28" placeholder="1"
-                      className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] outline-none font-black text-sm text-[var(--color-text)] shadow-inner"
-                      onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
-                      onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
-                      value={genDiaCobro} onChange={e => setGenDiaCobro(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <label className="flex items-center gap-4 cursor-pointer">
-                  <div
-                    onClick={() => setGenSobrescribir(!genSobrescribir)}
-                    className="w-12 h-6 rounded-full border-2 transition-all relative"
-                    style={genSobrescribir
-                      ? { backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-primary)' }
-                      : { backgroundColor: 'var(--color-background)', borderColor: 'var(--color-border)', opacity: 0.4 }
-                    }
-                  >
-                    <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${genSobrescribir ? 'left-6' : 'left-0.5'}`} />
-                  </div>
-                  <span className="text-xs font-black uppercase tracking-widest opacity-60 text-[var(--color-text)]">
-                    Sobrescribir cargos existentes
-                  </span>
-                </label>
-              </div>
-
-              <div className="p-5 rounded-3xl border border-dashed flex items-start gap-4"
-                style={{ backgroundColor: 'var(--color-primary)08', borderColor: 'var(--color-primary)30' }}
-              >
-                <ShieldAlert size={20} style={{ color: 'var(--color-primary)', marginTop: 2 }} />
-                <p className="text-[10px] font-black uppercase tracking-widest leading-normal" style={{ color: 'var(--color-primary)' }}>
-                  El monto individual configurado por alumno prevalece sobre el monto por defecto.
-                </p>
-              </div>
-
-              {genError && (
-                <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-500 border border-red-500 text-red-400">
-                  <AlertCircle size={16} />
-                  <span className="text-xs font-bold">{genError}</span>
-                </div>
-              )}
-
-              <motion.button whileTap={{ scale: 0.95 }} onClick={handleGenerarMes} disabled={saving}
-                className="w-full h-16 text-white font-black rounded-[2.5rem] flex items-center justify-center gap-4 shadow-2xl disabled:opacity-50 hover:brightness-110 transition-all"
-                style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 8px 32px -8px var(--color-primary)50' }}
-              >
-                {saving
-                  ? <Loader2 className="animate-spin" size={24} />
-                  : <><ArrowDownLeft size={24} /> Ejecutar Proceso Masivo</>
-                }
-              </motion.button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
     </div>
   );
 };
 
-const CajaFinanzasWithBoundary: React.FC = () => (
+const CajaProfesorWithBoundary: React.FC = () => (
   <CajaErrorBoundary>
-    <CajaFinanzas />
+    <CajaProfesor />
   </CajaErrorBoundary>
 );
 
-export default CajaFinanzasWithBoundary;
+export default CajaProfesorWithBoundary;
