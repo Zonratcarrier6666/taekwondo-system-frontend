@@ -8,7 +8,7 @@ Permite la administración de alumnos, control de información y conexión con u
 
 ## 🚀 Tecnologías utilizadas
 
-- ⚡ Angular
+- ⚡ Angular y React
 - 🟦 TypeScript
 - 🎨 HTML5 & CSS3
 - 🔗 Consumo de API REST
