@@ -4,20 +4,14 @@ import {
   Users,
   CheckCircle2,
   Trophy,
-  Calendar,
   LogOut,
   Loader2,
-  TrendingUp,
   PieChart as PieIcon,
-  Search,
   ChevronRight,
   Bell,
   Sparkles,
-  Smartphone,
   UserCheck,
   Clock,
-  LayoutDashboard,
-  GraduationCap
 } from 'lucide-react';
 
 // --- IMPORTACIONES REALES DE PRODUCCIÓN ---
@@ -34,10 +28,12 @@ import GlobalNavbar from '../../components/common/GlobalNavbar';
 // @ts-ignore
 import CajaProfesor from './CajaProfesor';
 // @ts-ignore
-// @ts-ignore
 import PaseListaView from './PaseListaView';
 // @ts-ignore
 import ExamenesView from './Examenesview';
+// @ts-ignore
+import CombatesActivos from './CombatesView';
+
 
 const BELT_COLOR_MAP: Record<string, string> = {
   Blanca: '#f8fafc', Amarilla: '#fbbf24', Naranja: '#fb923c',
@@ -289,7 +285,7 @@ export const ProfesorDashboard: React.FC = () => {
 
             {/* LISTADO DE ALUMNOS (ASISTENCIA RÁPIDA) */}
             {activeTab === 'alumnos' && (
-              <PaseListaView alumnos={filteredAlumnos} />
+              <PaseListaView />
             )}
 
             {/* MÓDULO FINANZAS — REAL */}
@@ -300,6 +296,10 @@ export const ProfesorDashboard: React.FC = () => {
             {/* MÓDULO Examenes — REAL */}
             {activeTab === 'examenes' && (
               <ExamenesView />
+            )}
+            {/*Modulo de torneos para profesores*/}
+            {activeTab === 'torneos' && (
+              <CombatesActivos />
             )}
           </motion.div>
         </AnimatePresence>

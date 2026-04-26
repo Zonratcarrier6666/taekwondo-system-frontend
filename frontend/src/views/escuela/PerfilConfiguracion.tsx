@@ -36,6 +36,7 @@ import { LISTA_TEMAS, TEMAS_CLAROS, TEMAS_OSCUROS } from '../../constants/themes
 
 interface Props {
   initialEscuela?: Escuela;
+  onUpdate?: () => void;   // ← añadir
 }
 
 /**

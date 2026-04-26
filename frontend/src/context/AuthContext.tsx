@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-// IMPORTACIÓN DE TIPOS: Usamos 'import type' para cumplir con verbatimModuleSyntax
 import type { ReactNode } from 'react';
 import type { User, Role, ThemeName, AuthContextType } from '../types/escuela.types';
 
@@ -7,6 +6,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  // FIX: Agregamos el estado para 'role' que pide tu AuthContextType
+  const [role, setRole] = useState<Role | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [currentTheme, setCurrentTheme] = useState<ThemeName>('auto');
 
@@ -19,12 +20,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (savedUser) {
           const parsed = JSON.parse(savedUser);
           setUser(parsed);
+          // FIX: También recuperamos el rol del usuario guardado
+          setRole(parsed.role || null);
           applyTheme(savedTheme || parsed.tema || 'auto');
         } else {
           applyTheme(savedTheme || 'auto');
         }
       } catch {
-        // Limpiamos el catch para evitar el error de variable no usada 'e'
         localStorage.clear();
       } finally {
         setIsInitializing(false);
@@ -41,9 +43,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = (token: string, role: Role, username: string) => {
     localStorage.setItem('access_token', token);
-    const userData: User = { username, rol: role, tema: 'auto' };
+    // FIX: Cambiamos 'rol' por 'role' para que coincida con tu interfaz User
+    const userData: User = { username, role, tema: 'auto' };
     localStorage.setItem('user_session', JSON.stringify(userData));
     setUser(userData);
+    setRole(role); // FIX: Guardamos el rol en el estado
     applyTheme('auto');
   };
 
@@ -51,6 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user_session');
     setUser(null);
+    setRole(null); // FIX: Limpiamos el rol al salir
   };
 
   const setTheme = (newTheme: ThemeName) => {
@@ -64,12 +69,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isInitializing, setTheme, currentTheme }}>
+    // FIX: Agregamos 'role' al value del Provider
+    <AuthContext.Provider value={{ user, role, login, logout, isInitializing, setTheme, currentTheme }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
+// FIX: Añadimos el ignore para que ESLint no se queje del Fast Refresh
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

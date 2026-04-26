@@ -20,7 +20,7 @@ import {
 
 import { finanzasService } from '../../services/finanzas.service';
 import type {
-  ConfigPrecios, PreciosResponse, TipoNotificacion, NotificacionLoteResult,
+  ConfigPrecios, TipoNotificacion, NotificacionLoteResult,
 } from '../../services/finanzas.service';
 import { alumnoService } from '../../services/alumno.service';
 import { ModalReciboImpresion } from './ModalReciboImpresion';
@@ -992,15 +992,16 @@ export const CajaFinanzas: React.FC = () => {
       if (!aid) return;
       if (!map.has(aid)) {
         map.set(aid, {
-          idalumno: aid,
-          nombreCompleto: (nombresCache[aid]
-            ?? `${p.alumno?.nombres ?? ''} ${p.alumno?.apellidopaterno ?? ''}`.trim())
-            || `Alumno #${aid}`,
-          totalDeuda: 0,
-          pagos: [],
-          cintaColor: p.alumno?.cinta?.color ?? p.alumno?.grado?.color ?? undefined,
-          cintaNivel: p.alumno?.cinta?.nivelkupdan ?? p.alumno?.grado?.nivelkupdan ?? undefined,
-        });
+  idalumno: aid,
+  nombreCompleto: (nombresCache[aid]
+    ?? `${p.alumno?.nombres ?? ''} ${p.alumno?.apellidopaterno ?? ''}`.trim())
+    || `Alumno #${aid}`,
+  totalDeuda: 0,
+  pagos: [],
+  desgloseDeuda: [],   // ← añadir esta línea
+  cintaColor: p.alumno?.cinta?.color ?? p.alumno?.grado?.color ?? undefined,
+  cintaNivel: p.alumno?.cinta?.nivelkupdan ?? p.alumno?.grado?.nivelkupdan ?? undefined,
+});
       }
       const d = map.get(aid)!;
       // Si nombre era placeholder y este pago trae datos reales, actualizarlo

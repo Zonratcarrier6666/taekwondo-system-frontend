@@ -956,16 +956,17 @@ const CajaProfesor: React.FC = () => {
       const aid = p.idalumno;
       if (!aid) return;
       if (!map.has(aid)) {
-        map.set(aid, {
-          idalumno: aid,
-          nombreCompleto: (nombresCache[aid]
-            ?? `${p.alumno?.nombres ?? ''} ${p.alumno?.apellidopaterno ?? ''}`.trim())
-            || `Alumno #${aid}`,
-          totalDeuda: 0,
-          pagos: [],
-          cintaColor: p.alumno?.cinta?.color ?? p.alumno?.grado?.color ?? undefined,
-          cintaNivel: p.alumno?.cinta?.nivelkupdan ?? p.alumno?.grado?.nivelkupdan ?? undefined,
-        });
+       map.set(aid, {
+  idalumno: aid,
+  nombreCompleto: (nombresCache[aid]
+    ?? `${p.alumno?.nombres ?? ''} ${p.alumno?.apellidopaterno ?? ''}`.trim())
+    || `Alumno #${aid}`,
+  totalDeuda: 0,
+  pagos: [],
+  desgloseDeuda: [],   // ← solo esta línea es nueva
+  cintaColor: p.alumno?.cinta?.color ?? p.alumno?.grado?.color ?? undefined,
+  cintaNivel: p.alumno?.cinta?.nivelkupdan ?? p.alumno?.grado?.nivelkupdan ?? undefined,
+});
       }
       const d = map.get(aid)!;
       // Si nombre era placeholder y este pago trae datos reales, actualizarlo

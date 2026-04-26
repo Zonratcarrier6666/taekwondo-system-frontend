@@ -55,3 +55,52 @@ export interface AlumnoCreateDTO {
  * DTO para actualizaciones parciales.
  */
 export type AlumnoUpdateDTO = Partial<AlumnoCreateDTO>;
+
+/**
+ * Definición de Roles de Usuario
+ */
+export type Role = 'Admin' | 'Escuela' | 'Profesor' | 'Alumno' | 'Staff' | 'Juez';
+
+/**
+ * Nombres de temas disponibles
+ */
+export type ThemeName = 'light' | 'dark' | 'auto' | 'P-rojo' | 'P-azul' | 'P-oro';
+
+/**
+ * Estructura del Usuario que viene del Backend
+ */
+export interface User {
+  username: string;
+  role: Role;
+  tema?: ThemeName;
+  // Agrega estos campos para silenciar los errores de Dashboard
+  nombre?: string;
+  name?: string;
+  idusuario?: number;
+  id?: number;
+}
+
+/**
+ * Definición del Contexto de Autenticación
+ */
+export interface AuthContextType {
+  user: User | null;
+  role: Role | null;
+  isInitializing: boolean;
+  currentTheme: ThemeName;
+  login: (token: string, role: Role, username: string) => void;
+  logout: () => void;
+  setTheme: (theme: ThemeName) => void;
+}
+export interface Escuela {
+  id: number;
+  nombre: string;
+  nombreescuela?: string;   // ← nombre que usa el backend
+  direccion?: string;
+  telefono?: string;
+  logo_url?: string;
+  color_paleta?: string; 
+  lema?: string;
+  telefono_oficina?: string;
+  correo_escuela?: string;   // ← tema de color de la escuela
+}

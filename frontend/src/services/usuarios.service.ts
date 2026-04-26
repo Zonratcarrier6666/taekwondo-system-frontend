@@ -10,7 +10,7 @@ import type {
   RegistroProfesorDTO,
   RegistroJuezDTO,
   RegistroStaffDTO,
-} from '../types/usuario.types';
+} from '../types/usuarios.types';
 
 export const usuarioService = {
 

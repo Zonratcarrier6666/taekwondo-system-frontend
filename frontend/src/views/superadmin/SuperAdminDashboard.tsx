@@ -30,21 +30,25 @@ interface UsuarioItem {
   rol: string;
   [key: string]: any;
 }
-
+interface CheckinTorneoViewProps {
+  idtorneo: number;
+  onVolver: () => void;
+  T?: any;   // ← añadir
+}
 interface EscuelaItem {
   idescuela: number;
   nombreescuela: string;
-  logo_url: string | null;
+  logo_url?: string | null;  // ← añadir ?
 }
 
 interface SuperAdminStats {
   total_usuarios: number;
-  usuarios_online_recientes: number;
+  usuarios_online_recientes?: number;  // ← añadir ?
   usuarios_por_rol: Record<string, number>;
   usuarios_lista: UsuarioItem[];
   escuelas: EscuelaItem[];
-  filtro_aplicado: any;
-  resumen_sistema: { total_escuelas: number };
+  filtro_aplicado?: any;
+  resumen_sistema: { total_escuelas?: number; [key: string]: any };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -849,7 +853,7 @@ export const SuperAdminDashboard: React.FC = () => {
                 <p className="text-[9px] font-black uppercase italic tracking-tighter leading-none"
                   style={{ color: T.text }}>{user?.nombre || user?.name || 'Superadmin'}</p>
                 <p className="text-[7px] font-bold uppercase tracking-widest mt-0.5 leading-none"
-                  style={{ color: T.violet }}>{user?.rol || user?.role}</p>
+                  style={{ color: T.violet }}>{user?.role}</p>
               </div>
               <motion.span animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}
                 className="w-1.5 h-1.5 rounded-full flex-shrink-0"

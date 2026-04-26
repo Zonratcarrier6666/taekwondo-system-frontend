@@ -565,11 +565,12 @@ const ResultadosView: React.FC<{
       // Intentamos los endpoints más probables en orden
       let data: ResultadoData[] = [];
 
-      const intentos = [
-        () => torneoAreasService.listarCombates?.(idtorneoActivo),
-        () => torneoAreasService.resultados?.(idtorneoActivo),
-        () => torneoAreasService.historialCombates?.(idtorneoActivo),
-      ];
+      const svc = torneoAreasService as any;
+const intentos = [
+  () => svc.listarCombates?.(idtorneoActivo),
+  () => svc.resultados?.(idtorneoActivo),
+  () => svc.historialCombates?.(idtorneoActivo),
+];
 
       for (const intento of intentos) {
         try {

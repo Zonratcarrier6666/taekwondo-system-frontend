@@ -838,7 +838,7 @@ const TorneoCardCombates: React.FC<{
 // ─────────────────────────────────────────────────────────────
 //  VISTA PRINCIPAL
 // ─────────────────────────────────────────────────────────────
-const CombatesView: React.FC<{ T: Tema }> = ({ T }) => {
+const CombatesView: React.FC<{ T: Tema; onAbrirQR?: (id: number) => void }> = ({ T, onAbrirQR }) => {
   const [torneos, setTorneos]           = useState<Torneo[]>([]);
   const [loading, setLoading]           = useState(true);
   const [torneoDetalle, setTorneoDetalle] = useState<Torneo | null>(null);

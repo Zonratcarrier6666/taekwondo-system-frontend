@@ -3,6 +3,8 @@
 //  Sincronizado con app/schemas/pagos.py
 // ============================================================
 
+import { Escuela } from "./escuela.types";
+
 // ─── Enums (espejo de Python) ────────────────────────────────
 
 export type TipoPago = 1 | 2 | 3 | 4 | 5;
@@ -18,10 +20,18 @@ export type CicloSemestral = 'ENE-JUN' | 'JUL-DIC';
 // ─── Alumno embebido en Pago ──────────────────────────────────
 
 export interface AlumnoPago {
-  idalumno:        number;
-  nombres:         string;
-  apellidopaterno: string;
+  idalumno:         number;
+  nombres:          string;
+  apellidopaterno:  string;
   apellidomaterno?: string;
+  cinta?: {
+    color?:      string;
+    nivelkupdan?: string;
+  };
+  grado?: {
+    color?:      string;
+    nivelkupdan?: string;
+  };
 }
 
 // ─── Pago principal ──────────────────────────────────────────
@@ -42,6 +52,7 @@ export interface Pago {
   fecharegistro:       string;    // ISO string
   fecha_pago?:         string;    // ISO string cuando estatus=1
   alumno?:             AlumnoPago;
+  folio_recibo?: string;
 }
 
 // ─── DTOs de cobro ───────────────────────────────────────────
@@ -80,14 +91,22 @@ export interface GenerarMensualidadDTO {
 // ─── Recibo / ticket ─────────────────────────────────────────
 
 export interface ReciboImpresion {
-  idpago:          number;
-  alumno?:         AlumnoPago;
-  concepto?:       string;
-  monto?:          number;
-  metodo_pago?:    MetodoPago;
-  fecha_pago?:     string;
-  notas?:          string;
-  escuela?:        { nombre: string; logo_url?: string };
+  idpago: number;
+  metadata?: {
+    folio?: string;
+    status_texto?: string;
+    fecha_impresion?: string;
+  };
+  pago?: {
+    monto: number;
+    concepto: string;
+    desglose?: any[];
+    monto_texto?: string;
+  };
+  escuela?: Escuela;
+  alumno?: {
+    nombre_completo: string;
+  };
 }
 
 // ─── Resumen alumno  (ResumenPagosAlumno) ────────────────────

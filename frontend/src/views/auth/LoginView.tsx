@@ -9,8 +9,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
+import api from '../../api/axios';
 /** * --- NOTA DE COMPATIBILIDAD ---
  * En tu proyecto local, estas importaciones funcionarán correctamente.
  * Para la previsualización del chat, hemos añadido lógica de respaldo.
@@ -55,7 +54,7 @@ export const LoginView = () => {
     params.append('password', form.pass);
 
     try {
-      const res = await axios.post("https://taekwondo-system-api.onrender.com/auth/login", params);
+      const res = await api.post("/auth/login", params);
       
       // Aplicamos el tema del servidor si existe
       if (res.data.tema && themeService) {

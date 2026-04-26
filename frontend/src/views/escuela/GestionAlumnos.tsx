@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Users, Search, Plus, UserPlus, X, Loader2, Smartphone, 
-  ShieldCheck, User as UserIcon, Calendar, Phone, Activity, 
-  Briefcase, CameraIcon, Eye, Save, Info, HeartPulse, 
-  Hash, AlertTriangle, Edit3, DollarSign, ImagePlus, CheckCircle2,
-  GraduationCap, RotateCcw, MapPin, Heart, BookOpen, ShieldAlert, Mail, tempFile, UserCircle, CalendarDays, PhoneForwarded,
-  Link2, Copy, CheckCheck, QrCode, ExternalLink, UserPlus as UserPlusIcon
+  Users, Search, UserPlus, X, Loader2, Smartphone, 
+  User as UserIcon, Phone, 
+  Briefcase, CameraIcon, Eye, Save, HeartPulse, 
+  Edit3, DollarSign, ImagePlus, CheckCircle2,
+  GraduationCap, RotateCcw, MapPin, Heart, BookOpen, ShieldAlert, Mail, UserCircle, CalendarDays, PhoneForwarded,
+  Link2, Copy, CheckCheck, QrCode, UserPlus as UserPlusIcon
 } from 'lucide-react';
 
 /**
@@ -732,7 +732,7 @@ export const App: React.FC = () => {
                                         <select 
                                             className={`w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border ${errors.idprofesor ? 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'border-[var(--color-border)]'} focus:border-[var(--color-primary)] outline-none font-black text-[9px] uppercase text-[var(--color-text)] appearance-none cursor-pointer transition-all`} 
                                             value={formData.idprofesor || ''} 
-                                            onChange={e => handleInputChange('idprofesor', e.target.value ? e.target.value : null)}
+onChange={e => handleInputChange('idprofesor', e.target.value)}
                                         >
                                             <option value="">Seleccionar Maestro</option>
                                             {profesores.map(p => <option key={p.idprofesor} value={p.idprofesor}>{p.nombrecompleto}</option>)}

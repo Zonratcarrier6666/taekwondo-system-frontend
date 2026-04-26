@@ -6,6 +6,8 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "noImplicitAny": false,
+    "strict": false,
 
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

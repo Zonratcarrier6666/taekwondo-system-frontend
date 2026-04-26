@@ -279,7 +279,6 @@ const PaseListaView: React.FC = () => {
         const res = await alumnoService.actualizar(selectedAlumno.idalumno, {
           nombres: formData.nombres, apellidopaterno: formData.apellidopaterno,
           apellidomaterno: formData.apellidomaterno, idgradoactual: formData.idgradoactual,
-          estatus: formData.estatus, fotoalumno: formData.fotoalumno,
         });
         setAlumnos(p => p.map(a => a.idalumno === res.idalumno ? res : a));
         setIsModalOpen(false);

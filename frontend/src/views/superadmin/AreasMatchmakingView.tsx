@@ -358,7 +358,7 @@ const MatchmakingPanel: React.FC<{ idtorneo: number; T: Tema }> = ({ idtorneo, T
             <ArrowLeftRight size={11} />
             {modoSwap ? 'Cancelar swap' : 'Editar orden'}
           </motion.button>
-          <motion.button whileTap={{ scale: 0.9 }} onClick={cargar}
+          <motion.button whileTap={{ scale: 0.9 }} onClick={() => cargar()}
             className="w-8 h-8 flex items-center justify-center rounded-xl"
             style={{ background: T.surface, border: `1px solid ${T.border}` }}>
             <RefreshCw size={12} style={{ color: T.textDim }} />

@@ -318,6 +318,7 @@ const CompetidorRow: React.FC<{
 interface CheckinTorneoViewProps {
   idtorneo: number;
   onVolver: () => void;
+  T?: any;   // ← añadir
 }
 
 const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolver }) => {
