@@ -141,9 +141,6 @@ export const ProfesorDashboard: React.FC = () => {
           </div>
           
           <div className="flex gap-2">
-            <button className="p-3 bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] text-[var(--color-text-muted)] shadow-xl active:scale-90 transition-all hover:text-[var(--color-primary)]">
-              <Bell size={20} />
-            </button>
             <button onClick={handleLogout} className="p-3 bg-red-500/10 text-red-500 rounded-2xl border border-red-500/10 shadow-xl active:scale-90 transition-all hover:bg-red-500 hover:text-white">
               <LogOut size={20} />
             </button>

@@ -10,13 +10,6 @@ import {
   Link2, Copy, CheckCheck, QrCode, UserPlus as UserPlusIcon
 } from 'lucide-react';
 
-/**
- * --- NOTA PARA EL DESARROLLADOR ---
- * Para que el Canvas pueda previsualizar la interfaz sin errores de compilación,
- * hemos definido mocks internos de los servicios. En tu entorno local de desarrollo,
- * simplemente DESCOMENTA las importaciones reales de abajo y elimina los mocks.
- */
-
 import api from '../../api/axios';
 import { alumnoService } from '../../services/alumno.service';
 import { profesorService } from '../../services/profesor.service';

@@ -451,9 +451,6 @@ export const EscuelaDashboard: React.FC = () => {
             </div>
           </div>
           <div className="flex gap-1.5">
-            <button className="p-2.5 bg-[var(--color-card)] rounded-xl border border-[var(--color-border)] text-[var(--color-text-muted)] shadow-sm active:scale-90 transition-all hover:text-[var(--color-primary)]">
-              <Bell size={18} />
-            </button>
             <button onClick={handleLogout}
               className="p-2.5 bg-red-500/10 text-red-500 rounded-xl border border-red-500/10 shadow-sm active:scale-90 transition-all hover:bg-red-500 hover:text-white">
               <LogOut size={18} />

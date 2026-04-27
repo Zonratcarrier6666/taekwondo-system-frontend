@@ -1303,34 +1303,7 @@ const CajaProfesor: React.FC = () => {
                   style={{ color: loading ? 'var(--color-primary)' : undefined }}
                 />
               </motion.button>
-
-              {/* Notificar a todos (solo alumnos del profesor) */}
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.03 }}
-                onClick={() => {
-                  const ids = deudoresAgrupados.map(d => d.idalumno);
-                  if (!ids.length) { setSuccessMsg('No hay alumnos con deuda'); return; }
-                  finanzasService.notificarLote(ids, 'pago_pendiente' as TipoNotificacion)
-                    .then(r => setSuccessMsg(`${r.enviados} notificaciones enviadas`))
-                    .catch(() => setErrorMsg('Error al enviar notificaciones'));
-                }}
-                className="flex-1 h-10 px-4 rounded-xl flex items-center justify-center gap-2 border transition-all"
-                style={{
-                  background: 'var(--color-primary)18',
-                  borderColor: 'var(--color-primary)35',
-                  color: 'var(--color-primary)',
-                }}
-                title="Notificar a todos mis alumnos con adeudo"
-              >
-                <Bell size={14} strokeWidth={2.5} />
-                <span className="text-[10px] font-black uppercase italic tracking-tighter">Notificar</span>
-              </motion.button>
-
-
             </div>
-
-
           </div>
         </div>
 

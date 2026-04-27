@@ -256,9 +256,10 @@ export const GestionProfesores: React.FC = () => {
             <div className="p-20 text-center opacity-30 italic font-bold uppercase tracking-widest text-xs text-[var(--color-text-muted)]">Sin registros en el staff</div>
         ) : (
           filtered.map((prof) => (
-            <motion.div layout key={prof.idprofesor} className="bg-[var(--color-card)]/80 backdrop-blur-xl p-5 rounded-[2.8rem] border border-[var(--color-border)] shadow-lg flex items-center justify-between group hover:border-[var(--color-primary)]/40 transition-all">
+            <motion.div layout key={prof.idprofesor} className="bg-[var(--color-card)]/80 backdrop-blur-xl p-5 rounded-[2.8rem] border border-[var(--color-border)] shadow-lg flex flex-col gap-4 group hover:border-[var(--color-primary)]/40 transition-all">
+              {/* Fila superior: avatar + nombre */}
               <div className="flex items-center gap-5">
-                <div className="relative">
+                <div className="relative flex-shrink-0">
                   <div className="w-16 h-16 rounded-[1.8rem] bg-[var(--color-background)] border-2 border-[var(--color-border)] overflow-hidden flex items-center justify-center shadow-inner group-hover:rotate-3 transition-transform duration-500">
                     {prof.foto_url ? <img src={prof.foto_url} className="w-full h-full object-cover" alt="" /> : <User size={30} className="text-slate-600 opacity-20" />}
                   </div>
@@ -270,37 +271,39 @@ export const GestionProfesores: React.FC = () => {
                     <div className="absolute -top-1 -left-1 bg-red-500 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded-lg leading-none">OFF</div>
                   )}
                 </div>
-                <div>
-                  <h3 className="text-sm font-black uppercase italic tracking-tighter text-[var(--color-text)] leading-tight">{prof.nombrecompleto}</h3>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm font-black uppercase italic tracking-tighter text-[var(--color-text)] leading-tight truncate">{prof.nombrecompleto}</h3>
                   <p className="text-[9px] font-bold text-[var(--color-primary)] uppercase tracking-widest mt-1 flex items-center gap-1.5"><ShieldCheck size={10} className="text-emerald-500" /> Instructor Cinturón Negro</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+
+              {/* Fila inferior: botones de acción a ancho completo */}
+              <div className="flex items-center gap-2 w-full">
                 {/* Foto */}
-                <button title="Cambiar foto" onClick={() => { setSelectedProfId(prof.idprofesor); setStep('photo_choice'); setIsModalOpen(true); }} className="p-3 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-[var(--color-primary)] active:scale-90 transition-all hover:bg-[var(--color-primary)] hover:text-white shadow-sm">
-                  <Camera size={18} />
+                <button title="Cambiar foto" onClick={() => { setSelectedProfId(prof.idprofesor); setStep('photo_choice'); setIsModalOpen(true); }} className="flex-1 flex items-center justify-center p-2.5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-[var(--color-primary)] active:scale-90 transition-all hover:bg-[var(--color-primary)] hover:text-white shadow-sm">
+                  <Camera size={17} />
                 </button>
                 {/* Reset password */}
-                <button title="Resetear contraseña" onClick={() => handleResetPassword(prof.idprofesor)} disabled={actionLoading === prof.idprofesor} className="p-3 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-amber-500 active:scale-90 transition-all hover:bg-amber-500 hover:text-white shadow-sm disabled:opacity-40">
-                  {actionLoading === prof.idprofesor ? <Loader2 size={18} className="animate-spin" /> : <KeyRound size={18} />}
+                <button title="Resetear contraseña" onClick={() => handleResetPassword(prof.idprofesor)} disabled={actionLoading === prof.idprofesor} className="flex-1 flex items-center justify-center p-2.5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-amber-500 active:scale-90 transition-all hover:bg-amber-500 hover:text-white shadow-sm disabled:opacity-40">
+                  {actionLoading === prof.idprofesor ? <Loader2 size={17} className="animate-spin" /> : <KeyRound size={17} />}
                 </button>
                 {/* Activar/Desactivar */}
-                <button title={prof.estatus === 1 ? 'Desactivar' : 'Activar'} onClick={() => handleToggleEstatus(prof)} disabled={actionLoading === prof.idprofesor} className={`p-3 rounded-2xl border active:scale-90 transition-all shadow-sm disabled:opacity-40 ${prof.estatus === 1 ? 'bg-[var(--color-background)] border-[var(--color-border)] text-red-500 hover:bg-red-500 hover:text-white' : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-500 hover:text-white'}`}>
-                  {prof.estatus === 1 ? <PowerOff size={18} /> : <Power size={18} />}
+                <button title={prof.estatus === 1 ? 'Desactivar' : 'Activar'} onClick={() => handleToggleEstatus(prof)} disabled={actionLoading === prof.idprofesor} className={`flex-1 flex items-center justify-center p-2.5 rounded-2xl border active:scale-90 transition-all shadow-sm disabled:opacity-40 ${prof.estatus === 1 ? 'bg-[var(--color-background)] border-[var(--color-border)] text-red-500 hover:bg-red-500 hover:text-white' : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-500 hover:text-white'}`}>
+                  {prof.estatus === 1 ? <PowerOff size={17} /> : <Power size={17} />}
                 </button>
                 {/* Eliminar */}
                 {confirmDelete === prof.idprofesor ? (
-                  <div className="flex gap-1">
-                    <button onClick={() => handleEliminar(prof.idprofesor)} disabled={actionLoading === prof.idprofesor} className="p-3 bg-red-500 rounded-2xl text-white active:scale-90 shadow-sm disabled:opacity-40">
-                      {actionLoading === prof.idprofesor ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
+                  <div className="flex gap-1.5 flex-1">
+                    <button onClick={() => handleEliminar(prof.idprofesor)} disabled={actionLoading === prof.idprofesor} className="flex-1 flex items-center justify-center p-2.5 bg-red-500 rounded-2xl text-white active:scale-90 shadow-sm disabled:opacity-40">
+                      {actionLoading === prof.idprofesor ? <Loader2 size={17} className="animate-spin" /> : <Trash2 size={17} />}
                     </button>
-                    <button onClick={() => setConfirmDelete(null)} className="p-3 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-[var(--color-text)] active:scale-90">
-                      <X size={18} />
+                    <button onClick={() => setConfirmDelete(null)} className="flex-1 flex items-center justify-center p-2.5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-[var(--color-text)] active:scale-90">
+                      <X size={17} />
                     </button>
                   </div>
                 ) : (
-                  <button title="Eliminar profesor" onClick={() => setConfirmDelete(prof.idprofesor)} className="p-3 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-red-400 active:scale-90 transition-all hover:bg-red-500 hover:text-white shadow-sm">
-                    <Trash2 size={18} />
+                  <button title="Eliminar profesor" onClick={() => setConfirmDelete(prof.idprofesor)} className="flex-1 flex items-center justify-center p-2.5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] text-red-400 active:scale-90 transition-all hover:bg-red-500 hover:text-white shadow-sm">
+                    <Trash2 size={17} />
                   </button>
                 )}
               </div>

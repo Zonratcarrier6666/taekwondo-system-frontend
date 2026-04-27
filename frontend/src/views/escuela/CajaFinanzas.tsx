@@ -1411,24 +1411,6 @@ export const CajaFinanzas: React.FC = () => {
                   style={{ color: loading ? 'var(--color-primary)' : undefined }}
                 />
               </motion.button>
-
-              {/* Notificar */}
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ scale: 1.03 }}
-                onClick={() => { setNotifResultado(null); setNotifLoteModal(true); }}
-                className="flex-1 h-10 px-4 rounded-xl flex items-center justify-center gap-2 border transition-all"
-                style={{
-                  background: 'var(--color-primary)18',
-                  borderColor: 'var(--color-primary)35',
-                  color: 'var(--color-primary)',
-                }}
-                title="Enviar notificaciones masivas"
-              >
-                <Bell size={14} strokeWidth={2.5} />
-                <span className="text-[10px] font-black uppercase italic tracking-tighter">Notificar</span>
-              </motion.button>
-
               {/* Precios */}
               <motion.button
                 whileTap={{ scale: 0.95 }}
@@ -1446,24 +1428,6 @@ export const CajaFinanzas: React.FC = () => {
                 <span className="text-[10px] font-black uppercase italic tracking-tighter">Precios</span>
               </motion.button>
             </div>
-
-            {/* Fila inferior — acción principal */}
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ scale: 1.02 }}
-              onClick={() => { setGenError(null); setIsGenerarModalOpen(true); }}
-              className="w-full h-11 rounded-xl flex items-center justify-center gap-2 border transition-all"
-              style={{
-                background: 'var(--color-primary)',
-                borderColor: 'var(--color-primary)',
-                color: '#ffffff',
-                boxShadow: '0 6px 20px -4px var(--color-primary)50',
-              }}
-            >
-              <PlusCircle size={16} strokeWidth={2.5} />
-              <span className="text-[10px] font-black uppercase italic tracking-tighter">Cargar Mensualidades</span>
-            </motion.button>
-
           </div>
         </div>
 
@@ -2509,156 +2473,265 @@ export const CajaFinanzas: React.FC = () => {
       {/* ═══════════════════════════════════════════════════════
           MODAL — CONFIGURAR PRECIOS
       ═══════════════════════════════════════════════════════ */}
-      <AnimatePresence>
-        {preciosModal && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 backdrop-blur-md" style={{ background: 'rgba(0,0,0,0.95)' }}
-              onClick={() => setPreciosModal(false)} />
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 30 }}
-              className="relative w-full max-w-lg bg-[var(--color-card)] rounded-[3rem] border border-[var(--color-border)] shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
+      {/* ═══════════════════════════════════════════════════════
+    MODAL — CONFIGURAR PRECIOS (VERSIÓN CORREGIDA)
+═══════════════════════════════════════════════════════ */}
+<AnimatePresence>
+  {preciosModal && (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+      {/* Backdrop más oscuro y con mayor z-index */}
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onClick={() => setPreciosModal(false)} 
+      />
+      
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0, y: 30 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 30 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        className="relative w-full max-w-md bg-[var(--color-card)] rounded-3xl border border-[var(--color-border)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+        style={{ background: 'var(--color-card)' }}
+      >
+        {/* Header con gradiente */}
+        <div 
+          className="p-5 text-white relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-dark, #1a4a6e))' }}
+        >
+          <div className="absolute top-0 right-0 p-3 opacity-10">
+            <Settings size={80} />
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                <DollarSign size={20} />
+              </div>
+              <div>
+                <h3 className="text-lg font-black uppercase tracking-tighter leading-none">
+                  Configuración de Precios
+                </h3>
+                <p className="text-[8px] font-black uppercase tracking-[0.2em] opacity-70 mt-1">
+                  Gestiona las tarifas del Dojo
+                </p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setPreciosModal(false)}
+              className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all"
             >
-              {/* Header */}
-              <div className="p-6 flex items-center justify-between border-b border-[var(--color-border)]">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                    style={{ background: 'var(--color-primary)15', color: 'var(--color-primary)' }}>
-                    <Settings size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">
-                      Precios del Dojo
-                    </h3>
-                    <p className="text-[8px] font-black uppercase tracking-widest opacity-40 mt-0.5 text-[var(--color-text-muted)]">
-                      {precios?.actualizado_en ? `Actualizado: ${precios.actualizado_en}` : 'Sin configurar — usando defaults'}
-                    </p>
-                  </div>
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-[var(--color-border)] px-4 pt-3 gap-2">
+          <button
+            onClick={() => setPreciosTab('config')}
+            className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-t-xl transition-all ${
+              preciosTab === 'config'
+                ? 'text-[var(--color-primary)] border-b-2 border-[var(--color-primary)]'
+                : 'text-[var(--color-text-muted)] opacity-60 hover:opacity-100'
+            }`}
+          >
+            ⚙️ Configuración
+          </button>
+          <button
+            onClick={() => setPreciosTab('historial')}
+            className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-t-xl transition-all ${
+              preciosTab === 'historial'
+                ? 'text-[var(--color-primary)] border-b-2 border-[var(--color-primary)]'
+                : 'text-[var(--color-text-muted)] opacity-60 hover:opacity-100'
+            }`}
+          >
+            📋 Historial
+          </button>
+        </div>
+
+        {/* Contenido */}
+        <div className="flex-1 overflow-y-auto p-5">
+          {preciosTab === 'config' && preciosForm && (
+            <div className="space-y-5">
+              {/* Mensualidad */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[var(--color-text)]">
+                  <span className="text-base">📅</span> Mensualidad
+                  <span className="text-[8px] font-normal opacity-40">— Cobro recurrente mensual</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] font-black">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="10"
+                    value={preciosForm.mensualidad_default}
+                    onChange={e => setPreciosForm(prev => prev ? { ...prev, mensualidad_default: parseFloat(e.target.value) || 0 } : prev)}
+                    className="w-full h-11 pl-8 pr-4 rounded-xl border outline-none font-bold text-sm"
+                    style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
+                  />
                 </div>
-                <button onClick={() => setPreciosModal(false)}
-                  className="p-2 rounded-full opacity-40 hover:opacity-100 text-[var(--color-text)]">
-                  <X size={18} />
-                </button>
               </div>
 
-              {/* Tabs */}
-              <div className="flex p-2 gap-1 border-b border-[var(--color-border)]">
-                {(['config', 'historial'] as const).map(t => (
-                  <button key={t} onClick={() => setPreciosTab(t)}
-                    className="flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
-                    style={preciosTab === t
-                      ? { background: 'var(--color-primary)', color: '#fff' }
-                      : { opacity: 0.4, color: 'var(--color-text)' }
-                    }>
-                    {t === 'config' ? '⚙️ Configuración' : '📋 Historial'}
-                  </button>
-                ))}
+              {/* Inscripción */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[var(--color-text)]">
+                  <span className="text-base">📝</span> Inscripción
+                  <span className="text-[8px] font-normal opacity-40">— Por ciclo/semestre</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] font-black">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="10"
+                    value={preciosForm.inscripcion_default}
+                    onChange={e => setPreciosForm(prev => prev ? { ...prev, inscripcion_default: parseFloat(e.target.value) || 0 } : prev)}
+                    className="w-full h-11 pl-8 pr-4 rounded-xl border outline-none font-bold text-sm"
+                    style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
+                  />
+                </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6">
-                {preciosTab === 'config' && preciosForm && (
-                  <div className="space-y-5">
-                    <p className="text-[9px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)]">
-                      Los precios se aplican al generar nuevos cargos. Los cargos ya creados conservan el precio con el que fueron generados.
-                    </p>
+              {/* Examen */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[var(--color-text)]">
+                  <span className="text-base">🥋</span> Examen de Grado
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] font-black">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="10"
+                    value={preciosForm.examen_default}
+                    onChange={e => setPreciosForm(prev => prev ? { ...prev, examen_default: parseFloat(e.target.value) || 0 } : prev)}
+                    className="w-full h-11 pl-8 pr-4 rounded-xl border outline-none font-bold text-sm"
+                    style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
+                  />
+                </div>
+              </div>
 
-                    {/* Campos de precios */}
-                    {[
-                      { key: 'mensualidad_default', label: 'Mensualidad mensual',    icon: '📅', desc: 'Cobro mensual por alumno' },
-                      { key: 'inscripcion_default', label: 'Inscripción semestral',  icon: '📝', desc: 'Al inicio de cada ciclo' },
-                      { key: 'examen_default',      label: 'Examen de grado',        icon: '🥋', desc: 'Por examen de cinta' },
-                      { key: 'recargo_semanal',     label: 'Recargo por semana',     icon: '⚠️', desc: 'Se suma por cada semana de atraso' },
-                    ].map(({ key, label, icon, desc }) => (
-                      <div key={key} className="space-y-1.5">
-                        <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[var(--color-text)]">
-                          <span>{icon}</span> {label}
-                          <span className="opacity-40 font-bold normal-case tracking-normal">— {desc}</span>
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-[var(--color-primary)]">$</span>
-                          <input
-                            type="number" min="0" step="0.50"
-                            value={(preciosForm as any)[key]}
-                            onChange={e => setPreciosForm(prev => prev ? { ...prev, [key]: parseFloat(e.target.value) || 0 } : prev)}
-                            className="w-full h-12 pl-8 pr-4 rounded-2xl border outline-none font-black text-sm"
-                            style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
-                            onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
-                            onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
-                          />
-                        </div>
+              {/* Recargo semanal */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[var(--color-text)]">
+                  <span className="text-base">⚠️</span> Recargo por Semana de Atraso
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] font-black">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="10"
+                    value={preciosForm.recargo_semanal}
+                    onChange={e => setPreciosForm(prev => prev ? { ...prev, recargo_semanal: parseFloat(e.target.value) || 0 } : prev)}
+                    className="w-full h-11 pl-8 pr-4 rounded-xl border outline-none font-bold text-sm"
+                    style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
+                  />
+                </div>
+              </div>
+
+              {/* Días de gracia */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[var(--color-text)]">
+                  <span className="text-base">⏳</span> Días Hábiles de Gracia
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="30"
+                  value={preciosForm.dias_gracia}
+                  onChange={e => setPreciosForm(prev => prev ? { ...prev, dias_gracia: parseInt(e.target.value) || 0 } : prev)}
+                  className="w-full h-11 px-4 rounded-xl border outline-none font-bold text-sm"
+                  style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
+                />
+              </div>
+
+              {preciosError && (
+                <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-bold bg-red-500/10 border border-red-500/30 text-red-500">
+                  <AlertCircle size={14} /> {preciosError}
+                </div>
+              )}
+
+              {/* Info adicional */}
+              <div className="p-3 rounded-xl bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/20">
+                <p className="text-[8px] font-black uppercase tracking-wider text-[var(--color-primary)] mb-1">
+                  ℹ️ Información
+                </p>
+                <p className="text-[9px] opacity-60 leading-relaxed">
+                  Los precios se aplicarán a los nuevos cargos generados automáticamente. 
+                  Los cargos existentes mantienen el precio con el que fueron creados.
+                </p>
+              </div>
+
+              <button
+                onClick={handleGuardarPrecios}
+                disabled={savingPrecios}
+                className="w-full h-12 rounded-xl text-white font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                style={{ background: 'var(--color-primary)' }}
+              >
+                {savingPrecios ? (
+                  <><Loader2 className="animate-spin" size={16} /> Guardando...</>
+                ) : (
+                  <><CheckCircle2 size={16} /> Guardar Cambios</>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Historial */}
+          {preciosTab === 'historial' && (
+            <div className="space-y-3">
+              {preciosHistorial.length === 0 ? (
+                <div className="py-16 text-center">
+                  <FileText size={32} className="mx-auto mb-3 opacity-30" />
+                  <p className="text-[10px] font-black uppercase tracking-wider opacity-40">
+                    Sin cambios registrados en el historial
+                  </p>
+                  <p className="text-[8px] opacity-30 mt-1">
+                    Los cambios se registrarán automáticamente al guardar
+                  </p>
+                </div>
+              ) : (
+                preciosHistorial.map((h, i) => (
+                  <div key={i} className="p-4 rounded-xl border" style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)' }}>
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <p className="text-[9px] font-black text-[var(--color-primary)]">
+                          {new Date(h.fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}
+                        </p>
+                        <p className="text-[7px] opacity-40 uppercase tracking-wider mt-1">
+                          por {h.actualizado_por || 'admin'}
+                        </p>
                       </div>
-                    ))}
-
-                    {/* Días de gracia */}
-                    <div className="space-y-1.5">
-                      <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[var(--color-text)]">
-                        <span>⏳</span> Días hábiles de gracia
-                        <span className="opacity-40 font-bold normal-case tracking-normal">— Sin recargo tras vencimiento</span>
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="number" min="0" max="30" step="1"
-                          value={preciosForm.dias_gracia}
-                          onChange={e => setPreciosForm(prev => prev ? { ...prev, dias_gracia: parseInt(e.target.value) || 0 } : prev)}
-                          className="w-full h-12 px-4 rounded-2xl border outline-none font-black text-sm"
-                          style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
-                          onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
-                          onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
-                        />
+                      <div className="text-right">
+                        <span className="text-[7px] font-black uppercase tracking-wider px-2 py-1 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+                          Versión #{preciosHistorial.length - i}
+                        </span>
                       </div>
                     </div>
-
-                    {preciosError && (
-                      <div className="flex items-center gap-2 px-4 py-3 rounded-2xl text-xs font-bold"
-                        style={{ background: '#ef444415', color: '#ef4444' }}>
-                        <AlertCircle size={14} /> {preciosError}
-                      </div>
-                    )}
-
-                    <motion.button whileTap={{ scale: 0.96 }} onClick={handleGuardarPrecios}
-                      disabled={savingPrecios}
-                      className="w-full h-14 text-white font-black rounded-[2rem] flex items-center justify-center gap-3 disabled:opacity-40 transition-all"
-                      style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary)cc)', boxShadow: '0 6px 24px -6px var(--color-primary)60' }}>
-                      {savingPrecios ? <Loader2 className="animate-spin" size={20} /> : <><CheckCircle2 size={20} /> Guardar Precios</>}
-                    </motion.button>
-                  </div>
-                )}
-
-                {preciosTab === 'historial' && (
-                  <div className="space-y-3">
-                    {preciosHistorial.length === 0 ? (
-                      <div className="py-16 text-center opacity-30">
-                        <FileText size={28} className="mx-auto mb-2" />
-                        <p className="text-[10px] font-bold uppercase">Sin cambios registrados</p>
-                      </div>
-                    ) : preciosHistorial.map((h, i) => (
-                      <div key={i} className="rounded-2xl p-4 border space-y-2"
-                        style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)' }}>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'var(--color-primary)' }}>
-                            {h.fecha}
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[var(--color-border)]">
+                      {Object.entries(h.precios || {}).map(([key, value]) => (
+                        <div key={key} className="flex justify-between items-center">
+                          <span className="text-[8px] opacity-50 capitalize">
+                            {key.replace(/_/g, ' ').replace('default', '')}
                           </span>
-                          <span className="text-[8px] opacity-50 text-[var(--color-text-muted)]">por {h.actualizado_por}</span>
+                          <span className="text-[9px] font-black">${String(value)}</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                          {Object.entries(h.precios ?? {}).map(([k, v]) => (
-                            <div key={k} className="flex justify-between text-[9px]">
-                              <span className="opacity-50 capitalize">{k.replace(/_/g,' ')}</span>
-                              <span className="font-black text-[var(--color-text)]">${String(v)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  )}
+</AnimatePresence>
       {/* ═══════════════════════════════════════════════════════
           MODAL — NOTIFICACIONES POR LOTE
       ═══════════════════════════════════════════════════════ */}
