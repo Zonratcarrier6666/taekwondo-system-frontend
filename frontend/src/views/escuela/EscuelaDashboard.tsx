@@ -155,12 +155,13 @@ const LineChart = ({ data }: { data: { mes_label: string; total: number }[] }) =
 };
 
 // ─── Stat Card ───────────────────────────────────────────────
-const StatCard = ({ icon: Icon, label, value, sub, accent, delay = 0 }: {
-  icon: any; label: string; value: string | number; sub?: string; accent?: string; delay?: number;
+const StatCard = ({ icon: Icon, label, value, sub, accent, delay = 0, onClick }: {
+  icon: any; label: string; value: string | number; sub?: string; accent?: string; delay?: number; onClick?: () => void;
 }) => (
   <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
     transition={{ delay, duration: 0.4 }}
-    className="bg-[var(--color-card)] p-5 rounded-[2rem] border border-[var(--color-border)] shadow-xl flex flex-col gap-2">
+    onClick={onClick}
+    className={`bg-[var(--color-card)] p-5 rounded-[2rem] border border-[var(--color-border)] shadow-xl flex flex-col gap-2 ${onClick ? 'cursor-pointer active:scale-95 transition-transform hover:shadow-2xl hover:border-[var(--color-primary)]/30' : ''}`}>
     <div className="flex items-center justify-between">
       <div className="w-9 h-9 rounded-xl flex items-center justify-center"
         style={{ backgroundColor: accent ? `${accent}18` : 'var(--color-primary)18' }}>
@@ -173,19 +174,118 @@ const StatCard = ({ icon: Icon, label, value, sub, accent, delay = 0 }: {
   </motion.div>
 );
 
+// ─── Modal Asistencia ─────────────────────────────────────────
+const AsistenciaModal = ({ count, onClose }: { count: number; onClose: () => void }) => (
+  <AnimatePresence>
+    <motion.div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <motion.div className="relative bg-[var(--color-card)] rounded-[2.5rem] p-8 shadow-2xl border border-[var(--color-border)] text-center max-w-xs w-full"
+        initial={{ scale: 0.8, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.8, opacity: 0 }}
+        transition={{ type: 'spring', damping: 20 }}>
+        <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+          <CheckCircle size={32} className="text-emerald-500" />
+        </div>
+        <p className="text-[8px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-2">Asistencia Hoy</p>
+        <p className="text-7xl font-black italic tracking-tighter text-[var(--color-text)] leading-none mb-2">{count}</p>
+        <p className="text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-widest opacity-50">
+          {count === 1 ? 'alumno presente' : 'alumnos presentes'}
+        </p>
+        <button onClick={onClose}
+          className="mt-6 px-6 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest text-white active:scale-95 transition-transform"
+          style={{ backgroundColor: 'var(--color-primary)' }}>
+          Cerrar
+        </button>
+      </motion.div>
+    </motion.div>
+  </AnimatePresence>
+);
+
+// ─── Modal Cumpleaños ──────────────────────────────────────────
+const BIRTHDAY_MESSAGES = [
+  "🥋 ¡Que este nuevo año te traiga más fuerza, disciplina y victorias dentro y fuera del tatami! ¡Feliz cumpleaños!",
+  "🎉 ¡Hoy es tu día, campeón! Que cada entrenamiento te siga forjando como el gran guerrero que eres. ¡Felicidades!",
+  "🏆 ¡Feliz cumpleaños! Que tus metas sean tan altas como tus patadas y tu espíritu tan fuerte como tu cinturón.",
+  "🌟 Un año más de crecimiento, esfuerzo y dedicación. ¡Que este cumpleaños sea el inicio de tu mejor temporada!",
+  "💪 ¡Otro año más de entrenamiento y superación! El dojo se alegra por ti hoy. ¡Feliz cumpleaños, guerrero!",
+];
+
+const BirthdayModal = ({ alumno, onClose }: { alumno: any; onClose: () => void }) => {
+  const [selectedMsg, setSelectedMsg] = useState(BIRTHDAY_MESSAGES[Math.floor(Math.random() * BIRTHDAY_MESSAGES.length)]);
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(`${alumno.nombres} ${alumno.apellidopaterno}, ${selectedMsg}`).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+        <motion.div className="relative bg-[var(--color-card)] rounded-[2.5rem] p-6 shadow-2xl border border-pink-500/20 max-w-sm w-full"
+          initial={{ scale: 0.8, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.8, opacity: 0 }}
+          transition={{ type: 'spring', damping: 20 }}>
+          <div className="text-center mb-5">
+            <div className="w-16 h-16 rounded-2xl bg-pink-500/10 flex items-center justify-center mx-auto mb-3">
+              <Cake size={30} className="text-pink-500" />
+            </div>
+            <p className="text-[8px] font-black uppercase tracking-[0.3em] text-pink-500">¡Feliz Cumpleaños!</p>
+            <p className="text-lg font-black italic uppercase tracking-tighter text-[var(--color-text)] mt-1">
+              {alumno.nombres} {alumno.apellidopaterno}
+            </p>
+            <p className="text-[8px] text-[var(--color-text-muted)] font-black opacity-50">{alumno.edad} años · {alumno.fecha_display}</p>
+          </div>
+
+          <div className="bg-[var(--color-background)] rounded-2xl p-4 mb-4">
+            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)] opacity-60 mb-2">Mensaje sugerido</p>
+            <p className="text-[11px] text-[var(--color-text)] leading-relaxed font-medium">{selectedMsg}</p>
+          </div>
+
+          <div className="space-y-2">
+            <button onClick={() => setSelectedMsg(BIRTHDAY_MESSAGES[Math.floor(Math.random() * BIRTHDAY_MESSAGES.length)])}
+              className="w-full py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest border border-pink-500/30 text-pink-500 active:scale-95 transition-transform hover:bg-pink-500/10">
+              Otro mensaje
+            </button>
+            <button onClick={copyToClipboard}
+              className="w-full py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest text-white active:scale-95 transition-transform flex items-center justify-center gap-2"
+              style={{ backgroundColor: copied ? '#22c55e' : '#ec4899' }}>
+              {copied ? '✓ ¡Copiado!' : 'Copiar mensaje'}
+            </button>
+          </div>
+
+          <button onClick={onClose}
+            className="mt-3 w-full py-2 text-[8px] font-black uppercase tracking-widest text-[var(--color-text-muted)] opacity-40 hover:opacity-70 transition-opacity">
+            Cerrar
+          </button>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
 // ─── Vista Inicio ────────────────────────────────────────────
-const VistaInicio = ({ stats }: { stats: DashboardEscuela }) => {
+const VistaInicio = ({ stats, onNavigate }: { stats: DashboardEscuela; onNavigate: (tab: string) => void }) => {
   const cambio = pctChange(stats.ingresos_mes_actual, stats.ingresos_mes_anterior);
+  const [showAsistencia, setShowAsistencia] = useState(false);
+  const [birthdayAlumno, setBirthdayAlumno] = useState<any>(null);
+
   return (
     <div className="space-y-5">
+      {/* Modals */}
+      {showAsistencia && <AsistenciaModal count={stats.asistencia_hoy} onClose={() => setShowAsistencia(false)} />}
+      {birthdayAlumno && <BirthdayModal alumno={birthdayAlumno} onClose={() => setBirthdayAlumno(null)} />}
 
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4">
         <StatCard icon={Users} label="Alumnos Activos" value={stats.total_alumnos_activos}
-          sub={`+${stats.alumnos_nuevos_30d} este mes`} delay={0.05} />
-        <StatCard icon={GraduationCap} label="Profesores" value={stats.total_profesores} delay={0.1} />
-        <StatCard icon={CheckCircle} label="Asistencia Hoy" value={stats.asistencia_hoy} accent="#22c55e" delay={0.15} />
-        <StatCard icon={Clock} label="Pagos Pendientes" value={stats.pagos_pendientes_count} accent="#f97316" delay={0.2} />
+          sub={`+${stats.alumnos_nuevos_30d} este mes`} delay={0.05} onClick={() => onNavigate('alumnos')} />
+        <StatCard icon={GraduationCap} label="Profesores" value={stats.total_profesores} delay={0.1} onClick={() => onNavigate('profesores')} />
+        <StatCard icon={CheckCircle} label="Asistencia Hoy" value={stats.asistencia_hoy} accent="#22c55e" delay={0.15} onClick={() => setShowAsistencia(true)} />
+        <StatCard icon={Clock} label="Pagos Pendientes" value={stats.pagos_pendientes_count} accent="#f97316" delay={0.2} onClick={() => onNavigate('caja')} />
       </div>
 
       {/* Distribución cintas */}
@@ -281,13 +381,15 @@ const VistaInicio = ({ stats }: { stats: DashboardEscuela }) => {
 
       {/* Resumen deuda + torneo */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-[var(--color-card)] p-5 rounded-[2rem] border border-[var(--color-border)] shadow-xl text-center flex flex-col items-center gap-1">
+        <div onClick={() => onNavigate('caja')}
+          className="bg-[var(--color-card)] p-5 rounded-[2rem] border border-[var(--color-border)] shadow-xl text-center flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition-transform hover:shadow-2xl hover:border-orange-500/30">
           <AlertTriangle className="text-orange-500 mb-1" size={22} />
           <p className="text-[8px] font-black uppercase text-[var(--color-text-muted)] tracking-widest">Deuda Vencida</p>
           <p className="text-xl font-black italic text-[var(--color-text)]">{stats.alumnos_deuda_vencida.length}</p>
           <p className="text-[7px] text-orange-500 font-black">${fmt(stats.deuda_total_pendiente)}</p>
         </div>
-        <div className="bg-[var(--color-card)] p-5 rounded-[2rem] border border-[var(--color-border)] shadow-xl text-center flex flex-col items-center gap-1">
+        <div onClick={() => onNavigate('combates')}
+          className="bg-[var(--color-card)] p-5 rounded-[2rem] border border-[var(--color-border)] shadow-xl text-center flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition-transform hover:shadow-2xl hover:border-purple-500/30">
           <Target className="text-purple-500 mb-1" size={22} />
           <p className="text-[8px] font-black uppercase text-[var(--color-text-muted)] tracking-widest">En Torneo</p>
           <p className="text-xl font-black italic text-[var(--color-text)]">{stats.alumnos_torneo_count}</p>
@@ -297,12 +399,13 @@ const VistaInicio = ({ stats }: { stats: DashboardEscuela }) => {
       {/* Alumnos con deuda vencida */}
       {stats.alumnos_deuda_vencida.length > 0 && (
         <div className="bg-[var(--color-card)]/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-orange-500/20 shadow-2xl space-y-2">
-          <div className="flex items-center gap-2 mb-3">
+          <div onClick={() => onNavigate('caja')} className="flex items-center gap-2 mb-3 cursor-pointer">
             <AlertTriangle size={14} className="text-orange-500" />
             <span className="text-[9px] font-black uppercase tracking-widest text-orange-500">Deuda Vencida +30 días</span>
           </div>
           {stats.alumnos_deuda_vencida.slice(0, 5).map((a, i) => (
-            <div key={i} className="flex items-center justify-between gap-3 p-3 rounded-2xl"
+            <div key={i} onClick={() => onNavigate('caja')}
+              className="flex items-center justify-between gap-3 p-3 rounded-2xl cursor-pointer active:scale-95 transition-transform hover:bg-orange-500/10"
               style={{ backgroundColor: 'var(--color-background)' }}>
               <div className="text-left min-w-0">
                 <p className="text-[11px] font-black uppercase italic tracking-tighter truncate text-[var(--color-text)]">
@@ -356,7 +459,8 @@ const VistaInicio = ({ stats }: { stats: DashboardEscuela }) => {
             <span className="text-[9px] font-black uppercase tracking-widest text-pink-500">Cumpleaños Esta Semana</span>
           </div>
           {stats.cumpleanos_proximos.map((a, i) => (
-            <div key={i} className="flex items-center justify-between gap-3 p-3 rounded-2xl"
+            <div key={i} onClick={() => setBirthdayAlumno(a)}
+              className="flex items-center justify-between gap-3 p-3 rounded-2xl cursor-pointer active:scale-95 transition-transform hover:bg-pink-500/10"
               style={{ backgroundColor: 'var(--color-background)' }}>
               <p className="text-[11px] font-black uppercase italic tracking-tighter text-[var(--color-text)]">
                 {a.nombres} {a.apellidopaterno}
@@ -464,7 +568,7 @@ export const EscuelaDashboard: React.FC = () => {
           <motion.div key={activeTab}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             exit={{ opacity: 0 }} className="space-y-5">
-            {activeTab === 'inicio' && stats && <VistaInicio stats={stats} />}
+            {activeTab === 'inicio' && stats && <VistaInicio stats={stats} onNavigate={handleTabChange} />}
             {activeTab === 'perfil' && escuela && <PerfilConfiguracion initialEscuela={escuela} onUpdate={() => fetchData(true)} />}
             {activeTab === 'profesores' && <GestionProfesores />}
             {activeTab === 'alumnos' && <GestionAlumnos />}
