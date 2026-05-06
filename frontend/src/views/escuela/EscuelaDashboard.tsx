@@ -565,7 +565,11 @@ export const EscuelaDashboard: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-[var(--color-background)] text-[var(--color-text)] transition-colors duration-700">
       <header className="sticky top-0 z-40 bg-[var(--color-background)]/80 backdrop-blur-xl border-b border-[var(--color-border)]/30 px-4 py-2.5">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          {/* ✅ Logo + Nombre clickeable -> volver a Inicio */}
+          <div 
+            className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => handleTabChange('inicio')}
+          >
             <div className="w-10 h-10 rounded-xl bg-[var(--color-card)] shadow-lg border border-[var(--color-border)]/50 overflow-hidden flex items-center justify-center flex-shrink-0">
               {escuela?.logo_url
                 ? <img src={escuela.logo_url} className="w-full h-full object-cover" alt="Logo" />
