@@ -386,7 +386,7 @@ export const FormularioInscripcion: React.FC = () => {
       case 'basicos':
         return (
           <div className="flex flex-col gap-4">
-            <Field label="Nombre(s)" name="nombres" value={form.nombres} onChange={handleChange} required placeholder="Juan Carlos" error={fieldErrors.nombres} />
+            <Field label="Nombre(s)" name="nombres" value={form.nombres} onChange={handleChange} required error={fieldErrors.nombres} />
             <Field label="Apellido Paterno" name="apellidopaterno" value={form.apellidopaterno} onChange={handleChange} required error={fieldErrors.apellidopaterno} />
             <Field label="Apellido Materno" name="apellidomaterno" value={form.apellidomaterno} onChange={handleChange} opcional />
             <Field label="Fecha de Nacimiento" name="fechanacimiento" value={form.fechanacimiento} onChange={handleChange} type="date" required error={fieldErrors.fechanacimiento} />

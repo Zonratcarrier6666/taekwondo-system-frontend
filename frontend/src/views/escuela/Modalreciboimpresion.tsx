@@ -32,7 +32,34 @@ function getThemeColor(variable: string, fallback: string): string {
   return val || fallback;
 }
 
-// ── Genera e imprime en ventana dedicada ──────────────────────────────────────
+// ── Imprime usando iframe oculto — evita bloqueo de popups del navegador ───────
+function imprimirConIframe(html: string) {
+  const old = document.getElementById('__recibo_iframe__');
+  if (old) old.remove();
+
+  const iframe = document.createElement('iframe');
+  iframe.id = '__recibo_iframe__';
+  iframe.style.cssText =
+    'position:fixed;top:-9999px;left:-9999px;width:0;height:0;border:none;visibility:hidden;';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentDocument || iframe.contentWindow?.document;
+  if (!doc) return;
+
+  doc.open();
+  doc.write(html);
+  doc.close();
+
+  // Dar tiempo a fuentes e imágenes antes de lanzar print()
+  iframe.onload = () => {
+    setTimeout(() => {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+    }, 500);
+  };
+}
+
+// ── Genera HTML e imprime 2 recibos por hoja ──────────────────────────────────
 function imprimirRecibo(data: ReciboData, accent: string, escuelaNombre = 'Dojo') {
   const rawFolio = data.metadata?.folio ?? data.idpago ?? '0';
   const folio    = generarFolio(typeof rawFolio === 'number' ? rawFolio : parseInt(String(rawFolio), 10));
@@ -40,36 +67,99 @@ function imprimirRecibo(data: ReciboData, accent: string, escuelaNombre = 'Dojo'
 
   const logoHTML = data.escuela?.logo_url
     ? `<img src="${data.escuela.logo_url}"
-         style="height:48px;width:auto;object-fit:contain;display:block;
-                border:2px solid ${accent};border-radius:6px;padding:2px;"/>`
-    : `<div style="width:48px;height:48px;border:2px solid ${accent};border-radius:6px;
+         style="height:40px;width:auto;object-fit:contain;display:block;
+                border:2px solid ${accent};border-radius:5px;padding:2px;"/>`
+    : `<div style="width:40px;height:40px;border:2px solid ${accent};border-radius:5px;
                    display:flex;align-items:center;justify-content:center;
-                   font-size:8px;font-weight:900;text-transform:uppercase;
+                   font-size:7px;font-weight:900;text-transform:uppercase;
                    color:${accent};text-align:center;">LOGO</div>`;
 
   const desgloseHTML = (data.pago?.desglose ?? []).map(d => `
     <tr>
-      <td style="padding:3px 0;color:#666;font-size:10px;text-transform:uppercase;
-                 letter-spacing:.06em;">${d.metodo}</td>
-      <td style="padding:3px 0;text-align:right;font-weight:700;font-size:10px;">
+      <td style="padding:2px 0;color:#666;font-size:9px;text-transform:uppercase;letter-spacing:.04em;">${d.metodo}</td>
+      <td style="padding:2px 0;text-align:right;font-weight:700;font-size:9px;">
         $\u00a0${Number(d.monto).toLocaleString('es-MX',{minimumFractionDigits:2})}
       </td>
     </tr>`).join('');
 
-  // Recargo si aplica
-  const recargo     = (data.pago as any)?.recargo ?? 0;
-  const montoBase   = Number(data.pago?.monto ?? 0) - recargo;
-  const totalFinal  = Number(data.pago?.monto ?? 0);
+  const recargo    = (data.pago as any)?.recargo ?? 0;
+  const montoBase  = Number(data.pago?.monto ?? 0) - recargo;
+  const totalFinal = Number(data.pago?.monto ?? 0);
+  const fechaStr   = data.metadata?.fecha_impresion
+    ?? new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
 
   const recargoHTML = recargo > 0 ? `
-    <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-      <span style="font-size:9px;color:#888;">Base mensualidad</span>
-      <span style="font-size:10px;font-weight:700;">$\u00a0${montoBase.toLocaleString('es-MX',{minimumFractionDigits:2})}</span>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+      <span style="font-size:8px;color:#888;">Base</span>
+      <span style="font-size:9px;font-weight:700;">$\u00a0${montoBase.toLocaleString('es-MX',{minimumFractionDigits:2})}</span>
     </div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #eee;">
-      <span style="font-size:9px;color:#c0392b;">Recargo por atraso</span>
-      <span style="font-size:10px;font-weight:700;color:#c0392b;">+$\u00a0${recargo.toLocaleString('es-MX',{minimumFractionDigits:2})}</span>
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid #eee;">
+      <span style="font-size:8px;color:#c0392b;">Recargo</span>
+      <span style="font-size:9px;font-weight:700;color:#c0392b;">+$\u00a0${recargo.toLocaleString('es-MX',{minimumFractionDigits:2})}</span>
     </div>` : '';
+
+  // ── Bloque reutilizable para cada copia ──────────────────────────────────────
+  const bloqueRecibo = (etiqueta: string) => `
+  <div class="recibo">
+    <div class="top-band">
+      <div style="display:flex;align-items:center;gap:10px;">
+        ${logoHTML}
+        <div>
+          <div class="dojo-name">${data.escuela?.nombre ?? 'Dragon Negro Dojo'}</div>
+          <div class="dojo-sub">${[data.escuela?.direccion, data.escuela?.telefono ? `Tel.\u00a0${data.escuela.telefono}` : ''].filter(Boolean).join('\u00a0·\u00a0')}</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:7px;color:#777;letter-spacing:.1em;text-transform:uppercase;">Comprobante de Pago</div>
+        <div style="font-size:15px;font-weight:900;color:#fff;margin:2px 0;">${folio}</div>
+        <span style="display:inline-block;font-size:7px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;padding:2px 8px;border-radius:3px;background:${esPagado ? '#059669' : accent};color:#fff;">${data.metadata?.status_texto ?? 'PENDIENTE'}</span>
+        <div style="font-size:7px;color:#555;margin-top:3px;text-transform:uppercase;letter-spacing:.06em;">${etiqueta}</div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="col-left">
+        <div class="sec-label">Datos del Alumno</div>
+        <div class="field"><span class="fl">Alumno</span><span class="fv">${data.alumno?.nombre_completo ?? '—'}</span></div>
+        <div class="field"><span class="fl">Concepto</span><span class="fv">${data.pago?.concepto ?? '—'}</span></div>
+        <div class="field"><span class="fl">Fecha</span><span class="fv">${fechaStr}</span></div>
+        ${data.pago?.monto_texto ? `<div class="field"><span class="fl">En letra</span><span class="fv" style="font-style:italic;font-size:8px;">${data.pago.monto_texto}</span></div>` : ''}
+        ${(data.pago?.desglose ?? []).length > 0 ? `
+        <div style="margin-top:8px;padding-top:6px;border-top:1px solid #eee;">
+          <div class="sec-label">Forma de Pago</div>
+          <table style="width:100%;border-collapse:collapse;">${desgloseHTML}</table>
+        </div>` : ''}
+      </div>
+
+      <div class="col-right">
+        <div class="sec-label">Resumen</div>
+        ${recargoHTML}
+        <hr style="border:none;border-top:2px solid #111;margin:5px 0;"/>
+        <div class="sec-label">Total</div>
+        <div style="font-size:22px;font-weight:900;color:${accent};letter-spacing:-.02em;line-height:1;">
+          $\u00a0${totalFinal.toLocaleString('es-MX',{minimumFractionDigits:2})}
+        </div>
+        <div style="margin-top:6px;font-size:7px;color:#aaa;">Recibido por: ${escuelaNombre}</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>
+        <div style="width:100px;border-bottom:1px solid #111;margin-bottom:3px;"></div>
+        <div style="font-size:7px;color:#aaa;text-transform:uppercase;letter-spacing:.1em;">Firma / Sello</div>
+      </div>
+      <div style="text-align:right;font-size:7px;color:#bbb;text-transform:uppercase;letter-spacing:.04em;line-height:1.6;">
+        Documento válido como comprobante de pago<br/>
+        ${new Date().toLocaleDateString('es-MX')}
+      </div>
+    </div>
+
+    <div class="tira">
+      <span style="color:${accent};font-weight:900;">${folio}</span>
+      <span>✂\u00a0─\u00a0─\u00a0─\u00a0─\u00a0─</span>
+      <span>${data.alumno?.nombre_completo ?? ''}\u00a0·\u00a0$${totalFinal.toLocaleString('es-MX',{minimumFractionDigits:2})}</span>
+    </div>
+  </div>`;
 
   const html = `<!DOCTYPE html>
 <html lang="es">
@@ -79,161 +169,64 @@ function imprimirRecibo(data: ReciboData, accent: string, escuelaNombre = 'Dojo'
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
     *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:'Inter',Arial,sans-serif;background:#f0f0f0;
-         display:flex;align-items:flex-start;justify-content:center;padding:24px;}
-    .sheet{width:520px;background:#fff;border:1.5px solid #ddd;border-radius:8px;
-           overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12);}
-
-    /* ── BANDA SUPERIOR ── */
-    .top-band{background:#111;padding:14px 18px;
-              display:flex;align-items:center;justify-content:space-between;}
-    .dojo-name{font-size:13px;font-weight:900;color:#fff;
-               letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px;}
-    .dojo-sub{font-size:9px;color:#999;}
-    .folio-block{text-align:right;}
-    .folio-label{font-size:8px;color:#888;letter-spacing:.12em;
-                 text-transform:uppercase;}
-    .folio-val{font-size:17px;font-weight:900;color:#fff;
-               letter-spacing:.02em;margin:2px 0;}
-    .status-badge{display:inline-block;font-size:8px;font-weight:900;
-                  text-transform:uppercase;letter-spacing:.1em;padding:3px 10px;
-                  border-radius:4px;
-                  background:${esPagado ? '#059669' : accent};
-                  color:${esPagado ? '#fff' : '#fff'};}
-
-    /* ── CUERPO 2 COLUMNAS ── */
+    html,body{width:100%;height:100%;}
+    body{
+      font-family:'Inter',Arial,sans-serif;
+      background:#e8e8e8;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:16px;
+      gap:0;
+    }
+    .page{
+      width:190mm;
+      background:#fff;
+      overflow:hidden;
+    }
+    .recibo{width:100%;}
+    .top-band{background:#111;padding:11px 15px;display:flex;align-items:center;justify-content:space-between;}
+    .dojo-name{font-size:11px;font-weight:900;color:#fff;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px;}
+    .dojo-sub{font-size:7.5px;color:#888;}
     .body{display:flex;border-bottom:1px solid #e8e8e8;}
-    .col-left{flex:1;padding:16px 18px;border-right:1px solid #e8e8e8;}
-    .col-right{width:170px;padding:16px;background:#f9f9f9;
-               display:flex;flex-direction:column;justify-content:center;}
-    .section-label{font-size:7px;font-weight:900;color:#aaa;
-                   text-transform:uppercase;letter-spacing:.15em;margin-bottom:10px;}
-    .field{display:flex;justify-content:space-between;align-items:baseline;
-           margin-bottom:8px;gap:10px;}
-    .f-label{font-size:8px;color:#888;text-transform:uppercase;
-             letter-spacing:.06em;flex-shrink:0;}
-    .f-value{font-size:10px;font-weight:700;color:#111;
-             text-align:right;max-width:55%;}
+    .col-left{flex:1;padding:11px 15px;border-right:1px solid #e8e8e8;}
+    .col-right{width:150px;padding:11px 13px;background:#f9f9f9;display:flex;flex-direction:column;justify-content:center;}
+    .sec-label{font-size:6.5px;font-weight:900;color:#aaa;text-transform:uppercase;letter-spacing:.14em;margin-bottom:7px;}
+    .field{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;gap:8px;}
+    .fl{font-size:7px;color:#999;text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;}
+    .fv{font-size:9px;font-weight:700;color:#111;text-align:right;max-width:60%;}
+    .footer{padding:9px 15px;display:flex;justify-content:space-between;align-items:flex-end;}
+    .tira{border-top:2px dashed #ddd;padding:5px 15px;background:#f7f7f7;display:flex;justify-content:space-between;align-items:center;font-size:7.5px;text-transform:uppercase;letter-spacing:.07em;color:#bbb;}
 
-    /* ── TOTAL ── */
-    .total-label{font-size:8px;font-weight:900;color:#aaa;
-                 text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px;}
-    .total-num{font-size:26px;font-weight:900;color:${accent};
-               letter-spacing:-.02em;line-height:1;}
-    .divider{border:none;border-top:2px solid #111;margin:8px 0;}
-
-    /* ── DESGLOSE ── */
-    .desglose{padding:10px 18px;border-bottom:1px solid #e8e8e8;background:#fafafa;}
-    .desglose table{width:100%;border-collapse:collapse;}
-
-    /* ── PIE ── */
-    .footer{padding:12px 18px;display:flex;justify-content:space-between;align-items:flex-end;}
-    .firma-line{width:110px;border-bottom:1px solid #111;margin-bottom:4px;}
-    .firma-label{font-size:8px;color:#999;text-transform:uppercase;letter-spacing:.1em;}
-    .footer-note{text-align:right;font-size:8px;color:#bbb;
-                 text-transform:uppercase;letter-spacing:.04em;line-height:1.5;max-width:120px;}
-
-    /* ── TALÓN ── */
-    .tira{border-top:2px dashed #ddd;padding:7px 18px;background:#f7f7f7;
-          display:flex;justify-content:space-between;align-items:center;
-          font-size:8px;text-transform:uppercase;
-          letter-spacing:.08em;color:#bbb;}
-    .tira-accent{color:${accent};font-weight:900;}
+    /* Línea de corte */
+    .corte{
+      display:flex;align-items:center;gap:8px;padding:5px 15px;
+      background:#efefef;border-top:2px dashed #bbb;border-bottom:2px dashed #bbb;
+      font-size:7.5px;font-weight:900;color:#aaa;text-transform:uppercase;letter-spacing:.14em;
+    }
+    .corte-line{flex:1;border-top:1px dashed #ccc;}
 
     @media print{
-      body{background:#fff;padding:0;}
-      .sheet{width:100%;box-shadow:none;border-radius:0;border:none;}
+      html,body{background:#fff;padding:0;margin:0;}
+      .page{width:100%;box-shadow:none;}
+      @page{size:A4 portrait;margin:8mm 10mm;}
     }
   </style>
 </head>
 <body>
-<div class="sheet">
-
-  <!-- BANDA SUPERIOR -->
-  <div class="top-band">
-    <div style="display:flex;align-items:center;gap:12px;">
-      ${logoHTML}
-      <div>
-        <div class="dojo-name">${data.escuela?.nombre ?? 'Dragon Negro Dojo'}</div>
-        <div class="dojo-sub">
-          ${[data.escuela?.direccion, data.escuela?.telefono ? `Tel. ${data.escuela.telefono}` : ''].filter(Boolean).join('  ·  ')}
-        </div>
-      </div>
-    </div>
-    <div class="folio-block">
-      <div class="folio-label">Comprobante de Pago</div>
-      <div class="folio-val">${folio}</div>
-      <div><span class="status-badge">${data.metadata?.status_texto ?? 'PENDIENTE'}</span></div>
-    </div>
+<div class="page">
+  ${bloqueRecibo('Copia Escuela')}
+  <div class="corte">
+    <div class="corte-line"></div>
+    <span>✂&nbsp;&nbsp;Cortar aquí</span>
+    <div class="corte-line"></div>
   </div>
-
-  <!-- CUERPO -->
-  <div class="body">
-    <!-- Columna datos -->
-    <div class="col-left">
-      <div class="section-label">Datos del Alumno</div>
-      <div class="field">
-        <span class="f-label">Alumno</span>
-        <span class="f-value">${data.alumno?.nombre_completo ?? '—'}</span>
-      </div>
-      <div class="field">
-        <span class="f-label">Concepto</span>
-        <span class="f-value">${data.pago?.concepto ?? '—'}</span>
-      </div>
-      <div class="field">
-        <span class="f-label">Fecha</span>
-        <span class="f-value">${data.metadata?.fecha_impresion ?? new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'})}</span>
-      </div>
-      ${data.pago?.monto_texto ? `
-      <div class="field">
-        <span class="f-label">En letra</span>
-        <span class="f-value" style="font-style:italic;font-size:9px;">${data.pago.monto_texto}</span>
-      </div>` : ''}
-      ${(data.pago?.desglose ?? []).length > 0 ? `
-      <div style="margin-top:10px;padding-top:8px;border-top:1px solid #eee;">
-        <div class="section-label">Forma de Pago</div>
-        <table style="width:100%;border-collapse:collapse;">${desgloseHTML}</table>
-      </div>` : ''}
-    </div>
-
-    <!-- Columna total -->
-    <div class="col-right">
-      <div class="total-label">Resumen</div>
-      ${recargoHTML}
-      <hr class="divider"/>
-      <div class="total-label" style="margin-top:4px;">Total</div>
-      <div class="total-num">$&nbsp;${totalFinal.toLocaleString('es-MX',{minimumFractionDigits:2})}</div>
-      <div style="margin-top:8px;font-size:8px;color:#aaa;">
-        Recibido por: ${escuelaNombre}
-      </div>
-    </div>
-  </div>
-
-  <!-- PIE -->
-  <div class="footer">
-    <div>
-      <div class="firma-line"></div>
-      <div class="firma-label">Firma / Sello</div>
-    </div>
-    <div class="footer-note">
-      Documento válido como<br/>comprobante de pago<br/>
-      ${new Date().toLocaleDateString('es-MX')}
-    </div>
-  </div>
-
-  <!-- TALÓN -->
-  <div class="tira">
-    <span>Folio: <span class="tira-accent">${folio}</span></span>
-    <span>✂ ─ ─ ─ ─ ─</span>
-    <span>${data.alumno?.nombre_completo ?? ''}  ·  $${totalFinal.toLocaleString('es-MX',{minimumFractionDigits:2})}</span>
-  </div>
+  ${bloqueRecibo('Copia Alumno')}
 </div>
-<script>window.onload=()=>{window.print();}</script>
 </body>
 </html>`;
 
-  const w = window.open('', '_blank', 'width=600,height=780');
-  if (w) { w.document.write(html); w.document.close(); }
+  imprimirConIframe(html);
 }
 
 // ── Componente React ───────────────────────────────────────────────────────────

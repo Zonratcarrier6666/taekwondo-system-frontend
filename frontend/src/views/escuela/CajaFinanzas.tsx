@@ -113,6 +113,7 @@ const ModalDetalleAlumno: React.FC<ModalDetalleProps> = ({
   const [resumen, setResumen]               = useState<ResumenAlumno | null>(null);
   const [loadingResumen, setLoadingResumen] = useState(false);
 
+
   // Todos los pagos del alumno en pantalla
   const pagosAlumno = pago ? todosPagos.filter(p => p.idalumno === pago.idalumno) : [];
 
@@ -347,8 +348,8 @@ const ModalDetalleAlumno: React.FC<ModalDetalleProps> = ({
                           <motion.button
                             whileTap={{ scale: 0.96 }}
                             onClick={() => onCobrar(p)}
-                            className="flex-1 h-11 rounded-2xl text-white text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:brightness-110 shadow-lg"
-                            style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 4px 20px -4px var(--color-primary)60' }}
+                            className="flex-1 h-11 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2"
+                            style={{ backgroundColor: 'var(--color-primary)15', borderColor: 'var(--color-primary)', color: 'var(--color-primary)', boxShadow: '0 4px 20px -4px var(--color-primary)40' }}
                           >
                             <TrendingUp size={15} /> Pagar ahora
                           </motion.button>
@@ -492,6 +493,7 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
 }) => {
   const [resumen, setResumen]           = useState<ResumenAlumno | null>(null);
   const [loadingResumen, setLoadingResumen] = useState(false);
+
 
   useEffect(() => {
     if (!deudor?.idalumno) return;
@@ -676,8 +678,8 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
                     <div className="flex gap-2">
                       <motion.button whileTap={{ scale: 0.95 }}
                         onClick={() => { onClose(); onAbrirCobro(p); }}
-                        className="flex-1 h-10 rounded-2xl text-white text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:brightness-110"
-                        style={{ backgroundColor: 'var(--color-primary)', boxShadow: '0 4px 16px -4px var(--color-primary)50' }}
+                        className="flex-1 h-10 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2"
+                        style={{ backgroundColor: 'var(--color-primary)15', borderColor: 'var(--color-primary)', color: 'var(--color-primary)', boxShadow: '0 4px 16px -4px var(--color-primary)40' }}
                       >
                         <TrendingUp size={13} /> Cobrar
                       </motion.button>
@@ -802,6 +804,7 @@ export const CajaFinanzas: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [saving, setSaving]         = useState(false);
   const [notificando, setNotificando] = useState<number | null>(null); // idpago en proceso
+
 
   // ── Tab deudores ────────────────────────────────────────────
   const [deudorSeleccionado, setDeudorSeleccionado] = useState<DeudorAgrupado | null>(null);
@@ -1073,67 +1076,108 @@ export const CajaFinanzas: React.FC = () => {
     setIsCobrarModalOpen(true);
   };
 
-  // Captura el recibo como PNG (usando html2canvas si está disponible,
-  // si no genera un Blob SVG/HTML como fallback) y lo registra como comprobante
+  // Imprime el recibo en un iframe aislado para evitar que los estilos de la app
+  // interfieran. Opcionalmente captura el nodo como PNG para adjuntar como comprobante.
   const captureYImprimir = async () => {
     setCapturandoRecibo(true);
     try {
       const node = reciboPrintRef.current;
-      if (!node) { window.print(); return; }
 
-      // Intentar usar html2canvas (cargado dinámicamente)
-      let captureBlob: Blob | null = null;
-
-      try {
-        // Carga dinámica de html2canvas si no está disponible
-        let html2canvas: any = (window as any).html2canvas;
-        if (!html2canvas) {
-          await new Promise<void>((res, rej) => {
-            const s = document.createElement('script');
-            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-            s.onload = () => res();
-            s.onerror = () => rej(new Error('No se pudo cargar html2canvas'));
-            document.head.appendChild(s);
+      // ── 1. Captura PNG con html2canvas (para adjuntar como comprobante) ───────
+      if (node) {
+        let captureBlob: Blob | null = null;
+        try {
+          let html2canvas: any = (window as any).html2canvas;
+          if (!html2canvas) {
+            await new Promise<void>((res, rej) => {
+              const s = document.createElement('script');
+              s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+              s.onload = () => res();
+              s.onerror = () => rej(new Error('No se pudo cargar html2canvas'));
+              document.head.appendChild(s);
+            });
+            html2canvas = (window as any).html2canvas;
+          }
+          const canvas = await html2canvas(node, {
+            scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false,
           });
-          html2canvas = (window as any).html2canvas;
+          captureBlob = await new Promise<Blob | null>(res =>
+            canvas.toBlob(res, 'image/png', 0.95)
+          );
+        } catch {
+          // Captura fallback — no bloquea la impresión
         }
-        const canvas = await html2canvas(node, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: '#ffffff',
-          logging: false,
-        });
-        captureBlob = await new Promise<Blob | null>(res =>
-          canvas.toBlob(res, 'image/png', 0.95)
-        );
-      } catch {
-        // Fallback: serializar HTML como SVG data URL
-        const xml = new XMLSerializer().serializeToString(node);
-        const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800">
-          <foreignObject width="100%" height="100%">
-            <div xmlns="http://www.w3.org/1999/xhtml">${xml}</div>
-          </foreignObject>
-        </svg>`;
-        captureBlob = new Blob([svgStr], { type: 'image/svg+xml' });
+        if (captureBlob) {
+          const captureFile = new File(
+            [captureBlob],
+            `recibo_${selectedPago?.idpago ?? 'x'}_${Date.now()}.png`,
+            { type: captureBlob.type }
+          );
+          setComprobanteFile(captureFile);
+          setComprobantePreview(URL.createObjectURL(captureBlob));
+        }
       }
 
-      if (captureBlob) {
-        const captureFile = new File(
-          [captureBlob],
-          `recibo_${selectedPago?.idpago ?? 'x'}_${Date.now()}.png`,
-          { type: captureBlob.type }
-        );
-        setComprobanteFile(captureFile);
-        setComprobantePreview(URL.createObjectURL(captureBlob));
+      // ── 2. Imprimir via iframe aislado (evita hoja en blanco) ────────────────
+      if (node) {
+        // Recolectar todos los estilos inline del nodo
+        const estilosInline = Array.from(node.querySelectorAll<HTMLElement>('[style]'))
+          .map(el => el.getAttribute('style') ?? '')
+          .join('');
+
+        // Serializar el HTML del recibo
+        const htmlRecibo = node.outerHTML;
+
+        // Extraer CSS de los <style> que viven dentro del nodo
+        const cssInterno = Array.from(node.querySelectorAll('style'))
+          .map(s => s.textContent ?? '')
+          .join('\n');
+
+        const htmlCompleto = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html,body{background:#fff;font-family:'Arial',sans-serif;}
+    ${cssInterno}
+    @media print{
+      html,body{margin:0;padding:0;}
+      @page{size:A4 portrait;margin:0;}
+    }
+  </style>
+</head>
+<body>${htmlRecibo}</body>
+</html>`;
+
+        // Crear iframe oculto e imprimir desde él
+        const old = document.getElementById('__recibo_caja_iframe__');
+        if (old) old.remove();
+
+        const iframe = document.createElement('iframe');
+        iframe.id = '__recibo_caja_iframe__';
+        iframe.style.cssText =
+          'position:fixed;top:-9999px;left:-9999px;width:0;height:0;border:none;visibility:hidden;';
+        document.body.appendChild(iframe);
+
+        const doc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (doc) {
+          doc.open();
+          doc.write(htmlCompleto);
+          doc.close();
+          iframe.onload = () => {
+            setTimeout(() => {
+              iframe.contentWindow?.focus();
+              iframe.contentWindow?.print();
+            }, 400);
+          };
+        }
       }
 
-      // Imprimir
-      window.print();
       setReciboImpreso(true);
       setVecesImpreso(v => v + 1);
     } catch (err) {
-      console.error('Error capturando recibo:', err);
-      window.print();
+      console.error('Error imprimiendo recibo:', err);
       setReciboImpreso(true);
       setVecesImpreso(v => v + 1);
     } finally {
@@ -1546,7 +1590,7 @@ export const CajaFinanzas: React.FC = () => {
                         <label className="text-[7px] font-black uppercase tracking-widest ml-1" style={{ color:'var(--color-text-muted)' }}>{label}</label>
                         <select value={val} onChange={e => { set(e.target.value); setHistPagina(1); }}
                           className="w-full h-9 px-2 rounded-xl text-[9px] font-bold outline-none appearance-none"
-                          style={{ background:'var(--color-surface)', border:'1px solid var(--color-border)', color:'var(--color-text)' }}>
+                          style={{ background:'var(--color-background)', border:'1px solid var(--color-border)', color:'var(--color-text)' }}>
                           {opts.map(([v,l]) => <option key={v} value={v}>{l}</option>)}
                         </select>
                       </div>
@@ -1561,14 +1605,14 @@ export const CajaFinanzas: React.FC = () => {
                         <label className="text-[7px] font-black uppercase tracking-widest ml-1" style={{ color:'var(--color-text-muted)' }}>{label}</label>
                         <input type="date" value={val} onChange={e => { set(e.target.value); setHistPagina(1); }}
                           className="w-full h-9 px-2 rounded-xl text-[9px] font-bold outline-none"
-                          style={{ background:'var(--color-surface)', border:'1px solid var(--color-border)', color:'var(--color-text)' }} />
+                          style={{ background:'var(--color-background)', border:'1px solid var(--color-border)', color:'var(--color-text)' }} />
                       </div>
                     ))}
                   </div>
                   {[histEstatus,histTipo,histMetodo,histDesde,histHasta].some(Boolean) && (
                     <button onClick={() => { setHistEstatus(''); setHistTipo(''); setHistMetodo(''); setHistDesde(''); setHistHasta(''); setHistPagina(1); }}
                       className="w-full h-9 rounded-2xl flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-wider"
-                      style={{ background:'var(--color-surface)', border:'1px solid var(--color-border)', color:'var(--color-text-muted)' }}>
+                      style={{ background:'var(--color-background)', border:'1px solid var(--color-border)', color:'var(--color-text-muted)' }}>
                       <X size={11} /> Limpiar filtros
                     </button>
                   )}
@@ -2021,6 +2065,7 @@ export const CajaFinanzas: React.FC = () => {
                 <button onClick={() => setIsCobrarModalOpen(false)} className="p-2.5 rounded-full relative z-10" style={{ background: "rgba(0,0,0,0.2)" }}><X size={18} /></button>
               </div>
 
+              <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
               <AnimatePresence mode="wait">
 
                 {/* ════════════════════════════════
@@ -2029,7 +2074,7 @@ export const CajaFinanzas: React.FC = () => {
                 {pasoRecibo === 'form' && (
                   <motion.div key="form"
                     initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                    className="p-7 space-y-6 text-left overflow-y-auto">
+                    className="p-7 space-y-6 text-left overflow-y-auto flex-1 min-h-0">
 
                     {/* Info alumno */}
                     <div className="p-5 rounded-[2rem] border border-[var(--color-border)]"
@@ -2146,8 +2191,8 @@ export const CajaFinanzas: React.FC = () => {
                     {/* Botón avanzar → recibo */}
                     <motion.button whileTap={{ scale: 0.97 }} onClick={handleConfirmarCobro}
                       disabled={Math.abs(diferenciaDesglose) > 0.01}
-                      className="w-full h-14 text-white font-black rounded-[2rem] flex items-center justify-center gap-3 transition-all disabled:opacity-40"
-                      style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary)cc)', boxShadow: '0 6px 24px -6px var(--color-primary)60' }}>
+                      className="w-full h-14 font-black rounded-[2rem] flex items-center justify-center gap-3 transition-all disabled:opacity-40 border-2"
+                      style={{ backgroundColor: 'var(--color-primary)15', borderColor: 'var(--color-primary)', color: 'var(--color-primary)', boxShadow: '0 6px 24px -6px var(--color-primary)40' }}>
                       <Printer size={20} />
                       <span className="text-sm uppercase italic tracking-tighter">Imprimir Recibo de Pago</span>
                     </motion.button>
@@ -2160,9 +2205,9 @@ export const CajaFinanzas: React.FC = () => {
                 {pasoRecibo === 'recibo' && (
                   <motion.div key="recibo"
                     initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
-                    className="flex flex-col overflow-y-auto">
+                    className="flex flex-col overflow-y-auto flex-1 min-h-0">
 
-                    {/* ── RECIBO IMPRIMIBLE — diseño horizontal profesional ── */}
+                    {/* ── RECIBO IMPRIMIBLE — 2 copias por hoja A4 ── */}
                     {(() => {
                       const folio = generarFolio(selectedPago.idpago);
                       const nombreAlumno = (selectedPago.alumno?.nombres
@@ -2171,113 +2216,127 @@ export const CajaFinanzas: React.FC = () => {
                       const fechaEmision = new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' });
                       const metodoPago = desglose.map(d => `${d.metodo}${desglose.length > 1 ? ' $' + d.monto : ''}`).join(' + ');
                       const totalFinal = infoAtrasoSelected && infoAtrasoSelected.recargo > 0 ? montoEsperado : selectedPago.monto;
-                      return (
-                        <div id="recibo-print" ref={reciboPrintRef}
-                          style={{ background: '#fff', color: '#111', fontFamily: "'Arial', sans-serif", width: '100%' }}>
 
-                          {/* ── BANDA SUPERIOR OSCURA ── */}
-                          <div style={{ background: '#111', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      const ReciboBloque = ({ copia }: { copia: 'ORIGINAL' | 'COPIA' }) => (
+                        <div style={{
+                          width: '100%', background: '#fff', color: '#111',
+                          fontFamily: "'Arial', sans-serif",
+                          boxSizing: 'border-box', padding: '18px 24px 14px',
+                          borderBottom: copia === 'ORIGINAL' ? '2px dashed #bbb' : 'none',
+                        }}>
+                          {/* HEADER */}
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, paddingBottom: 10, borderBottom: '2px solid #111' }}>
+                            {/* Logo + escuela */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                               {escuelaInfo.logo
                                 ? <img src={escuelaInfo.logo} alt="Logo"
-                                    style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover', border: '2px solid #fff' }}
+                                    style={{ width: 44, height: 44, borderRadius: 6, objectFit: 'cover', border: '1.5px solid #ddd' }}
                                     onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-                                : <div style={{ width: 40, height: 40, borderRadius: 8, background: '#333', border: '2px solid #555', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 8, fontWeight: 900, textTransform: 'uppercase' }}>LOGO</div>
+                                : <div style={{ width: 44, height: 44, borderRadius: 6, background: '#eee', border: '1.5px solid #ddd', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 7, fontWeight: 900, color: '#999', textTransform: 'uppercase' }}>LOGO</div>
                               }
                               <div>
-                                <p style={{ margin: 0, fontSize: 13, fontWeight: 900, color: '#fff', letterSpacing: 1, textTransform: 'uppercase' }}>
+                                <p style={{ margin: 0, fontSize: 14, fontWeight: 900, color: '#111', letterSpacing: 0.5, textTransform: 'uppercase' }}>
                                   {escuelaInfo.nombre || 'Dragon Negro Dojo'}
                                 </p>
-                                <p style={{ margin: 0, fontSize: 9, color: '#aaa', marginTop: 2 }}>
+                                <p style={{ margin: 0, fontSize: 9, color: '#777', marginTop: 2 }}>
                                   {[escuelaInfo.ciudad, escuelaInfo.tel ? `Tel: ${escuelaInfo.tel}` : ''].filter(Boolean).join('  ·  ')}
                                 </p>
                               </div>
                             </div>
+                            {/* Folio + badge copia */}
                             <div style={{ textAlign: 'right' }}>
-                              <p style={{ margin: 0, fontSize: 8, color: '#888', letterSpacing: 2, textTransform: 'uppercase' }}>Comprobante de Pago</p>
-                              <p style={{ margin: 0, fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: 1, marginTop: 2 }}>{folio}</p>
-                              <div style={{ marginTop: 4, display: 'inline-block', background: '#f59e0b', color: '#111', fontSize: 7, fontWeight: 900, padding: '2px 8px', borderRadius: 4, letterSpacing: 2, textTransform: 'uppercase' }}>
-                                PENDIENTE DE COBRO
+                              <p style={{ margin: 0, fontSize: 8, color: '#999', letterSpacing: 2, textTransform: 'uppercase' }}>Comprobante de Pago</p>
+                              <p style={{ margin: 0, fontSize: 20, fontWeight: 900, color: '#111', letterSpacing: 0.5, marginTop: 2 }}>{folio}</p>
+                              <div style={{ marginTop: 4, display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+                                <span style={{ background: '#f59e0b', color: '#111', fontSize: 7, fontWeight: 900, padding: '2px 7px', borderRadius: 3, letterSpacing: 2, textTransform: 'uppercase' }}>
+                                  PENDIENTE DE COBRO
+                                </span>
+                                <span style={{ background: copia === 'ORIGINAL' ? '#111' : '#e5e5e5', color: copia === 'ORIGINAL' ? '#fff' : '#555', fontSize: 7, fontWeight: 900, padding: '2px 7px', borderRadius: 3, letterSpacing: 2, textTransform: 'uppercase' }}>
+                                  {copia}
+                                </span>
                               </div>
                             </div>
                           </div>
 
-                          {/* ── CUERPO HORIZONTAL: 2 columnas ── */}
-                          <div style={{ display: 'flex', borderBottom: '1px solid #e5e5e5' }}>
+                          {/* CUERPO: 3 columnas */}
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 160px', gap: 0, border: '1px solid #e5e5e5', borderRadius: 6, overflow: 'hidden', marginBottom: 10 }}>
 
-                            {/* Columna izquierda — datos del alumno y concepto */}
-                            <div style={{ flex: 1, padding: '16px 20px', borderRight: '1px solid #e5e5e5' }}>
-                              <p style={{ margin: 0, fontSize: 7, fontWeight: 900, color: '#aaa', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
-                                Datos del Alumno
-                              </p>
+                            {/* Col 1 — Alumno */}
+                            <div style={{ padding: '12px 14px', borderRight: '1px solid #e5e5e5' }}>
+                              <p style={{ margin: '0 0 8px', fontSize: 7, fontWeight: 900, color: '#aaa', letterSpacing: 2, textTransform: 'uppercase' }}>Datos del Alumno</p>
                               {[
-                                { label: 'Nombre',     value: nombreAlumno },
-                                { label: 'Concepto',   value: selectedPago.concepto ?? '—' },
-                                { label: 'Fecha',      value: fechaEmision },
-                                { label: 'Método',     value: metodoPago },
+                                { label: 'Nombre',   value: nombreAlumno },
+                                { label: 'Concepto', value: selectedPago.concepto ?? '—' },
+                                { label: 'Fecha',    value: fechaEmision },
+                                { label: 'Método',   value: metodoPago },
                               ].map(({ label, value }) => (
-                                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 7, gap: 8 }}>
-                                  <span style={{ fontSize: 8, fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: 1, flexShrink: 0 }}>{label}:</span>
-                                  <span style={{ fontSize: 9, fontWeight: 700, color: '#111', textAlign: 'right', maxWidth: '60%' }}>{value}</span>
+                                <div key={label} style={{ marginBottom: 6 }}>
+                                  <span style={{ fontSize: 7, fontWeight: 700, color: '#aaa', textTransform: 'uppercase', letterSpacing: 1 }}>{label}</span>
+                                  <p style={{ margin: '1px 0 0', fontSize: 10, fontWeight: 700, color: '#111' }}>{value}</p>
                                 </div>
                               ))}
                             </div>
 
-                            {/* Columna derecha — totales */}
-                            <div style={{ width: 180, padding: '16px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: '#fafafa' }}>
-                              <p style={{ margin: 0, fontSize: 7, fontWeight: 900, color: '#aaa', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 }}>
-                                Resumen
-                              </p>
-                              {infoAtrasoSelected && infoAtrasoSelected.recargo > 0 ? (
-                                <>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                                    <span style={{ fontSize: 8, color: '#888' }}>Base</span>
-                                    <span style={{ fontSize: 9, fontWeight: 700 }}>${selectedPago.monto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
-                                  </div>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                    <span style={{ fontSize: 8, color: '#c0392b' }}>Recargo ({infoAtrasoSelected.semanasAtraso}×$50)</span>
-                                    <span style={{ fontSize: 9, fontWeight: 700, color: '#c0392b' }}>+${infoAtrasoSelected.recargo.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
-                                  </div>
-                                  <div style={{ borderTop: '2px solid #111', paddingTop: 8 }}>
-                                    <p style={{ margin: 0, fontSize: 7, fontWeight: 900, color: '#888', letterSpacing: 2, textTransform: 'uppercase' }}>Total</p>
-                                    <p style={{ margin: 0, fontSize: 22, fontWeight: 900, color: '#111', letterSpacing: -1 }}>
-                                      ${totalFinal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                                    </p>
-                                  </div>
-                                </>
-                              ) : (
-                                <div style={{ borderTop: '2px solid #111', paddingTop: 8 }}>
-                                  <p style={{ margin: 0, fontSize: 7, fontWeight: 900, color: '#888', letterSpacing: 2, textTransform: 'uppercase' }}>Total</p>
-                                  <p style={{ margin: 0, fontSize: 22, fontWeight: 900, color: '#111', letterSpacing: -1 }}>
-                                    ${totalFinal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                                  </p>
+                            {/* Col 2 — Desglose pagos */}
+                            <div style={{ padding: '12px 14px', borderRight: '1px solid #e5e5e5', background: '#fafafa' }}>
+                              <p style={{ margin: '0 0 8px', fontSize: 7, fontWeight: 900, color: '#aaa', letterSpacing: 2, textTransform: 'uppercase' }}>Desglose</p>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                                <span style={{ fontSize: 9, color: '#555' }}>Mensualidad base</span>
+                                <span style={{ fontSize: 9, fontWeight: 700 }}>${selectedPago.monto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
+                              </div>
+                              {infoAtrasoSelected && infoAtrasoSelected.recargo > 0 && (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                                  <span style={{ fontSize: 9, color: '#c0392b' }}>Recargo ({infoAtrasoSelected.semanasAtraso} sem × $50)</span>
+                                  <span style={{ fontSize: 9, fontWeight: 700, color: '#c0392b' }}>+${infoAtrasoSelected.recargo.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
                                 </div>
                               )}
+                              {desglose.length > 1 && (
+                                <>
+                                  <p style={{ margin: '8px 0 5px', fontSize: 7, fontWeight: 900, color: '#aaa', letterSpacing: 2, textTransform: 'uppercase' }}>Forma de pago</p>
+                                  {desglose.map((d, i) => (
+                                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                                      <span style={{ fontSize: 9, color: '#555' }}>{d.metodo}</span>
+                                      <span style={{ fontSize: 9, fontWeight: 700 }}>${Number(d.monto).toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
+                                    </div>
+                                  ))}
+                                </>
+                              )}
+                            </div>
+
+                            {/* Col 3 — Total destacado */}
+                            <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', background: '#111' }}>
+                              <p style={{ margin: '0 0 4px', fontSize: 7, fontWeight: 900, color: '#888', letterSpacing: 2, textTransform: 'uppercase' }}>Total</p>
+                              <p style={{ margin: 0, fontSize: 26, fontWeight: 900, color: '#fff', letterSpacing: -1, lineHeight: 1 }}>
+                                ${totalFinal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                              </p>
+                              <p style={{ margin: '6px 0 0', fontSize: 8, color: '#666', textAlign: 'center' }}>{metodoPago}</p>
                             </div>
                           </div>
 
-                          {/* ── PIE: firma + talón ── */}
-                          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', padding: '12px 20px 8px' }}>
-                            <div style={{ borderTop: '1px solid #111', paddingTop: 4, minWidth: 120 }}>
-                              <p style={{ margin: 0, fontSize: 7, color: '#999', textTransform: 'uppercase', letterSpacing: 2 }}>Firma / Sello</p>
+                          {/* PIE */}
+                          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ borderTop: '1px solid #333', paddingTop: 3, width: 140 }}>
+                                <p style={{ margin: 0, fontSize: 7, color: '#aaa', textTransform: 'uppercase', letterSpacing: 2 }}>Firma / Sello</p>
+                              </div>
                             </div>
                             <div style={{ textAlign: 'center', fontSize: 7, color: '#bbb' }}>
                               Documento válido como comprobante de pago
                             </div>
-                            <div style={{ textAlign: 'right', fontSize: 7, color: '#999' }}>
-                              {new Date().toLocaleDateString('es-MX')}
+                            {/* Talón */}
+                            <div style={{ padding: '4px 10px', border: '1px dashed #ccc', borderRadius: 4, textAlign: 'right' }}>
+                              <p style={{ margin: 0, fontSize: 7, fontWeight: 900, color: '#aaa', textTransform: 'uppercase', letterSpacing: 1 }}>Folio: {folio}</p>
+                              <p style={{ margin: '2px 0 0', fontSize: 7, color: '#bbb' }}>{nombreAlumno}  ·  {new Date().toLocaleDateString('es-MX')}  ·  ${totalFinal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</p>
                             </div>
                           </div>
+                        </div>
+                      );
 
-                          {/* ── TALÓN DESPRENDIBLE ── */}
-                          <div style={{ margin: '0 20px 12px', padding: '6px 12px', border: '1px dashed #ccc', borderRadius: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: 7, fontWeight: 900, color: '#bbb', textTransform: 'uppercase', letterSpacing: 2 }}>
-                              Folio: {folio}
-                            </span>
-                            <span style={{ fontSize: 7, color: '#bbb' }}>
-                              {nombreAlumno}  ·  {new Date().toLocaleDateString('es-MX')}  ·  ${totalFinal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                            </span>
-                          </div>
+                      return (
+                        <div id="recibo-print" ref={reciboPrintRef}
+                          style={{ background: '#fff', width: '100%', display: 'flex', flexDirection: 'column' }}>
+                          <ReciboBloque copia="ORIGINAL" />
+                          <ReciboBloque copia="COPIA" />
                         </div>
                       );
                     })()}
@@ -2292,7 +2351,7 @@ export const CajaFinanzas: React.FC = () => {
                         disabled={capturandoRecibo}
                         className="w-full h-12 rounded-2xl flex items-center justify-center gap-2 font-black text-[11px] uppercase tracking-widest transition-all disabled:opacity-60"
                         style={{
-                          background: reciboImpreso ? 'var(--color-surface)' : 'var(--color-primary)',
+                          background: reciboImpreso ? 'var(--color-background)' : 'var(--color-primary)',
                           border: reciboImpreso ? '1px solid var(--color-border)' : 'none',
                           color: reciboImpreso ? 'var(--color-text)' : '#fff',
                           boxShadow: reciboImpreso ? 'none' : '0 4px 16px -4px var(--color-primary)50',
@@ -2345,7 +2404,7 @@ export const CajaFinanzas: React.FC = () => {
                         disabled={saving || !reciboImpreso}
                         className="w-full h-14 font-black rounded-[2rem] flex items-center justify-center gap-3 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                         style={{
-                          background: reciboImpreso ? 'linear-gradient(135deg, #10b981, #059669)' : 'var(--color-surface)',
+                          background: reciboImpreso ? 'linear-gradient(135deg, #10b981, #059669)' : 'var(--color-background)',
                           boxShadow: reciboImpreso ? '0 6px 24px -6px #10b98160' : 'none',
                           color: reciboImpreso ? '#fff' : 'var(--color-text-muted)',
                           border: reciboImpreso ? 'none' : '1px solid var(--color-border)',
@@ -2363,6 +2422,7 @@ export const CajaFinanzas: React.FC = () => {
                 )}
 
               </AnimatePresence>
+              </div>
             </motion.div>
           </div>
         )}

@@ -15,32 +15,10 @@ import { alumnoService } from '../../services/alumno.service';
 import { profesorService } from '../../services/profesor.service';
 import { cintasService } from '../../services/cintas.service';
 
-/**
- * MAPA TÉCNICO DE COLORES DE CINTAS
- */
-const BELT_COLORS: Record<string, string> = {
-  "Blanca": "#f8f8f8", "Crema": "#fffde7", "Marfil": "#fffff0",
-  "Amarilla": "#facc15", "Dorada": "#d97706", "Naranja": "#f97316",
-  "Verde": "#16a34a", "Verde Claro": "#4ade80", "Verde Oscuro": "#14532d",
-  "Celeste": "#38bdf8", "Azul": "#2563eb", "Azul Marino": "#1e40af", "Cian": "#06b6d4",
-  "Coral": "#ff6b6b", "Roja": "#dc2626", "Guinda": "#881337", "Granate": "#991b1b",
-  "Lila": "#c084fc", "Morada": "#7c3aed", "Purpura": "#9333ea",
-  "Rosa": "#ec4899", "Fucsia": "#db2777",
-  "Cafe Claro": "#a16207", "Cafe": "#7c2d12", "Vino": "#7f1d1d",
-  "Gris": "#6b7280", "Plateada": "#d1d5db", "Negra": "#111111",
-  // aliases
-  "Marrón": "#7c2d12", "Café": "#7c2d12", "Negro": "#111111",
-};
-
-// Helper para obtener hex de cualquier nombre de color (case-insensitive)
-function getBeltHex(colorName: string): string {
-  if (!colorName) return "#f8f8f8";
-  const direct = BELT_COLORS[colorName];
-  if (direct) return direct;
-  // case-insensitive fallback
-  const key = Object.keys(BELT_COLORS).find(k => k.toLowerCase() === colorName.toLowerCase());
-  return key ? BELT_COLORS[key] : "#888888";
-}
+// ── Resolución de colores de cintas ──────────────────────────
+// Importamos la fuente única de verdad para que los colores
+// coincidan exactamente con lo que configura PerfilConfiguracion.
+import { getBeltHex } from '../../utils/beltColors';
 // Mini visual de cinta para tarjetas de alumno
 function MiniCintaBelt({ colorName, stripeName }: { colorName: string; stripeName?: string | null }) {
   const bg = getBeltHex(colorName);

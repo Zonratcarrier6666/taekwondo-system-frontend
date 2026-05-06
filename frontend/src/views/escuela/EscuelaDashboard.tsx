@@ -41,27 +41,19 @@ import MisCombatesView from './MisCombatesView';
 // @ts-ignore
 import EscaneoQRView from '../juez/EscaneoQRView';
 
-// Convierte el nombre de color de la BD al hex CSS correcto.
-// Si la escuela tiene colores personalizados (ej. "Azul Marino"), usa el valor
-// directamente si parece un hex/rgb, o busca en el mapa como fallback.
-const BELT_COLOR_MAP: Record<string, string> = {
-  Blanca: '#f8fafc', Amarilla: '#fbbf24', Naranja: '#fb923c',
-  Verde: '#22c55e', Azul: '#3b82f6', Roja: '#ef4444',
-  Marrón: '#92400e', Café: '#92400e', Morada: '#a855f7',
-  Negra: '#1e293b', Gris: '#64748b',
-};
-
-const beltHex = (color: string): string => {
-  if (!color) return '#94a3b8';
-  // Si ya es un valor CSS válido (hex, rgb, hsl) úsalo directo
-  if (/^#[0-9a-f]{3,8}$/i.test(color) || /^rgb/i.test(color)) return color;
-  return BELT_COLOR_MAP[color] ?? '#94a3b8';
-};
+// Fuente única de verdad — mismos colores que PerfilConfiguracion.
+// @ts-ignore
+import { getBeltHex as beltHex } from '../../utils/beltColors';
 const fmt = (n: number) => n.toLocaleString('es-MX', { minimumFractionDigits: 0 });
 const pctChange = (cur: number, prev: number) =>
   prev === 0 ? null : Math.round(((cur - prev) / prev) * 100);
 
 // ─── Donut de cintas ─────────────────────────────────────────
+// La franja se renderiza con un segundo círculo superpuesto,
+// más delgado (30% del ancho) y desplazado al final del segmento.
+// linearGradient no funciona en stroke de círculos SVG.
+const CIRC = 2 * Math.PI * 40; // circunferencia r=40 ≈ 251.3
+
 const BeltRingChart = ({ data }: { data: BeltStat[] }) => {
   const total = data.reduce((a, b) => a + b.count, 0);
   if (total === 0) return (
@@ -69,22 +61,55 @@ const BeltRingChart = ({ data }: { data: BeltStat[] }) => {
       <PieIcon size={20} />
     </div>
   );
-  let acc = 0;
+
+  // Pre-calcular offsets
+  const segments = data.map((item) => {
+    const pct = item.count / total;   // 0..1
+    return { ...item, pct };
+  });
+
+  let acc = 0; // acumulador en fracción 0..1
+
   return (
     <div className="relative w-32 h-32">
       <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-        {data.map((item, i) => {
-          const p = (item.count / total) * 100;
-          // Usa el color real de la cinta; si tiene franja, mezcla visualmente
-          const stroke = beltHex(item.color);
-          const off = acc; acc += p;
+        {segments.map((item, i) => {
+          const dash    = item.pct * CIRC;       // longitud del arco
+          const offset  = -(acc * CIRC);         // dónde empieza
+          const baseHex = beltHex(item.color);
+          const stripeHex = item.color_stripe ? beltHex(item.color_stripe) : null;
+
+          // Franja: ocupa el 28% final del segmento
+          const stripeDash   = dash * 0.28;
+          const stripeOffset = offset - (dash * 0.72); // al final del arco
+
+          acc += item.pct;
+
           return (
-            <motion.circle key={i} cx="50" cy="50" r="40" fill="transparent"
-              stroke={stroke} strokeWidth="14"
-              initial={{ strokeDasharray: '0 251' }}
-              animate={{ strokeDasharray: `${p * 2.51} 251` }}
-              strokeDashoffset={-off * 2.51}
-              transition={{ duration: 1.5, ease: 'circOut' }} />
+            <g key={i}>
+              {/* Arco base */}
+              <motion.circle
+                cx="50" cy="50" r="40" fill="transparent"
+                stroke={baseHex} strokeWidth="14"
+                strokeDasharray={`${dash} ${CIRC}`}
+                strokeDashoffset={offset}
+                initial={{ strokeDasharray: `0 ${CIRC}` }}
+                animate={{ strokeDasharray: `${dash} ${CIRC}` }}
+                transition={{ duration: 1.5, ease: 'circOut' }}
+              />
+              {/* Arco franja (encima, más delgado) */}
+              {stripeHex && (
+                <motion.circle
+                  cx="50" cy="50" r="40" fill="transparent"
+                  stroke={stripeHex} strokeWidth="5"
+                  strokeDasharray={`${stripeDash} ${CIRC}`}
+                  strokeDashoffset={stripeOffset}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 1.4 }}
+                />
+              )}
+            </g>
           );
         })}
       </svg>

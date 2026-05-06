@@ -1,7 +1,7 @@
 // ============================================================
 //  src/views/profesor/PaseListaView.tsx
 //  Pase de lista + CRUD de alumnos del profesor
-//  Tabs: Asistencia | Alumnos | Resumen
+//  Modal de alumnos IDÉNTICO a GestionAlumnos
 // ============================================================
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
@@ -14,9 +14,11 @@ import {
   Lock, Search, Eye, Edit3, CameraIcon, Phone, Briefcase,
   UserPlus, User as UserIcon, ImagePlus, RotateCcw, GraduationCap,
   Mail, MapPin, Heart, BookOpen, PhoneForwarded, CalendarDays as CalendarIcon,
+  HeartPulse, ShieldAlert, DollarSign, UserCircle, Link2, Copy, Smartphone, QrCode,
 } from 'lucide-react';
 
 import { alumnoService }     from '../../services/alumno.service';
+import { profesorService }    from '../../services/profesor.service';
 import { cintasService }     from '../../services/cintas.service';
 import {
   asistenciaService,
@@ -25,35 +27,11 @@ import {
   type ListaDiaResponse,
 } from '../../services/asistencia.service';
 import api from '../../api/axios';
+import { getBeltHex } from '../../utils/beltColors';
 
 // ─────────────────────────────────────────────────────────────
-//  BELT COLORS — idéntico a GestionAlumnos
+//  MINI COMPONENTE DE CINTA (con franja)
 // ─────────────────────────────────────────────────────────────
-
-const BELT_COLORS: Record<string, string> = {
-  blanca:'#f8f8f8', crema:'#fffde7', marfil:'#fffff0', perla:'#f5f5f0',
-  amarilla:'#facc15', amarillo:'#facc15', dorada:'#d97706', dorado:'#d97706', oro:'#f59e0b',
-  naranja:'#f97316', anaranjada:'#f97316', salmon:'#ff7f7f', coral:'#ff6b6b',
-  roja:'#dc2626', rojo:'#dc2626', vino:'#7f1d1d', granate:'#991b1b', carmesi:'#be123c', guinda:'#881337',
-  cafe:'#7c2d12', cafe_claro:'#a16207', marron:'#78350f', cafe_oscuro:'#431407',
-  verde:'#16a34a', verde_claro:'#4ade80', verde_oscuro:'#14532d', oliva:'#65a30d', esmeralda:'#059669',
-  azul:'#2563eb', azul_claro:'#60a5fa', azul_oscuro:'#1e3a8a', azul_marino:'#1e40af', celeste:'#38bdf8', cian:'#06b6d4',
-  morada:'#7c3aed', morado:'#7c3aed', purpura:'#9333ea', violeta:'#8b5cf6', lila:'#c084fc', lavanda:'#a78bfa',
-  rosa:'#ec4899', rosa_claro:'#f9a8d4', fucsia:'#db2777', magenta:'#d946ef',
-  negra:'#111111', negro:'#111111', negro_azulado:'#0f172a',
-  gris:'#6b7280', gris_claro:'#d1d5db', gris_oscuro:'#374151', plata:'#c0c0c0', plateada:'#d1d5db', plateado:'#d1d5db',
-  cafe_con_franja:'#7c2d12',
-};
-
-function getBeltHex(colorName?: string | null): string {
-  if (!colorName) return "#9ca3af";
-  if (colorName.startsWith('#')) return colorName;
-  const direct = BELT_COLORS[colorName];
-  if (direct) return direct;
-  const key = Object.keys(BELT_COLORS).find(k => k.toLowerCase() === colorName.toLowerCase());
-  return key ? BELT_COLORS[key] : "#888888";
-}
-
 function MiniCintaBelt({ colorName, stripeName }: { colorName?: string | null; stripeName?: string | null }) {
   const bg     = getBeltHex(colorName);
   const stripe = stripeName ? getBeltHex(stripeName) : null;
@@ -68,15 +46,12 @@ function MiniCintaBelt({ colorName, stripeName }: { colorName?: string | null; s
 // ─────────────────────────────────────────────────────────────
 //  HELPERS
 // ─────────────────────────────────────────────────────────────
-
 function hoy(): string { return new Date().toISOString().split('T')[0]; }
-
 function offsetFecha(base: string, dias: number): string {
   const d = new Date(base + 'T12:00:00');
   d.setDate(d.getDate() + dias);
   return d.toISOString().split('T')[0];
 }
-
 function formatFecha(iso: string): string {
   const [y, m, d] = iso.split('-');
   const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -84,27 +59,43 @@ function formatFecha(iso: string): string {
 }
 
 // ─────────────────────────────────────────────────────────────
-//  INPUT FIELD (igual que GestionAlumnos)
+//  INPUT FIELD (unificado con GestionAlumnos)
 // ─────────────────────────────────────────────────────────────
-
 interface InputProps {
-  label: string; name: string; value: string;
-  onChange: (n: string, v: string) => void;
-  error?: string; type?: string; required?: boolean;
-  placeholder?: string; maxLength?: number;
+  label: string;
+  name: string;
+  value: string;
+  onChange: (name: string, value: string) => void;
+  error?: string;
+  type?: string;
+  required?: boolean;
+  placeholder?: string;
+  maxLength?: number;
 }
-const InputField: React.FC<InputProps> = ({ label, name, value, onChange, error, type='text', required, placeholder, maxLength }) => (
+
+const InputField: React.FC<InputProps> = ({ 
+  label, name, value, onChange, error, type = "text", required, placeholder, maxLength 
+}) => (
   <div className="space-y-1">
     <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest flex items-center gap-1">
       {label} {required && <span className="text-red-500 font-bold text-xs">*</span>}
     </label>
-    <input type={type} placeholder={placeholder} maxLength={maxLength}
-      className={`w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border ${error ? 'border-red-500' : 'border-[var(--color-border)]'} focus:border-[var(--color-primary)] outline-none font-bold text-[11px] text-[var(--color-text)] shadow-inner transition-all placeholder:opacity-20`}
-      value={value} onChange={e => onChange(name, e.target.value)} />
+    <input 
+      type={type}
+      placeholder={placeholder}
+      maxLength={maxLength}
+      className={`w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border ${error ? 'border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'border-[var(--color-border)]'} focus:border-[var(--color-primary)] outline-none font-bold text-[11px] text-[var(--color-text)] shadow-inner transition-all placeholder:opacity-20`}
+      value={value} 
+      onChange={e => onChange(name, e.target.value)} 
+    />
     <AnimatePresence>
       {error && (
-        <motion.p initial={{ opacity:0,height:0 }} animate={{ opacity:1,height:'auto' }} exit={{ opacity:0,height:0 }}
-          className="text-[7px] text-red-500 ml-2 font-black uppercase italic tracking-tighter overflow-hidden">{error}</motion.p>
+        <motion.p 
+          initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+          className="text-[7px] text-red-500 ml-2 font-black uppercase italic tracking-tighter overflow-hidden"
+        >
+          {error}
+        </motion.p>
       )}
     </AnimatePresence>
   </div>
@@ -113,7 +104,6 @@ const InputField: React.FC<InputProps> = ({ label, name, value, onChange, error,
 // ─────────────────────────────────────────────────────────────
 //  COMPONENTE PRINCIPAL
 // ─────────────────────────────────────────────────────────────
-
 const PaseListaView: React.FC = () => {
 
   // ── Tabs ──────────────────────────────────────────────────
@@ -123,6 +113,46 @@ const PaseListaView: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg,   setErrorMsg]   = useState<string | null>(null);
   useEffect(() => { if (successMsg) { const t = setTimeout(() => setSuccessMsg(null), 3000); return () => clearTimeout(t); } }, [successMsg]);
+
+  // ══════════════════════════════════════════════════════════
+  //  ESTADO GLOBAL (cintas, profesores, profesor logueado)
+  // ══════════════════════════════════════════════════════════
+  const [cintas, setCintas] = useState<any[]>([]);
+  const [profesores, setProfesores] = useState<any[]>([]);
+  const [idProfesorActual, setIdProfesorActual] = useState<number | null>(null);
+
+  // Cargar grados y profesores al montar
+  useEffect(() => {
+    cintasService.listarGrados().then(res => {
+      const sorted = (res || []).slice().sort((a: any, b: any) => (a.orden ?? 99) - (b.orden ?? 99));
+      setCintas(sorted);
+    }).catch(() => setErrorMsg('Error al cargar grados'));
+
+    profesorService.listarProfesores().then(res => setProfesores(res || [])).catch(() => setErrorMsg('Error al cargar profesores'));
+
+    // Obtener ID del profesor logueado
+    api.get<any>('/profesores/mi-perfil')
+      .then(res => {
+        const id = res.data?.idprofesor ?? res.data?.profesor?.idprofesor ?? null;
+        setIdProfesorActual(id);
+      })
+      .catch(() => {
+        api.get<any>('/auth/me').then(res => {
+          const id = res.data?.idprofesor ?? res.data?.profesor?.idprofesor ?? null;
+          if (id) setIdProfesorActual(id);
+        }).catch(() => {/* silencioso */});
+      });
+  }, []);
+
+  // Función para obtener franja desde cintas usando nivel y color
+  const obtenerStripePorNivelYColor = useCallback((nivel?: string | null, colorBase?: string | null): string | null => {
+  if (!nivel || !cintas.length) return null;
+  const grado = cintas.find(c =>
+    c.nivelkupdan === nivel &&
+    (c.color || '').toLowerCase() === (colorBase || '').toLowerCase()
+  );
+  return grado?.color_stripe || null;
+}, [cintas]);
 
   // ══════════════════════════════════════════════════════════
   //  ESTADO: ASISTENCIA
@@ -141,15 +171,21 @@ const PaseListaView: React.FC = () => {
       const res = f === hoy()
         ? await asistenciaService.listarHoy()
         : await asistenciaService.listarPorFecha(f);
-      setListaData(res);
+
+      const alumnosConStripe = (res.alumnos || []).map(alumno => ({
+        ...alumno,
+        cinta_stripe: obtenerStripePorNivelYColor(alumno.cinta_nivel, alumno.cinta_color)
+      }));
+
+      setListaData({ ...res, alumnos: alumnosConStripe });
       const init: Record<number, boolean> = {};
-      res.alumnos.forEach(a => { init[a.idalumno] = a.presente !== null ? a.presente : true; });
+      alumnosConStripe.forEach(a => { init[a.idalumno] = a.presente !== null ? a.presente : true; });
       setLocal(init);
     } catch { setErrorMsg('Error al cargar la lista.'); }
     finally { setListaLoading(false); }
-  }, []);
+  }, [obtenerStripePorNivelYColor]);
 
-  useEffect(() => { loadLista(fecha); }, [fecha, loadLista]);
+  useEffect(() => { if (cintas.length) loadLista(fecha); }, [fecha, loadLista, cintas]);
 
   const toggle = (id: number) => { setLocal(p => ({ ...p, [id]: !p[id] })); setDirty(true); };
   const marcarTodos = (p: boolean) => {
@@ -178,10 +214,9 @@ const PaseListaView: React.FC = () => {
   }, [listaData, local]);
 
   // ══════════════════════════════════════════════════════════
-  //  ESTADO: ALUMNOS (CRUD)
+  //  ESTADO: ALUMNOS (CRUD) — MODAL UNIFICADO
   // ══════════════════════════════════════════════════════════
   const [alumnos, setAlumnos]   = useState<any[]>([]);
-  const [cintas,  setCintas]    = useState<any[]>([]);
   const [aluLoading, setAluLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -197,26 +232,38 @@ const PaseListaView: React.FC = () => {
   const fileRef   = useRef<HTMLInputElement>(null);
   const [tempFile, setTempFile] = useState<File | null>(null);
 
-  const initialForm = {
-    nombres:'', apellidopaterno:'', apellidomaterno:'N/A', fechanacimiento:'',
-    contacto_emergencia_nombre:'', contacto_emergencia_tel:'',
-    nombretutor:'', telefonocontacto:'', correotutor:'',
-    direcciondomicilio:'', grado_escolar:'Desconocido', escuela_procedencia:'Ninguna',
-    fotoalumno:'', tipo_sangre:'O+', alergias:'Ninguna', padecimientos_cronicos:'Ninguno',
-    seguro_medico:'No cuenta', nss_o_poliza:'', idgradoactual:1, idescuela:0, idprofesor:null, estatus:1
+  // Estado del formulario (compatible con GestionAlumnos)
+  const initialFormState = {
+    nombres: '',
+    apellidopaterno: '',
+    apellidomaterno: 'N/A',
+    fechanacimiento: '',
+    contacto_emergencia_nombre: '',
+    contacto_emergencia_tel: '',
+    nombretutor: '',
+    telefonocontacto: '',
+    correotutor: '',
+    direcciondomicilio: '',
+    grado_escolar: 'Desconocido',
+    escuela_procedencia: 'Ninguna',
+    fotoalumno: '',
+    tipo_sangre: 'O+',
+    alergias: 'Ninguna',
+    padecimientos_cronicos: 'Ninguno',
+    seguro_medico: 'No cuenta',
+    nss_o_poliza: '',
+    idgradoactual: 1,
+    idescuela: 0,
+    idprofesor: null as number | null,
+    estatus: 1
   };
-  const [formData, setFormData] = useState<any>(initialForm);
+  const [formData, setFormData] = useState<any>(initialFormState);
 
   const loadAlumnos = useCallback(async () => {
     setAluLoading(true);
     try {
-      const [aluRes, cintaRes] = await Promise.all([
-        alumnoService.getAlumnos(),
-        cintasService.listarGrados(),
-      ]);
+      const aluRes = await alumnoService.getAlumnos();
       setAlumnos(aluRes || []);
-      const sorted = (cintaRes || []).slice().sort((a: any, b: any) => (a.orden ?? 99) - (b.orden ?? 99));
-      setCintas(sorted);
     } catch { setErrorMsg('Error al cargar alumnos.'); }
     finally { setAluLoading(false); }
   }, []);
@@ -230,45 +277,82 @@ const PaseListaView: React.FC = () => {
       `${a.nombres} ${a.apellidopaterno}`.toLowerCase().includes(searchTerm.toLowerCase())
     ), [alumnos, searchTerm]);
 
-  const handleInputChange = (name: string, value: string) => {
-    if (['telefonocontacto','contacto_emergencia_tel','nss_o_poliza'].includes(name)) {
-      const limit = name === 'nss_o_poliza' ? 11 : 10;
-      setFormData((p: any) => ({ ...p, [name]: value.replace(/\D/g,'').slice(0, limit) }));
-    } else {
-      setFormData((p: any) => ({ ...p, [name]: value }));
+  // ─── VALIDACIÓN (IDÉNTICA A GestionAlumnos) ─────────────────
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (formData.nombres.trim().length < 2) newErrors.nombres = "Obligatorio";
+    if (formData.apellidopaterno.trim().length < 2) newErrors.apellidopaterno = "Obligatorio";
+    
+    if (!isEditing) {
+      if (!formData.fechanacimiento) newErrors.fechanacimiento = "Necesaria";
+      if (!formData.idprofesor) newErrors.idprofesor = "Selecciona instructor";
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!formData.correotutor || !emailRegex.test(formData.correotutor)) 
+        newErrors.correotutor = "Email inválido";
+      
+      if (formData.nombretutor.trim().length < 5) newErrors.nombretutor = "Nombre obligatorio";
+      
+      const phoneClean = formData.telefonocontacto.replace(/\D/g, '');
+      if (phoneClean.length !== 10) newErrors.telefonocontacto = "10 dígitos";
+      
+      if (formData.direcciondomicilio.trim().length < 10) newErrors.direcciondomicilio = "Dirección insuficiente";
+      
+      if (formData.contacto_emergencia_nombre.trim().length < 5) newErrors.contacto_emergencia_nombre = "Nombre obligatorio";
+      const emergencyPhoneClean = formData.contacto_emergencia_tel.replace(/\D/g, '');
+      if (emergencyPhoneClean.length !== 10) newErrors.contacto_emergencia_tel = "10 dígitos";
+
+      if (formData.seguro_medico !== 'No cuenta') {
+        const nssClean = formData.nss_o_poliza.replace(/\D/g, '');
+        if (nssClean.length !== 11) newErrors.nss_o_poliza = "Requiere 11 dígitos";
+      }
     }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const validateForm = () => {
-    const e: Record<string, string> = {};
-    if (formData.nombres.trim().length < 2)        e.nombres = 'Obligatorio';
-    if (formData.apellidopaterno.trim().length < 2) e.apellidopaterno = 'Obligatorio';
-    if (!isEditing) {
-      if (!formData.fechanacimiento)                e.fechanacimiento = 'Necesaria';
-      if (!formData.idprofesor)                     e.idprofesor = 'Selecciona instructor';
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!formData.correotutor || !emailRegex.test(formData.correotutor)) e.correotutor = 'Email inválido';
-      if (formData.nombretutor.trim().length < 5)   e.nombretutor = 'Nombre obligatorio';
-      if (formData.telefonocontacto.replace(/\D/g,'').length !== 10) e.telefonocontacto = '10 dígitos';
-      if (formData.direcciondomicilio.trim().length < 10) e.direcciondomicilio = 'Insuficiente';
-      if (formData.contacto_emergencia_nombre.trim().length < 5) e.contacto_emergencia_nombre = 'Obligatorio';
-      if (formData.contacto_emergencia_tel.replace(/\D/g,'').length !== 10) e.contacto_emergencia_tel = '10 dígitos';
+  const handleInputChange = (name: string, value: string) => {
+    if (["telefonocontacto", "contacto_emergencia_tel", "nss_o_poliza"].includes(name)) {
+      const limit = name === "nss_o_poliza" ? 11 : 10;
+      const numericValue = value.replace(/\D/g, '').slice(0, limit);
+      setFormData((prev: any) => ({ ...prev, [name]: numericValue }));
+    } else {
+      setFormData((prev: any) => ({ ...prev, [name]: value }));
     }
-    setErrors(e);
-    return Object.keys(e).length === 0;
   };
 
   const handleOpenAdd = () => {
-    setIsEditing(false); setFormData(initialForm); setErrors({}); setStep('form'); setIsModalOpen(true);
+    setIsEditing(false);
+    setFormData({
+      ...initialFormState,
+      idprofesor: idProfesorActual,   // Asignar automáticamente el profesor logueado
+    });
+    setErrors({});
+    setStep('form');
+    setIsModalOpen(true);
   };
+
   const handleOpenEdit = (a: any) => {
-    setIsEditing(true); setSelectedAlumno(a); setFormData({ ...a }); setErrors({}); setStep('form'); setIsModalOpen(true);
+    setIsEditing(true);
+    setSelectedAlumno(a);
+    setFormData({ ...a });
+    setErrors({});
+    setStep('form');
+    setIsModalOpen(true);
   };
+
   const handleOpenDetail = async (id: number) => {
     setStep('detail'); setIsModalOpen(true);
     try { const d = await alumnoService.getDetalle(id); setSelectedAlumno(d); } catch { /**/ }
   };
-  const handleOpenPhoto = (a: any) => { setSelectedAlumno(a); setStep('photo_choice'); setIsModalOpen(true); };
+
+  const handleOpenPhoto = (a: any) => {
+    setSelectedAlumno(a);
+    setStep('photo_choice');
+    setIsModalOpen(true);
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,22 +360,31 @@ const PaseListaView: React.FC = () => {
     setSavingAlu(true);
     try {
       if (isEditing && selectedAlumno) {
-        const res = await alumnoService.actualizar(selectedAlumno.idalumno, {
-          nombres: formData.nombres, apellidopaterno: formData.apellidopaterno,
-          apellidomaterno: formData.apellidomaterno, idgradoactual: formData.idgradoactual,
-        });
-        setAlumnos(p => p.map(a => a.idalumno === res.idalumno ? res : a));
+        const updatePayload = {
+          nombres: formData.nombres,
+          apellidopaterno: formData.apellidopaterno,
+          apellidomaterno: formData.apellidomaterno,
+          idgradoactual: formData.idgradoactual,
+          estatus: formData.estatus,
+          fotoalumno: formData.fotoalumno
+        };
+        const res = await alumnoService.actualizar(selectedAlumno.idalumno, updatePayload);
+        setAlumnos(prev => prev.map(a => a.idalumno === res.idalumno ? res : a));
         setIsModalOpen(false);
         setSuccessMsg('Alumno actualizado');
       } else {
-        const res = await alumnoService.registrar(formData);
-        setSelectedAlumno(res); setAlumnos(p => [...p, res]); setStep('photo_choice');
+        const payload = { ...formData, idprofesor: idProfesorActual };
+        const res = await alumnoService.registrar(payload);
+        setSelectedAlumno(res);
+        setAlumnos(prev => [...prev, res]);
+        setStep('photo_choice');
         setSuccessMsg('Alumno registrado');
       }
     } catch { setErrorMsg('Error al guardar.'); }
     finally { setSavingAlu(false); }
   };
 
+  // ─── GESTIÓN DE FOTOGRAFÍA ──────────────────────────────────
   const stopCamera = () => { streamRef.current?.getTracks().forEach(t => t.stop()); streamRef.current = null; };
   const startCamera = async () => {
     try {
@@ -315,14 +408,14 @@ const PaseListaView: React.FC = () => {
     setSavingAlu(true);
     try {
       const res = await alumnoService.subirFoto(selectedAlumno.idalumno, tempFile);
-      setAlumnos(p => p.map(a => a.idalumno === res.idalumno ? res : a));
+      setAlumnos(prev => prev.map(a => a.idalumno === res.idalumno ? res : a));
       setIsModalOpen(false); setSuccessMsg('Foto actualizada');
     } catch { setErrorMsg('Error al subir foto.'); }
     finally { setSavingAlu(false); }
   };
 
   // ══════════════════════════════════════════════════════════
-  //  ESTADO: RESUMEN
+  //  ESTADO: RESUMEN (con franjas)
   // ══════════════════════════════════════════════════════════
   const [resumen, setResumen]       = useState<ResumenAlumno[]>([]);
   const [resLoading, setResLoading] = useState(false);
@@ -333,20 +426,23 @@ const PaseListaView: React.FC = () => {
     try {
       const hasta = hoy(); const desde = offsetFecha(hasta, -(resDias-1));
       const res = await asistenciaService.resumenGrupo({ desde, hasta });
-      setResumen(res.alumnos || []);
+      const alumnosConStripe = (res.alumnos || []).map(alumno => ({
+        ...alumno,
+        cinta_stripe: obtenerStripePorNivelYColor(alumno.cinta_nivel, alumno.cinta_color)
+      }));
+      setResumen(alumnosConStripe);
     } catch { setResumen([]); }
     finally { setResLoading(false); }
-  }, [resDias]);
+  }, [resDias, obtenerStripePorNivelYColor]);
 
-  useEffect(() => { if (tab === 'resumen') loadResumen(); }, [tab, loadResumen]);
+  useEffect(() => { if (tab === 'resumen' && cintas.length) loadResumen(); }, [tab, loadResumen, cintas]);
 
   // ──────────────────────────────────────────────────────────
   //  RENDER
   // ──────────────────────────────────────────────────────────
   return (
     <>
-    <div className="space-y-4 text-[var(--color-text)] animate-in fade-in duration-500 pb-24">
-
+    <div className="space-y-4 text-[var(--color-text)] animate-in fade-in duration-500 pb-32">
       {/* Toasts */}
       <AnimatePresence>
         {successMsg && (
@@ -369,7 +465,7 @@ const PaseListaView: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* ── HEADER ── */}
+      {/* HEADER */}
       <div className="bg-[var(--color-card)] backdrop-blur-2xl p-5 rounded-[2.5rem] border border-[var(--color-border)] shadow-2xl space-y-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -386,8 +482,6 @@ const PaseListaView: React.FC = () => {
               </p>
             </div>
           </div>
-
-          {/* Acción contextual */}
           {tab === 'asistencia' && (
             <motion.button whileTap={{ scale:0.88, rotate:-180 }} transition={{ duration:0.35 }}
               onClick={() => loadLista(fecha)} disabled={listaLoading}
@@ -421,7 +515,7 @@ const PaseListaView: React.FC = () => {
           )}
         </div>
 
-        {/* Navegador de fecha — solo en asistencia */}
+        {/* Navegador de fecha (asistencia) */}
         {tab === 'asistencia' && (
           <>
             <div className="flex items-center gap-2">
@@ -448,14 +542,12 @@ const PaseListaView: React.FC = () => {
                 </button>
               )}
             </div>
-
-            {/* KPIs asistencia */}
             {!listaLoading && (listaData?.alumnos?.length ?? 0) > 0 && (
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { label:'Total',     val: statsAsist.total,     color:'var(--color-text)', Icon: Users },
-                  { label:'Presentes', val: statsAsist.presentes, color:'#22c55e',           Icon: CheckCircle2 },
-                  { label:'Ausentes',  val: statsAsist.ausentes,  color:'#ef4444',           Icon: XCircle },
+                  { label:'Total', val: statsAsist.total, color:'var(--color-text)', Icon: Users },
+                  { label:'Presentes', val: statsAsist.presentes, color:'#22c55e', Icon: CheckCircle2 },
+                  { label:'Ausentes', val: statsAsist.ausentes, color:'#ef4444', Icon: XCircle },
                 ].map(({ label, val, color, Icon }) => (
                   <div key={label} className="bg-[var(--color-background)] rounded-2xl p-3 text-center border border-[var(--color-border)]">
                     <Icon size={14} className="mx-auto mb-1" style={{ color }}/>
@@ -468,7 +560,7 @@ const PaseListaView: React.FC = () => {
           </>
         )}
 
-        {/* Buscador — solo en alumnos */}
+        {/* Buscador alumnos */}
         {tab === 'alumnos' && (
           <div className="relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]" size={12}/>
@@ -479,12 +571,12 @@ const PaseListaView: React.FC = () => {
         )}
       </div>
 
-      {/* ── TABS ── */}
+      {/* TABS */}
       <div className="flex p-1.5 bg-[var(--color-card)] rounded-[1.8rem] border border-[var(--color-border)] shadow-xl">
         {([
-          { key:'asistencia', label:'Lista',   Icon: CheckCheck },
-          { key:'alumnos',    label:'Alumnos', Icon: Users },
-          { key:'resumen',    label:'Resumen', Icon: BarChart2 },
+          { key:'asistencia', label:'Lista', Icon: CheckCheck },
+          { key:'alumnos', label:'Alumnos', Icon: Users },
+          { key:'resumen', label:'Resumen', Icon: BarChart2 },
         ] as const).map(({ key, label, Icon }) => (
           <button key={key} onClick={() => setTab(key)}
             className="flex-1 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1.5"
@@ -497,12 +589,10 @@ const PaseListaView: React.FC = () => {
       </div>
 
       {/* ══════════════════════════════════════════════════
-          TAB — ASISTENCIA
+          TAB — ASISTENCIA (sin cambios)
       ══════════════════════════════════════════════════ */}
       {tab === 'asistencia' && (
         <div className="space-y-3">
-
-          {/* Banner ya registrada */}
           {!listaLoading && listaData?.ya_registrada && (
             <motion.div initial={{ opacity:0,y:-8 }} animate={{ opacity:1,y:0 }}
               className="flex items-center gap-3 px-4 py-3 rounded-2xl border"
@@ -517,7 +607,6 @@ const PaseListaView: React.FC = () => {
             </motion.div>
           )}
 
-          {/* Botones rápidos */}
           {!listaLoading && (listaData?.alumnos?.length ?? 0) > 0 && !listaData?.ya_registrada && (
             <div className="flex gap-2">
               <button onClick={() => marcarTodos(true)}
@@ -533,7 +622,6 @@ const PaseListaView: React.FC = () => {
             </div>
           )}
 
-          {/* Lista */}
           {listaLoading ? (
             <div className="flex items-center justify-center py-20"><Loader2 className="animate-spin text-[var(--color-primary)]" size={32}/></div>
           ) : (listaData?.alumnos?.length ?? 0) === 0 ? (
@@ -548,6 +636,7 @@ const PaseListaView: React.FC = () => {
                 const noReg      = alumno.presente === null && !dirty;
                 const hex        = getBeltHex(alumno.cinta_color);
                 const yaRegistrada = listaData?.ya_registrada ?? false;
+                const stripeName = (alumno as any).cinta_stripe;
                 return (
                   <motion.div key={alumno.idalumno}
                     initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay: i*0.02 }}
@@ -560,8 +649,6 @@ const PaseListaView: React.FC = () => {
                       opacity: yaRegistrada ? 0.85 : 1,
                     }}>
                     <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-full opacity-40" style={{ backgroundColor: hex }}/>
-
-                    {/* Foto */}
                     <div className="relative flex-shrink-0 ml-1">
                       <div className="w-11 h-11 rounded-xl overflow-hidden flex items-center justify-center border-2"
                         style={{ borderColor: presente ? '#22c55e50' : '#ef444450', background:'var(--color-background)' }}>
@@ -570,16 +657,10 @@ const PaseListaView: React.FC = () => {
                           : <span className="text-base font-black" style={{ color:'var(--color-text-muted)' }}>{alumno.nombres.charAt(0)}</span>
                         }
                       </div>
-                      {/* Pastilla cinta sobre la foto */}
                       <div className="absolute -bottom-1 -right-1 border-2 rounded shadow-lg z-10 overflow-hidden" style={{ borderColor:'var(--color-background)' }}>
-                        <MiniCintaBelt
-                          colorName={(alumno as AlumnoDia & { cinta_stripe?: string }).cinta_stripe ? alumno.cinta_color : alumno.cinta_color}
-                          stripeName={(alumno as AlumnoDia & { cinta_stripe?: string }).cinta_stripe}
-                        />
+                        <MiniCintaBelt colorName={alumno.cinta_color} stripeName={stripeName} />
                       </div>
                     </div>
-
-                    {/* Info */}
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-black uppercase italic tracking-tighter truncate leading-none text-[var(--color-text)] mb-1">
                         {alumno.nombres} {alumno.apellidopaterno}
@@ -596,8 +677,6 @@ const PaseListaView: React.FC = () => {
                         )}
                       </div>
                     </div>
-
-                    {/* Toggle */}
                     <motion.div animate={{ scale: presente ? 1 : 0.9 }}
                       className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
                       style={{ background: presente ? '#22c55e20' : '#ef444420', border:`1.5px solid ${presente ? '#22c55e50' : '#ef444450'}` }}>
@@ -611,10 +690,9 @@ const PaseListaView: React.FC = () => {
               })}
             </div>
           )}
-
-          {/* Botón guardar sticky */}
+          <div className="h-8" />
           {!listaLoading && (listaData?.alumnos?.length ?? 0) > 0 && !listaData?.ya_registrada && (
-            <div className="sticky bottom-4 pt-2">
+            <div className="pt-2">
               <motion.button whileTap={{ scale:0.97 }} onClick={handleGuardar} disabled={saving}
                 className="w-full h-14 rounded-[2rem] flex items-center justify-center gap-3 font-black text-sm uppercase tracking-widest text-white shadow-2xl disabled:opacity-60"
                 style={{ background:'var(--color-primary)', boxShadow:'0 8px 32px -8px var(--color-primary)80' }}>
@@ -627,7 +705,7 @@ const PaseListaView: React.FC = () => {
       )}
 
       {/* ══════════════════════════════════════════════════
-          TAB — ALUMNOS (CRUD)
+          TAB — ALUMNOS (CRUD) — CON MODAL UNIFICADO
       ══════════════════════════════════════════════════ */}
       {tab === 'alumnos' && (
         <div className="space-y-2.5">
@@ -642,16 +720,14 @@ const PaseListaView: React.FC = () => {
             const beltInfo     = getCintaInfo(alumno.idgradoactual);
             const beltColorName = beltInfo?.color || 'Blanca';
             const hex          = getBeltHex(beltColorName);
+            const stripeName   = beltInfo?.color_stripe || null;
             const tieneDeuda   = (alumno.total_deuda || 0) > 0;
             return (
               <motion.div key={alumno.idalumno} layout
                 initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay: i*0.02 }}
                 className={`relative bg-[var(--color-card)]/40 backdrop-blur-xl p-3 rounded-[1.8rem] border border-[var(--color-border)] shadow-xl overflow-hidden transition-all ${tieneDeuda ? 'border-red-500/20' : ''}`}>
-
                 <div className="absolute left-0 top-0 bottom-0 w-[4px] opacity-30" style={{ backgroundColor: hex }}/>
-
                 <div className="flex items-center gap-3 ml-1">
-                  {/* Foto */}
                   <div className="relative flex-shrink-0">
                     <div className="w-12 h-12 rounded-2xl bg-black/20 border-[3px] overflow-hidden flex items-center justify-center"
                       style={{ borderColor: hex, boxShadow:`0 0 10px -2px ${hex}44` }}>
@@ -660,11 +736,9 @@ const PaseListaView: React.FC = () => {
                         : <UserIcon size={20} className="text-[var(--color-text-muted)] opacity-30"/>}
                     </div>
                     <div className="absolute -bottom-1 -right-1 border-2 rounded-md shadow-lg z-20 overflow-hidden" style={{ borderColor:'var(--color-background)' }}>
-                      <MiniCintaBelt colorName={beltColorName} stripeName={beltInfo?.color_stripe}/>
+                      <MiniCintaBelt colorName={beltColorName} stripeName={stripeName} />
                     </div>
                   </div>
-
-                  {/* Info */}
                   <div className="flex-1 min-w-0 text-left">
                     <div className="flex items-center gap-2 mb-0.5">
                       <h3 className="text-[13px] font-black uppercase italic tracking-tighter text-[var(--color-text)] truncate leading-none">
@@ -676,10 +750,9 @@ const PaseListaView: React.FC = () => {
                         </span>
                       )}
                     </div>
-
                     {beltInfo && (
                       <div className="flex items-center gap-1.5 mb-1">
-                        <MiniCintaBelt colorName={beltColorName} stripeName={beltInfo?.color_stripe}/>
+                        <MiniCintaBelt colorName={beltColorName} stripeName={stripeName} />
                         <span className="text-[8px] font-black uppercase tracking-wide"
                           style={{ color: hex === '#f8f8f8' ? 'var(--color-text-muted)' : hex }}>
                           {beltInfo.nivelkupdan}
@@ -687,14 +760,11 @@ const PaseListaView: React.FC = () => {
                         </span>
                       </div>
                     )}
-
                     <span className="text-[8px] font-bold flex items-center gap-1 text-[var(--color-text-muted)]">
                       <Phone size={8} className="text-emerald-500 flex-shrink-0"/>
                       {alumno.telefonocontacto || 'S/T'}
                     </span>
                   </div>
-
-                  {/* Botones */}
                   <div className="flex gap-1 flex-shrink-0">
                     <button onClick={() => handleOpenDetail(alumno.idalumno)} title="Ver"
                       className="p-2 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] text-[var(--color-primary)] active:scale-90 transition-all hover:bg-[var(--color-primary)] hover:text-white">
@@ -717,7 +787,7 @@ const PaseListaView: React.FC = () => {
       )}
 
       {/* ══════════════════════════════════════════════════
-          TAB — RESUMEN
+          TAB — RESUMEN (sin cambios)
       ══════════════════════════════════════════════════ */}
       {tab === 'resumen' && (
         <div className="space-y-3">
@@ -742,6 +812,7 @@ const PaseListaView: React.FC = () => {
             </div>
           ) : resumen.map((alumno, i) => {
             const hex      = getBeltHex(alumno.cinta_color);
+            const stripeName = (alumno as any).cinta_stripe;
             const pct      = alumno.porcentaje;
             const barColor = pct === null ? '#6b7280' : pct >= 80 ? '#22c55e' : pct >= 60 ? '#f97316' : '#ef4444';
             return (
@@ -749,22 +820,16 @@ const PaseListaView: React.FC = () => {
                 initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ delay: i*0.02 }}
                 className="bg-[var(--color-card)] rounded-[1.5rem] border border-[var(--color-border)] p-3 space-y-2">
                 <div className="flex items-center gap-3">
-                  {/* Avatar */}
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border-2 overflow-hidden relative"
                     style={{ borderColor: hex+'60', background:'var(--color-background)' }}>
                     {alumno.foto
                       ? <img src={alumno.foto} className="w-full h-full object-cover" alt=""/>
                       : <span className="text-sm font-black" style={{ color:'var(--color-text-muted)' }}>{alumno.nombre_completo.charAt(0)}</span>
                     }
-                    {/* Pastilla cinta */}
                     <div className="absolute -bottom-0.5 -right-0.5 border rounded overflow-hidden z-10" style={{ borderColor:'var(--color-background)' }}>
-                      <MiniCintaBelt
-                        colorName={alumno.cinta_color}
-                        stripeName={(alumno as ResumenAlumno & { cinta_stripe?: string }).cinta_stripe}
-                      />
+                      <MiniCintaBelt colorName={alumno.cinta_color} stripeName={stripeName} />
                     </div>
                   </div>
-
                   <div className="flex-1 min-w-0">
                     <p className="text-[12px] font-black uppercase italic tracking-tighter truncate text-[var(--color-text)]">
                       {alumno.nombre_completo}
@@ -774,8 +839,6 @@ const PaseListaView: React.FC = () => {
                       {alumno.cinta_nivel || '—'}
                     </span>
                   </div>
-
-                  {/* Badge % */}
                   {pct !== null ? (
                     <div className="px-2 py-0.5 rounded-full flex-shrink-0" style={{ background:`${barColor}18`, border:`1px solid ${barColor}35` }}>
                       <span className="text-[9px] font-black" style={{ color:barColor }}>{pct}%</span>
@@ -784,7 +847,6 @@ const PaseListaView: React.FC = () => {
                     <span className="text-[8px] opacity-30 font-bold text-[var(--color-text)]">—</span>
                   )}
                 </div>
-
                 {pct !== null && (
                   <div className="space-y-1">
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background:'var(--color-background)' }}>
@@ -797,16 +859,15 @@ const PaseListaView: React.FC = () => {
                     </div>
                   </div>
                 )}
-      </motion.div>
+              </motion.div>
             );
           })}
         </div>
       )}
-
     </div>
 
     {/* ══════════════════════════════════════════════════
-        MODAL ALUMNOS (CRUD)
+        MODAL ALUMNOS (IDÉNTICO A GestionAlumnos)
     ══════════════════════════════════════════════════ */}
     <AnimatePresence>
       {isModalOpen && (
@@ -825,7 +886,7 @@ const PaseListaView: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-base font-black italic uppercase tracking-tighter leading-none">
-                    {isEditing ? 'Actualizar Perfil' : step === 'detail' ? 'Expediente' : 'Nueva Inscripción'}
+                    {isEditing ? 'Actualizar Perfil' : step === 'detail' ? 'Expediente Completo' : 'Nueva Inscripción'}
                   </h3>
                   <p className="text-[6px] font-black uppercase tracking-[0.3em] opacity-70 mt-1">TKW SYSTEM</p>
                 </div>
@@ -836,219 +897,268 @@ const PaseListaView: React.FC = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 text-left">
-
-              {/* PASO: FORM */}
+              {/* PASO: FORM (IDÉNTICO A GestionAlumnos) */}
               {step === 'form' && (
                 <form onSubmit={handleSave} className="space-y-8 pb-10">
-
-                  {/* Sección identidad */}
+                  
+                  {/* SECCIÓN IDENTIDAD MARCIAL */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-[var(--color-primary)] opacity-80 font-black italic">
-                      <UserIcon size={14}/><span className="text-[9px] uppercase tracking-[0.2em]">Identidad Marcial</span>
+                      <UserIcon size={14} /><span className="text-[9px] uppercase tracking-[0.2em]">Identidad Marcial</span>
                     </div>
-                    <InputField label="Nombres" name="nombres" value={formData.nombres} onChange={handleInputChange} error={errors.nombres} required placeholder="Juan Román"/>
-                    <div className="grid grid-cols-2 gap-4">
-                      <InputField label="Apellido Paterno" name="apellidopaterno" value={formData.apellidopaterno} onChange={handleInputChange} error={errors.apellidopaterno} required/>
-                      <InputField label="Apellido Materno" name="apellidomaterno" value={formData.apellidomaterno} onChange={handleInputChange} placeholder="Opcional"/>
-                    </div>
-
-                    {/* Selector de cinta con preview */}
-                    <div className="space-y-1">
-                      <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Grado Dojo Actual</label>
-                      {formData.idgradoactual && (() => {
-                        const sel = cintas.find((c: any) => c.idgrado === Number(formData.idgradoactual));
-                        return sel ? (
-                          <div className="flex items-center gap-2 px-3 py-1.5 mb-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)]/50">
-                            <MiniCintaBelt colorName={sel.color} stripeName={sel.color_stripe}/>
-                            <span className="text-[9px] font-black uppercase tracking-wider"
-                              style={{ color: getBeltHex(sel.color) === '#f8f8f8' ? 'var(--color-text-muted)' : getBeltHex(sel.color) }}>
-                              {sel.nivelkupdan}
-                            </span>
-                            {sel.color_stripe && <span className="text-[8px] font-bold text-[var(--color-text-muted)]">· franja {sel.color_stripe}</span>}
-                          </div>
-                        ) : null;
-                      })()}
-                      <select required
-                        className="w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-black text-[9px] uppercase text-[var(--color-text)] appearance-none cursor-pointer shadow-inner"
-                        value={formData.idgradoactual} onChange={e => handleInputChange('idgradoactual', e.target.value)}>
-                        {cintas.map((c: any) => (
-                          <option key={c.idgrado} value={c.idgrado}>
-                            {c.nivelkupdan} — {c.color}{c.color_stripe ? ` / ${c.color_stripe}` : ''}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {isEditing && (
-                      <div className="space-y-1">
-                        <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Estatus</label>
-                        <select className="w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-black text-[9px] uppercase text-[var(--color-text)] appearance-none cursor-pointer shadow-inner"
-                          value={formData.estatus} onChange={e => handleInputChange('estatus', e.target.value)}>
-                          <option value={1}>ACTIVO</option>
-                          <option value={0}>INACTIVO</option>
-                        </select>
+                    <div className="grid grid-cols-1 gap-4">
+                      <InputField label="Nombres" name="nombres" value={formData.nombres} onChange={handleInputChange} error={errors.nombres} required placeholder="Juan Román" />
+                      <div className="grid grid-cols-2 gap-4">
+                        <InputField label="Apellido Paterno" name="apellidopaterno" value={formData.apellidopaterno} onChange={handleInputChange} error={errors.apellidopaterno} required placeholder="Riquelme" />
+                        <InputField label="Apellido Materno" name="apellidomaterno" value={formData.apellidomaterno} onChange={handleInputChange} placeholder="Opcional" />
                       </div>
-                    )}
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Grado Dojo Actual</label>
+                          {/* Preview cinta */}
+                          {formData.idgradoactual && (() => {
+                            const sel = cintas.find((c: any) => c.idgrado === Number(formData.idgradoactual));
+                            return sel ? (
+                              <div className="flex items-center gap-2 px-3 py-1.5 mb-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)]/50">
+                                <MiniCintaBelt colorName={sel.color} stripeName={sel.color_stripe} />
+                                <span className="text-[9px] font-black uppercase tracking-wider" style={{ color: getBeltHex(sel.color) === '#f8f8f8' ? 'var(--color-text-muted)' : getBeltHex(sel.color) }}>
+                                  {sel.nivelkupdan}
+                                </span>
+                                {sel.color_stripe && <span className="text-[8px] font-bold text-[var(--color-text-muted)]">· franja {sel.color_stripe}</span>}
+                              </div>
+                            ) : null;
+                          })()}
+                          <select
+                            required
+                            className="w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-black text-[9px] uppercase text-[var(--color-text)] appearance-none cursor-pointer shadow-inner"
+                            value={formData.idgradoactual}
+                            onChange={e => handleInputChange('idgradoactual', e.target.value)}
+                          >
+                            {cintas.map((c: any) => (
+                              <option key={c.idgrado} value={c.idgrado}>
+                                {c.nivelkupdan} — {c.color}{c.color_stripe ? ` / ${c.color_stripe}` : ''}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        {isEditing && (
+                          <div className="space-y-1">
+                            <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Estatus Alumno</label>
+                            <select className="w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-black text-[9px] uppercase text-[var(--color-text)] appearance-none cursor-pointer shadow-inner" value={formData.estatus} onChange={e => handleInputChange('estatus', e.target.value)}>
+                              <option value={1}>ACTIVO</option>
+                              <option value={0}>INACTIVO</option>
+                            </select>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Sección familia — solo en alta */}
+                  {/* SOLO PARA ALTA: FAMILIA Y AVISOS + MÉDICOS */}
                   {!isEditing && (
-                    <div className="space-y-4 pt-2">
-                      <div className="flex items-center gap-2 text-[var(--color-primary)] opacity-80 font-black italic">
-                        <Mail size={14}/><span className="text-[9px] uppercase tracking-[0.2em]">Familia y Avisos</span>
+                    <>
+                      {/* SECCIÓN FAMILIA Y AVISOS */}
+                      <div className="space-y-4 pt-2">
+                        <div className="flex items-center gap-2 text-[var(--color-primary)] opacity-80 font-black italic">
+                          <Mail size={14} /><span className="text-[9px] uppercase tracking-[0.2em]">Familia y Avisos</span>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4">
+                          <InputField label="F. Nacimiento" name="fechanacimiento" type="date" value={formData.fechanacimiento} onChange={handleInputChange} error={errors.fechanacimiento} required />
+                          <InputField label="Email del Tutor (Vital para Avisos)" name="correotutor" type="email" value={formData.correotutor} onChange={handleInputChange} error={errors.correotutor} required placeholder="tutor@dominio.com" />
+                          <div className="grid grid-cols-2 gap-4">
+                            <InputField label="Nombre Completo Tutor" name="nombretutor" value={formData.nombretutor} onChange={handleInputChange} error={errors.nombretutor} required placeholder="Nombre del padre/madre" />
+                            <InputField label="WhatsApp Contacto" name="telefonocontacto" maxLength={10} value={formData.telefonocontacto} onChange={handleInputChange} error={errors.telefonocontacto} required placeholder="10 dígitos" />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Instructor Responsable <span className="text-red-500 font-bold">*</span></label>
+                            <select 
+                              className={`w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border ${errors.idprofesor ? 'border-red-500' : 'border-[var(--color-border)]'} focus:border-[var(--color-primary)] outline-none font-black text-[9px] uppercase text-[var(--color-text)] appearance-none cursor-pointer transition-all`} 
+                              value={formData.idprofesor || ''} 
+                              onChange={e => handleInputChange('idprofesor', e.target.value)}
+                            >
+                              <option value="">Seleccionar Maestro</option>
+                              {profesores.map(p => <option key={p.idprofesor} value={p.idprofesor}>{p.nombrecompleto}</option>)}
+                            </select>
+                            {errors.idprofesor && <p className="text-[7px] text-red-500 ml-2 font-bold uppercase italic">{errors.idprofesor}</p>}
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Dirección de Domicilio <span className="text-red-500 font-bold">*</span></label>
+                            <textarea rows={2} className={`w-full p-4 bg-[var(--color-background)] rounded-xl border ${errors.direcciondomicilio ? 'border-red-500' : 'border-[var(--color-border)]'} focus:border-[var(--color-primary)] outline-none font-bold text-[10px] text-[var(--color-text)] resize-none transition-all placeholder:opacity-20`} placeholder="Calle, número, colonia..." value={formData.direcciondomicilio} onChange={e => handleInputChange('direcciondomicilio', e.target.value)} />
+                            {errors.direcciondomicilio && <p className="text-[7px] text-red-500 ml-2 font-bold uppercase italic">{errors.direcciondomicilio}</p>}
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <InputField label="Emergencia (Nombre)" name="contacto_emergencia_nombre" value={formData.contacto_emergencia_nombre} onChange={handleInputChange} error={errors.contacto_emergencia_nombre} required placeholder="Llamar a..." />
+                            <InputField label="Emergencia (Tel)" name="contacto_emergencia_tel" maxLength={10} value={formData.contacto_emergencia_tel} onChange={handleInputChange} error={errors.contacto_emergencia_tel} required placeholder="Teléfono" />
+                          </div>
+                        </div>
                       </div>
-                      <InputField label="F. Nacimiento" name="fechanacimiento" type="date" value={formData.fechanacimiento} onChange={handleInputChange} error={errors.fechanacimiento} required/>
-                      <InputField label="Email del Tutor" name="correotutor" type="email" value={formData.correotutor} onChange={handleInputChange} error={errors.correotutor} required placeholder="tutor@dominio.com"/>
-                      <div className="grid grid-cols-2 gap-4">
-                        <InputField label="Nombre Tutor" name="nombretutor" value={formData.nombretutor} onChange={handleInputChange} error={errors.nombretutor} required/>
-                        <InputField label="WhatsApp" name="telefonocontacto" maxLength={10} value={formData.telefonocontacto} onChange={handleInputChange} error={errors.telefonocontacto} required placeholder="10 dígitos"/>
+
+                      {/* SECCIÓN FICHA MÉDICA */}
+                      <div className="space-y-4 pt-2">
+                        <div className="flex items-center gap-2 text-[var(--color-primary)] opacity-80 font-black italic">
+                          <HeartPulse size={14} /><span className="text-[9px] uppercase tracking-[0.2em]">Ficha Médica</span>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4">
+                          <div className="grid grid-cols-3 gap-4">
+                            <div className="space-y-1">
+                              <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest flex items-center gap-1">Sangre <span className="text-red-500 font-bold text-xs">*</span></label>
+                              <select className="w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-black text-[9px] uppercase text-[var(--color-text)]" value={formData.tipo_sangre} onChange={e => handleInputChange('tipo_sangre', e.target.value)}>
+                                <option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option>
+                              </select>
+                            </div>
+                            <div className="col-span-2">
+                              <div className="space-y-1">
+                                <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest flex items-center gap-1">Seguro Médico <span className="text-red-500 font-bold text-xs">*</span></label>
+                                <select className="w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-black text-[9px] uppercase text-[var(--color-text)] appearance-none cursor-pointer transition-all shadow-inner" value={formData.seguro_medico} onChange={e => handleInputChange('seguro_medico', e.target.value)}>
+                                  <option value="No cuenta">No cuenta</option>
+                                  <option value="IMSS">IMSS</option>
+                                  <option value="ISSSTE">ISSSTE</option>
+                                  <option value="Privado">Seguro Privado</option>
+                                  <option value="Otro">Otro</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <InputField label="NSS / Póliza de Seguro" name="nss_o_poliza" value={formData.nss_o_poliza} onChange={handleInputChange} error={errors.nss_o_poliza} required={formData.seguro_medico !== 'No cuenta'} placeholder="11 dígitos" maxLength={11} />
+                          <InputField label="Alergias o Padecimientos" name="alergias" value={formData.alergias} onChange={handleInputChange} placeholder="Ninguna" />
+                        </div>
                       </div>
-                      <InputField label="Domicilio" name="direcciondomicilio" value={formData.direcciondomicilio} onChange={handleInputChange} error={errors.direcciondomicilio} required placeholder="Calle, número, colonia"/>
-                      <div className="grid grid-cols-2 gap-4">
-                        <InputField label="Contacto Emergencia" name="contacto_emergencia_nombre" value={formData.contacto_emergencia_nombre} onChange={handleInputChange} error={errors.contacto_emergencia_nombre} required/>
-                        <InputField label="Tel. Emergencia" name="contacto_emergencia_tel" maxLength={10} value={formData.contacto_emergencia_tel} onChange={handleInputChange} error={errors.contacto_emergencia_tel} required/>
-                      </div>
-                    </div>
+                    </>
                   )}
 
-                  <motion.button whileTap={{ scale:0.97 }} type="submit" disabled={savingAlu}
-                    className="w-full h-14 text-white font-black rounded-[2rem] flex items-center justify-center gap-3 text-sm uppercase tracking-widest disabled:opacity-50"
-                    style={{ background:'var(--color-primary)', boxShadow:'0 8px 24px -8px var(--color-primary)60' }}>
-                    {savingAlu ? <><Loader2 className="animate-spin" size={20}/> Guardando...</> : <><Save size={20}/> {isEditing ? 'Actualizar' : 'Registrar'}</>}
+                  <motion.button whileTap={{ scale: 0.98 }} type="submit" disabled={savingAlu}
+                    className="w-full h-16 bg-[var(--color-primary)] text-white font-black rounded-[2rem] shadow-xl flex items-center justify-center gap-3 active:brightness-125 transition-all mt-6">
+                    {savingAlu ? <Loader2 className="animate-spin" size={24} /> : <><Save size={24}/> <span className="text-base uppercase italic tracking-tighter font-black">{isEditing ? 'Sincronizar Perfil' : 'Completar Registro'}</span></>}
                   </motion.button>
                 </form>
               )}
 
-              {/* PASO: DETAIL */}
+              {/* PASO: DETAIL (EXPEDIENTE COMPLETO) — igual a GestionAlumnos */}
               {step === 'detail' && selectedAlumno && (
-                <div className="space-y-5 pb-6">
-                  {/* Cabecera alumno */}
-                  <div className="flex items-center gap-4 p-4 rounded-3xl border border-[var(--color-border)]" style={{ background:'var(--color-background)' }}>
-                    <div className="w-16 h-16 rounded-2xl overflow-hidden border-4 flex-shrink-0"
-                      style={{ borderColor: getBeltHex(getCintaInfo(selectedAlumno.idgradoactual)?.color) }}>
-                      {selectedAlumno.fotoalumno
-                        ? <img src={selectedAlumno.fotoalumno} className="w-full h-full object-cover" alt=""/>
-                        : <div className="w-full h-full flex items-center justify-center" style={{ background:'var(--color-card)' }}>
-                            <UserIcon size={28} className="opacity-30"/>
-                          </div>
-                      }
+                <div className="space-y-6 pb-6 text-left">
+                  {/* Encabezado */}
+                  <div className="flex items-center gap-5 p-5 bg-[var(--color-background)] rounded-[2.2rem] border border-[var(--color-border)] shadow-sm">
+                    <div className="w-24 h-24 rounded-[1.8rem] bg-black/20 border-4 shadow-2xl flex items-center justify-center overflow-hidden flex-shrink-0"
+                      style={{ borderColor: getBeltHex(getCintaInfo(selectedAlumno.idgradoactual)?.color || "Blanca") }}>
+                      {selectedAlumno.fotoalumno ? <img src={selectedAlumno.fotoalumno} className="w-full h-full object-cover" alt="" /> : <UserIcon size={36} className="text-[var(--color-text-muted)] opacity-30" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-black uppercase italic tracking-tighter text-[var(--color-text)] leading-none">
-                        {selectedAlumno.nombres} {selectedAlumno.apellidopaterno}
-                      </h3>
-                      {(() => {
-                        const ci = getCintaInfo(selectedAlumno.idgradoactual);
-                        return ci ? (
-                          <div className="flex items-center gap-2 mt-2">
-                            <MiniCintaBelt colorName={ci.color} stripeName={ci.color_stripe}/>
-                            <span className="text-[9px] font-black uppercase"
-                              style={{ color: getBeltHex(ci.color) === '#f8f8f8' ? 'var(--color-text-muted)' : getBeltHex(ci.color) }}>
-                              {ci.nivelkupdan}{ci.color_stripe ? ` / ${ci.color_stripe}` : ''}
-                            </span>
-                          </div>
-                        ) : null;
-                      })()}
+                      <div className="flex items-center gap-2 mb-1">
+                        {getCintaInfo(selectedAlumno.idgradoactual) && (
+                          <MiniCintaBelt
+                            colorName={getCintaInfo(selectedAlumno.idgradoactual)?.color || "Blanca"}
+                            stripeName={getCintaInfo(selectedAlumno.idgradoactual)?.color_stripe}
+                          />
+                        )}
+                        <span className="text-[9px] font-black uppercase text-[var(--color-primary)] tracking-widest">{getCintaInfo(selectedAlumno.idgradoactual)?.nivelkupdan}</span>
+                      </div>
+                      <h2 className="text-2xl font-black italic uppercase tracking-tighter text-[var(--color-text)] leading-tight truncate">{selectedAlumno.nombres}</h2>
+                      <h3 className="text-sm font-bold text-[var(--color-text-muted)] uppercase tracking-tighter">{selectedAlumno.apellidopaterno} {selectedAlumno.apellidomaterno}</h3>
                     </div>
                   </div>
 
-                  {/* Datos de contacto */}
-                  <div className="bg-[var(--color-card)] p-5 rounded-[2rem] border border-[var(--color-border)] space-y-4">
-                    <div className="flex items-center gap-2 text-[var(--color-primary)] font-black uppercase text-[9px] tracking-widest">
-                      <UserIcon size={13}/> Identidad y Contacto
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Nacimiento</p><p className="text-xs font-bold text-[var(--color-text)]">{selectedAlumno.fechanacimiento || '---'}</p></div>
-                      <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">WhatsApp</p><p className="text-xs font-bold text-[var(--color-text)]">{selectedAlumno.telefonocontacto || 'S/T'}</p></div>
-                      <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Tutor</p><p className="text-xs font-bold text-[var(--color-text)] italic">{selectedAlumno.nombretutor || 'No registrado'}</p></div>
-                      <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Email tutor</p><p className="text-[10px] font-bold text-[var(--color-text)] truncate">{selectedAlumno.correotutor || '---'}</p></div>
-                      <div className="col-span-2 border-t border-white/5 pt-3">
-                        <p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Domicilio</p>
-                        <p className="text-[10px] font-bold text-[var(--color-text)] opacity-80 leading-relaxed">
-                          <MapPin size={10} className="inline mr-1 text-red-500"/>{selectedAlumno.direcciondomicilio || 'No especificado'}
-                        </p>
+                  <div className="grid grid-cols-1 gap-5">
+                    {/* Adeudos */}
+                    {(selectedAlumno.total_deuda || 0) > 0 && (
+                      <div className="bg-red-500/10 p-5 rounded-[2rem] border border-red-500/20 space-y-4">
+                        <div className="flex items-center justify-between text-red-500">
+                          <div className="flex items-center gap-2"><ShieldAlert size={16} /><span className="text-[10px] font-black uppercase tracking-widest">Adeudos Pendientes</span></div>
+                          <span className="text-2xl font-black">${selectedAlumno.total_deuda}</span>
+                        </div>
+                        <div className="space-y-2">
+                          {(selectedAlumno.pagos_pendientes_detalle || []).map((p: any, idx: number) => (
+                            <div key={idx} className="flex justify-between items-center text-[10px] text-[var(--color-text)] opacity-80 bg-white/5 p-3 rounded-xl border border-red-500/5">
+                              <div className="flex items-center gap-2"><DollarSign size={12} className="text-red-500" /><span>{p.concepto}</span></div>
+                              <span className="font-black text-red-500 text-xs">${p.monto}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Identidad y Contacto */}
+                    <div className="bg-[var(--color-card)] p-6 rounded-[2.2rem] border border-[var(--color-border)] space-y-5">
+                      <div className="flex items-center gap-2 text-[var(--color-primary)] font-black uppercase text-[9px] tracking-widest"><UserCircle size={14}/> Identidad y Contacto</div>
+                      <div className="grid grid-cols-2 gap-5">
+                        <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Nacimiento</p><p className="text-xs font-bold text-[var(--color-text)] flex items-center gap-1"><CalendarDays size={10} /> {selectedAlumno.fechanacimiento || '---'}</p></div>
+                        <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Email Tutor</p><p className="text-xs font-bold text-[var(--color-text)] truncate">{selectedAlumno.correotutor}</p></div>
+                        <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Nombre Tutor</p><p className="text-xs font-bold text-[var(--color-text)] italic">{selectedAlumno.nombretutor || 'No registrado'}</p></div>
+                        <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">WhatsApp</p><p className="text-xs font-bold text-[var(--color-text)]">{selectedAlumno.telefonocontacto || 'S/T'}</p></div>
+                        <div className="col-span-2 border-t border-white/5 pt-3"><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Domicilio</p><p className="text-[10px] font-bold text-[var(--color-text)]"><MapPin size={10} className="inline mr-1 text-red-500" /> {selectedAlumno.direcciondomicilio || 'No especificado'}</p></div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Emergencia */}
-                  <div className="bg-[var(--color-card)] p-5 rounded-[2rem] border border-[var(--color-border)] space-y-4">
-                    <div className="flex items-center gap-2 text-red-500 font-black uppercase text-[9px] tracking-widest"><Heart size={13}/> Emergencia y Salud</div>
-                    <div className="bg-red-500/5 p-4 rounded-2xl border border-red-500/10">
-                      <p className="text-[7px] font-black uppercase text-red-500 opacity-60 mb-1">En caso de Emergencia</p>
-                      <p className="text-sm font-black text-red-500 uppercase">{selectedAlumno.contacto_emergencia_nombre || 'S/D'}</p>
-                      <p className="text-lg font-black text-red-500 mt-1 flex items-center gap-2"><PhoneForwarded size={16}/> {selectedAlumno.contacto_emergencia_tel || '---'}</p>
+                    {/* Emergencia y Salud */}
+                    <div className="bg-[var(--color-card)] p-6 rounded-[2.2rem] border border-[var(--color-border)] space-y-5">
+                      <div className="flex items-center gap-2 text-red-500 font-black uppercase text-[9px] tracking-widest"><Heart size={14}/> Ficha Médica y Emergencia</div>
+                      <div className="grid grid-cols-2 gap-5">
+                        <div className="col-span-2 bg-red-500/5 p-4 rounded-2xl border border-red-500/10">
+                          <p className="text-[7px] font-black uppercase text-red-500 opacity-60 mb-1">En caso de Emergencia</p>
+                          <p className="text-sm font-black text-red-500 uppercase">{selectedAlumno.contacto_emergencia_nombre || 'S/D'}</p>
+                          <p className="text-lg font-black text-red-500 mt-1 flex items-center gap-2"><PhoneForwarded size={16} /> {selectedAlumno.contacto_emergencia_tel || '---'}</p>
+                        </div>
+                        <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Tipo Sangre</p><p className="text-sm font-black text-red-500">{selectedAlumno.tipo_sangre || 'S/D'}</p></div>
+                        <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Seguro Médico</p><p className="text-[10px] font-bold uppercase">{selectedAlumno.seguro_medico}: {selectedAlumno.nss_o_poliza || 'S/N'}</p></div>
+                        <div className="col-span-2"><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Alergias / Padecimientos</p><p className="text-xs font-bold italic">{selectedAlumno.alergias} / {selectedAlumno.padecimientos_cronicos}</p></div>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Tipo Sangre</p><p className="text-sm font-black text-red-500">{selectedAlumno.tipo_sangre || 'S/D'}</p></div>
-                      <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Seguro</p><p className="text-[10px] font-bold uppercase">{selectedAlumno.seguro_medico}: {selectedAlumno.nss_o_poliza || 'S/N'}</p></div>
-                      <div className="col-span-2 border-t border-white/5 pt-3">
-                        <p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Alergias / Padecimientos</p>
-                        <p className="text-xs font-bold italic text-[var(--color-text)]">{selectedAlumno.alergias} / {selectedAlumno.padecimientos_cronicos}</p>
+
+                    {/* Académico */}
+                    <div className="bg-[var(--color-card)] p-6 rounded-[2.2rem] border border-[var(--color-border)] space-y-5">
+                      <div className="flex items-center gap-2 text-indigo-500 font-black uppercase text-[9px] tracking-widest"><BookOpen size={14}/> Académico y Registro</div>
+                      <div className="grid grid-cols-2 gap-5">
+                        <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Grado Escolar</p><p className="text-xs font-bold">{selectedAlumno.grado_escolar || '---'}</p></div>
+                        <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Escuela Procedencia</p><p className="text-xs font-bold">{selectedAlumno.escuela_procedencia || 'Ninguna'}</p></div>
+                        <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Matrícula</p><p className="text-sm font-black text-[var(--color-primary)]">ID #{selectedAlumno.idalumno}</p></div>
+                        <div><p className="text-[7px] font-black uppercase text-[var(--color-text-muted)] opacity-50">Fecha de Alta</p><p className="text-[10px] font-bold">{selectedAlumno.fecharegistro ? new Date(selectedAlumno.fecharegistro).toLocaleDateString() : '---'}</p></div>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* PASO: PHOTO CHOICE */}
+              {/* PASO: PHOTO CHOICE, CAMERA, PREVIEW — ya existente */}
               {step === 'photo_choice' && (
                 <div className="py-10 text-center space-y-10">
                   <div className="grid grid-cols-2 gap-6">
-                    <button onClick={() => fileRef.current?.click()}
-                      className="flex flex-col items-center justify-center gap-4 p-10 bg-[var(--color-background)] rounded-[3rem] border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all active:scale-95">
-                      <ImagePlus className="text-[var(--color-primary)]" size={32}/>
+                    <button onClick={() => fileRef.current?.click()} className="flex flex-col items-center justify-center gap-4 p-10 bg-[var(--color-background)] rounded-[3rem] border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all group active:scale-95">
+                      <ImagePlus className="text-[var(--color-primary)]" size={32} />
                       <span className="text-[10px] font-black uppercase text-[var(--color-text-muted)] tracking-widest">Galería</span>
                     </button>
-                    <button onClick={startCamera}
-                      className="flex flex-col items-center justify-center gap-4 p-10 bg-[var(--color-background)] rounded-[3rem] border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all active:scale-95">
-                      <CameraIcon className="text-[var(--color-primary)]" size={32}/>
+                    <button onClick={startCamera} className="flex flex-col items-center justify-center gap-4 p-10 bg-[var(--color-background)] rounded-[3rem] border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all group active:scale-95">
+                      <CameraIcon className="text-[var(--color-primary)]" size={32} />
                       <span className="text-[10px] font-black uppercase text-[var(--color-text-muted)] tracking-widest">Cámara</span>
                     </button>
                   </div>
-                  <input type="file" ref={fileRef} className="hidden" accept="image/*"
-                    onChange={e => { const f = e.target.files?.[0]; if (f) { setTempFile(f); setStep('preview'); } }}/>
-                  <button onClick={() => setIsModalOpen(false)}
-                    className="text-[10px] font-black uppercase text-[var(--color-text-muted)] opacity-50 tracking-widest">
-                    Omitir por ahora
-                  </button>
+                  <input type="file" ref={fileRef} className="hidden" accept="image/*" onChange={e => { const f = e.target.files?.[0]; if(f) { setTempFile(f); setStep('preview'); } }} />
+                  <button onClick={() => setIsModalOpen(false)} className="text-[10px] font-black uppercase text-[var(--color-text-muted)] border-b border-transparent hover:border-[var(--color-primary)] transition-all opacity-50 tracking-widest">Omitir por ahora</button>
                 </div>
               )}
 
-              {/* PASO: CAMERA */}
               {step === 'camera' && (
                 <div className="space-y-10 text-center py-4 flex flex-col items-center">
                   <div className="w-64 h-64 bg-black rounded-[4.5rem] border-4 border-[var(--color-primary)] overflow-hidden relative shadow-2xl scale-x-[-1]">
-                    <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover"/>
+                    <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
                   </div>
-                  <button onClick={capture}
-                    className="w-16 h-16 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center shadow-2xl active:scale-90 border-8 border-[var(--color-card)]">
-                    <CameraIcon size={24}/>
-                  </button>
+                  <button onClick={capture} className="w-16 h-16 bg-[var(--color-primary)] text-white rounded-full flex items-center justify-center shadow-2xl active:scale-90 border-8 border-[var(--color-card)]"><CameraIcon size={24} /></button>
                 </div>
               )}
 
-              {/* PASO: PREVIEW */}
               {step === 'preview' && (
                 <div className="text-center space-y-10 py-6 flex flex-col items-center">
                   <div className="w-56 h-56 rounded-[4rem] border-4 border-[var(--color-primary)] overflow-hidden shadow-2xl relative">
-                    {tempFile && <img src={URL.createObjectURL(tempFile)} className="w-full h-full object-cover" alt="Preview"/>}
-                    {savingAlu && <div className="absolute inset-0 bg-black/70 flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32}/></div>}
+                    {tempFile && <img src={URL.createObjectURL(tempFile)} className="w-full h-full object-cover" alt="Preview" />}
+                    {savingAlu && <div className="absolute inset-0 bg-black/70 flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}
                   </div>
                   <div className="flex flex-col gap-4 w-full px-10">
-                    <motion.button whileTap={{ scale:0.95 }} onClick={confirmUpload} disabled={savingAlu}
-                      className="w-full h-16 bg-[var(--color-text)] text-[var(--color-card)] font-black rounded-[2.5rem] flex items-center justify-center gap-3 shadow-2xl">
-                      <CheckCircle2 size={24} className="text-[var(--color-primary)]"/>
-                      <span className="text-sm uppercase italic tracking-tighter font-black">Actualizar Foto</span>
+                    <motion.button whileTap={{ scale: 0.95 }} onClick={confirmUpload} disabled={savingAlu} className="w-full h-16 bg-[var(--color-text)] text-[var(--color-card)] font-black rounded-[2.5rem] flex items-center justify-center gap-3 shadow-2xl border border-black/10">
+                      <CheckCircle2 size={24} className="text-[var(--color-primary)]" /> <span className="text-sm uppercase italic tracking-tighter font-black">Actualizar Foto</span>
                     </motion.button>
-                    <button onClick={() => setStep('photo_choice')} disabled={savingAlu}
-                      className="text-[10px] font-black uppercase text-[var(--color-text-muted)] opacity-60 flex items-center justify-center gap-2">
-                      <RotateCcw size={14}/> Reintentar
-                    </button>
+                    <button onClick={() => setStep('photo_choice')} disabled={savingAlu} className="text-[10px] font-black uppercase text-[var(--color-text-muted)] tracking-widest opacity-60 flex items-center justify-center gap-2"><RotateCcw size={14}/> Reintentar</button>
                   </div>
                 </div>
               )}
-
             </div>
           </motion.div>
         </div>
