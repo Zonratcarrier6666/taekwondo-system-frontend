@@ -179,10 +179,10 @@ const ModalDetalleAlumno: React.FC<ModalDetalleProps> = ({
                 <UserCircle size={28} />
               </div>
               <div className="flex-1 min-w-0 z-10 text-left">
-                <p className="text-[8px] font-black uppercase tracking-[0.3em] text-white opacity-[0.60] leading-none mb-1">
+                <p className="text-caption font-black uppercase tracking-[0.3em] text-white opacity-[0.60] leading-none mb-1">
                   Ficha de Alumno · ID {pago.idalumno}
                 </p>
-                <h2 className="text-xl font-black italic uppercase tracking-tighter text-white leading-tight">
+                <h2 className="text-subtitulo font-black italic uppercase tracking-tighter text-white leading-tight">
                   {nombreCompleto}
                 </h2>
               </div>
@@ -201,11 +201,11 @@ const ModalDetalleAlumno: React.FC<ModalDetalleProps> = ({
               {loadingResumen ? (
                 <div className="flex items-center gap-3 px-4 py-5 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)]">
                   <Loader2 className="animate-spin text-[var(--color-primary)]" size={18} />
-                  <span className="text-xs font-bold opacity-50 text-[var(--color-text)]">Cargando resumen del ciclo...</span>
+                  <span className="text-label font-bold opacity-50 text-[var(--color-text)]">Cargando resumen del ciclo...</span>
                 </div>
               ) : resumen && (
                 <div className="space-y-3">
-                  <p className="text-[8px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] px-1">
+                  <p className="text-caption font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] px-1">
                     Resumen del Ciclo
                   </p>
 
@@ -213,17 +213,17 @@ const ModalDetalleAlumno: React.FC<ModalDetalleProps> = ({
                     <div className="rounded-2xl p-4 text-left border"
                       style={{ backgroundColor: '#22c55e18', borderColor: '#22c55e40' }}>
                       <CheckCircle2 size={15} className="mb-2" style={{ color: '#22c55e' }} />
-                      <p className="text-2xl font-black leading-none" style={{ color: '#22c55e' }}>{resumen.mensualidades_pagadas}</p>
-                      <p className="text-[8px] font-black uppercase tracking-widest mt-1" style={{ color: '#22c55e' }}>Mensualidades pagadas</p>
+                      <p className="text-subtitulo font-black leading-none" style={{ color: '#22c55e' }}>{resumen.mensualidades_pagadas}</p>
+                      <p className="text-caption font-black uppercase tracking-widest mt-1" style={{ color: '#22c55e' }}>Mensualidades pagadas</p>
                     </div>
                     <div className="rounded-2xl p-4 text-left border"
                       style={{ backgroundColor: 'var(--color-primary)15', borderColor: 'var(--color-primary)30' }}
                     >
                       <Clock size={15} style={{ color: 'var(--color-primary)' }} className="mb-2" />
-                      <p className="text-2xl font-black leading-none" style={{ color: 'var(--color-primary)' }}>
+                      <p className="text-subtitulo font-black leading-none" style={{ color: 'var(--color-primary)' }}>
                         {resumen.mensualidades_pendientes}
                       </p>
-                      <p className="text-[8px] font-black uppercase tracking-widest opacity-80 mt-1" style={{ color: 'var(--color-primary)' }}>
+                      <p className="text-caption font-black uppercase tracking-widest opacity-80 mt-1" style={{ color: 'var(--color-primary)' }}>
                         Pendientes
                       </p>
                     </div>
@@ -234,8 +234,8 @@ const ModalDetalleAlumno: React.FC<ModalDetalleProps> = ({
                       style={{ backgroundColor: '#ef444418', borderColor: '#ef444440' }}>
                       <AlertTriangle size={18} style={{ color: '#ef4444' }} className="flex-shrink-0" />
                       <div>
-                        <p className="text-[8px] font-black uppercase tracking-widest" style={{ color: '#ef4444' }}>Adeudo Total</p>
-                        <p className="text-xl font-black leading-none mt-0.5" style={{ color: '#ef4444' }}>
+                        <p className="text-caption font-black uppercase tracking-widest" style={{ color: '#ef4444' }}>Adeudo Total</p>
+                        <p className="text-subtitulo font-black leading-none mt-0.5" style={{ color: '#ef4444' }}>
                           ${resumen.total_adeudo.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                         </p>
                       </div>
@@ -243,24 +243,24 @@ const ModalDetalleAlumno: React.FC<ModalDetalleProps> = ({
                   )}
 
                   <div className="bg-[var(--color-background)] border border-[var(--color-border)] rounded-2xl p-4 space-y-3 text-left">
-                    <p className="text-[8px] font-black uppercase tracking-widest opacity-50 text-[var(--color-text)]">
+                    <p className="text-caption font-black uppercase tracking-widest opacity-50 text-[var(--color-text)]">
                       Configuración de cobro
                     </p>
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold opacity-60 text-[var(--color-text)]">Mensualidad</span>
-                      <span className="text-sm font-black text-[var(--color-text)]">
+                      <span className="text-caption font-bold opacity-60 text-[var(--color-text)]">Mensualidad</span>
+                      <span className="text-datos font-black text-[var(--color-text)]">
                         ${resumen.monto_mensualidad.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold opacity-60 text-[var(--color-text)]">Día de cobro</span>
-                      <span className="text-sm font-black text-[var(--color-text)]">Día {resumen.dia_cobro}</span>
+                      <span className="text-caption font-bold opacity-60 text-[var(--color-text)]">Día de cobro</span>
+                      <span className="text-datos font-black text-[var(--color-text)]">Día {resumen.dia_cobro}</span>
                     </div>
                     {resumen.inscripcion_ciclo_actual && (
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-bold opacity-60 text-[var(--color-text)]">Inscripción ciclo</span>
+                        <span className="text-caption font-bold opacity-60 text-[var(--color-text)]">Inscripción ciclo</span>
                         <span
-                          className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full"
+                          className="text-caption font-black uppercase px-2 py-0.5 rounded-full"
                           style={{
                             backgroundColor: resumen.inscripcion_ciclo_actual === 'PAGADA' ? '#22c55e20' : 'var(--color-primary)20',
                             color: resumen.inscripcion_ciclo_actual === 'PAGADA' ? '#22c55e' : 'var(--color-primary)',
@@ -277,12 +277,12 @@ const ModalDetalleAlumno: React.FC<ModalDetalleProps> = ({
               {/* Todos los cargos del alumno */}
               <div>
                 <div className="flex items-center justify-between px-1 mb-3">
-                  <p className="text-[8px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)]">
+                  <p className="text-caption font-black uppercase tracking-widest opacity-40 text-[var(--color-text)]">
                     Cargos ({pagosOrdenados.length})
                   </p>
                   {pendientes.length > 0 && (
                     <span
-                      className="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+                      className="text-label font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
                       style={{ backgroundColor: 'var(--color-primary)20', color: 'var(--color-primary)' }}
                     >
                       {pendientes.length} pendiente{pendientes.length > 1 ? 's' : ''}
@@ -304,40 +304,40 @@ const ModalDetalleAlumno: React.FC<ModalDetalleProps> = ({
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
                             {p.idpago === pago.idpago && (
                               <span
-                                className="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+                                className="text-label font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
                                 style={{ backgroundColor: 'var(--color-primary)25', color: 'var(--color-primary)' }}
                               >
                                 Seleccionado
                               </span>
                             )}
                             <span
-                              className="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+                              className="text-label font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
                               style={{ backgroundColor: `${estatusColor(p.estatus ?? 0)}20`, color: estatusColor(p.estatus ?? 0) }}
                             >
                               {estatusLabel(p.estatus ?? 0)}
                             </span>
-                            <span className="text-[8px] font-bold uppercase text-[var(--color-text-muted)]">
+                            <span className="text-caption font-bold uppercase text-[var(--color-text-muted)]">
                               {tipoPagoLabel(p.id_tipo_pago)}
                             </span>
                           </div>
-                          <p className="text-sm font-black text-[var(--color-text)] truncate leading-tight">
+                          <p className="text-datos font-black text-[var(--color-text)] truncate leading-tight">
                             {p.concepto}
                           </p>
                           {p.mes_correspondiente && (
-                            <p className="text-[9px] font-bold text-[var(--color-text-muted)] mt-0.5">{p.mes_correspondiente}</p>
+                            <p className="text-caption font-bold text-[var(--color-text-muted)] mt-0.5">{p.mes_correspondiente}</p>
                           )}
                           {p.metodo_pago && (
-                            <p className="text-[9px] font-black uppercase tracking-widest text-[var(--color-text-muted)] mt-1 flex items-center gap-1">
+                            <p className="text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)] mt-1 flex items-center gap-1">
                               <CreditCard size={10} /> {p.metodo_pago}
                             </p>
                           )}
                           {p.fecha_pago && (
-                            <p className="text-[9px] font-bold text-[var(--color-text-muted)] mt-0.5 flex items-center gap-1">
+                            <p className="text-caption font-bold text-[var(--color-text-muted)] mt-0.5 flex items-center gap-1">
                               <Calendar size={10} /> {new Date(p.fecha_pago).toLocaleDateString('es-MX')}
                             </p>
                           )}
                         </div>
-                        <span className="text-xl font-black leading-none flex-shrink-0" style={{ color: 'var(--color-primary)' }}>
+                        <span className="text-subtitulo font-black leading-none flex-shrink-0" style={{ color: 'var(--color-primary)' }}>
                           ${p.monto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
@@ -348,7 +348,7 @@ const ModalDetalleAlumno: React.FC<ModalDetalleProps> = ({
                           <motion.button
                             whileTap={{ scale: 0.96 }}
                             onClick={() => onCobrar(p)}
-                            className="flex-1 h-11 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2"
+                            className="flex-1 h-11 rounded-2xl text-caption font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2"
                             style={{ backgroundColor: 'var(--color-primary)15', borderColor: 'var(--color-primary)', color: 'var(--color-primary)', boxShadow: '0 4px 20px -4px var(--color-primary)40' }}
                           >
                             <TrendingUp size={15} /> Pagar ahora
@@ -368,7 +368,7 @@ const ModalDetalleAlumno: React.FC<ModalDetalleProps> = ({
                         )}
                         <button
                           onClick={() => onTicket(p)}
-                          className={`h-11 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 border transition-all ${(p.estatus ?? 0) === 0 ? 'w-11 flex-shrink-0' : 'flex-1'}`}
+                          className={`h-11 rounded-2xl text-caption font-black uppercase tracking-widest flex items-center justify-center gap-2 border transition-all ${(p.estatus ?? 0) === 0 ? 'w-11 flex-shrink-0' : 'flex-1'}`}
                           style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)', backgroundColor: 'transparent' }}
                           onMouseEnter={e => {
                             const b = e.currentTarget as HTMLButtonElement;
@@ -537,10 +537,10 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
               <UserCircle size={24} />
             </div>
             <div className="flex-1 min-w-0 z-10 text-left">
-              <p className="text-[7px] font-black uppercase tracking-[0.3em] text-white opacity-60 leading-none mb-1">
+              <p className="text-label font-black uppercase tracking-[0.3em] text-white opacity-60 leading-none mb-1">
                 Estado de cuenta · ID {deudor.idalumno}
               </p>
-              <h2 className="text-lg font-black italic uppercase tracking-tighter text-white leading-tight truncate">
+              <h2 className="text-seccion font-black italic uppercase tracking-tighter text-white leading-tight truncate">
                 {deudor.nombreCompleto}
               </h2>
             </div>
@@ -557,7 +557,7 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
             {loadingResumen ? (
               <div className="flex items-center gap-3 px-4 py-4 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)]">
                 <Loader2 className="animate-spin text-[var(--color-primary)]" size={16} />
-                <span className="text-[10px] font-bold opacity-50 text-[var(--color-text)]">Cargando resumen...</span>
+                <span className="text-caption font-bold opacity-50 text-[var(--color-text)]">Cargando resumen...</span>
               </div>
             ) : resumen && (
               <div className="space-y-3">
@@ -568,17 +568,17 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
                     <div className="flex items-center gap-3">
                       <AlertTriangle size={18} style={{ color: '#ef4444' }} className="flex-shrink-0" />
                       <div className="flex-1">
-                        <p className="text-[7px] font-black uppercase tracking-widest" style={{ color: '#ef4444' }}>Adeudo total</p>
-                        <p className="text-2xl font-black leading-none" style={{ color: '#ef4444' }}>
+                        <p className="text-label font-black uppercase tracking-widest" style={{ color: '#ef4444' }}>Adeudo total</p>
+                        <p className="text-subtitulo font-black leading-none" style={{ color: '#ef4444' }}>
                           ${resumen.total_adeudo.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-[7px] font-black uppercase opacity-40">Mensualidad</p>
-                        <p className="text-sm font-black" style={{ color: 'var(--color-primary)' }}>
+                        <p className="text-label font-black uppercase opacity-40">Mensualidad</p>
+                        <p className="text-datos font-black" style={{ color: 'var(--color-primary)' }}>
                           ${resumen.monto_mensualidad.toLocaleString('es-MX', { minimumFractionDigits: 0 })}/mes
                         </p>
-                        <p className="text-[8px] opacity-40">Día {resumen.dia_cobro}</p>
+                        <p className="text-caption opacity-40">Día {resumen.dia_cobro}</p>
                       </div>
                     </div>
                     {/* Desglose por tipo desde deudor */}
@@ -587,11 +587,11 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
                         {(deudor.desgloseDeuda ?? []).map(t => (
                           <div key={t.tipo} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl"
                             style={{ backgroundColor: `${t.color}15`, border: `1px solid ${t.color}25` }}>
-                            <span className="text-[7px] font-black uppercase tracking-widest" style={{ color: t.color }}>{t.label}</span>
-                            <span className="text-[8px] font-black" style={{ color: t.color }}>
+                            <span className="text-label font-black uppercase tracking-widest" style={{ color: t.color }}>{t.label}</span>
+                            <span className="text-caption font-black" style={{ color: t.color }}>
                               ${t.monto.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
                             </span>
-                            <span className="text-[7px] opacity-50 font-bold" style={{ color: t.color }}>({t.count})</span>
+                            <span className="text-label opacity-50 font-bold" style={{ color: t.color }}>({t.count})</span>
                           </div>
                         ))}
                       </div>
@@ -607,8 +607,8 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
                   ].map(k => (
                     <div key={k.label} className="rounded-2xl p-3 text-center border"
                       style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)' }}>
-                      <p className="text-xl font-black leading-none" style={{ color: k.color }}>{k.val}</p>
-                      <p className="text-[7px] font-black uppercase tracking-widest mt-1 opacity-50">{k.label}</p>
+                      <p className="text-subtitulo font-black leading-none" style={{ color: k.color }}>{k.val}</p>
+                      <p className="text-label font-black uppercase tracking-widest mt-1 opacity-50">{k.label}</p>
                     </div>
                   ))}
                 </div>
@@ -618,7 +618,7 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
             {/* Cargos pendientes — con cobro inline */}
             {pendientes.length > 0 && (
               <div className="space-y-2">
-                <p className="text-[8px] font-black uppercase tracking-widest opacity-40 px-1 text-[var(--color-text)]">
+                <p className="text-caption font-black uppercase tracking-widest opacity-40 px-1 text-[var(--color-text)]">
                   Por cobrar ({pendientes.length})
                 </p>
                 {pendientes.map(p => (
@@ -627,14 +627,14 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0 text-left">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+                          <span className="text-label font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
                             style={{ backgroundColor: 'var(--color-primary)20', color: 'var(--color-primary)' }}>
                             {tipoPagoLabel(p.id_tipo_pago)}
                           </span>
-                          <span className="text-[8px] font-bold opacity-30 text-[var(--color-text)]">#{p.folio_recibo}</span>
+                          <span className="text-caption font-bold opacity-30 text-[var(--color-text)]">#{p.folio_recibo}</span>
                         </div>
-                        <p className="text-sm font-black truncate leading-tight text-[var(--color-text)]">{p.concepto}</p>
-                        <p className="text-[9px] opacity-40 mt-0.5 flex items-center gap-1">
+                        <p className="text-datos font-black truncate leading-tight text-[var(--color-text)]">{p.concepto}</p>
+                        <p className="text-caption opacity-40 mt-0.5 flex items-center gap-1">
                           <Calendar size={9}/> Vence: {p.fecha_pago ? new Date(p.fecha_pago).toLocaleDateString('es-MX') : '—'}
                         </p>
                         {/* Indicador de atraso por cargo */}
@@ -644,24 +644,24 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
                             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                               {inf.diasCorridos > 0 ? (
                                 <>
-                                  <span className="text-[8px] font-black flex items-center gap-1"
+                                  <span className="text-caption font-black flex items-center gap-1"
                                     style={{ color: inf.urgencia === 'vencido' ? '#ef4444' : '#f97316' }}>
                                     <AlertTriangle size={9} />
                                     {inf.diasCorridos}d atraso · {inf.diasHabilesVencidos} háb.
                                   </span>
                                   {inf.semanasAtraso > 0 && (
-                                    <span className="text-[7px] font-black px-2 py-0.5 rounded-full"
+                                    <span className="text-label font-black px-2 py-0.5 rounded-full"
                                       style={{ backgroundColor: '#ef444415', color: '#ef4444' }}>
                                       +${inf.recargo} recargo
                                     </span>
                                   )}
-                                  <span className="text-[7px] font-black px-2 py-0.5 rounded-full"
+                                  <span className="text-label font-black px-2 py-0.5 rounded-full"
                                     style={{ backgroundColor: '#ef444410', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
                                     Total c/recargo: ${inf.montoConRecargo.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                                   </span>
                                 </>
                               ) : inf.diasHabilesRestantes > 0 ? (
-                                <span className="text-[8px] font-black flex items-center gap-1" style={{ color: '#22c55e' }}>
+                                <span className="text-caption font-black flex items-center gap-1" style={{ color: '#22c55e' }}>
                                   <Clock size={9} />
                                   {inf.diasHabilesRestantes} día{inf.diasHabilesRestantes !== 1 ? 's' : ''} hábil{inf.diasHabilesRestantes !== 1 ? 'es' : ''} para pagar sin recargo
                                 </span>
@@ -670,7 +670,7 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
                           );
                         })()}
                       </div>
-                      <span className="text-xl font-black leading-none flex-shrink-0" style={{ color: '#ef4444' }}>
+                      <span className="text-subtitulo font-black leading-none flex-shrink-0" style={{ color: '#ef4444' }}>
                         ${p.monto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
@@ -678,7 +678,7 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
                     <div className="flex gap-2">
                       <motion.button whileTap={{ scale: 0.95 }}
                         onClick={() => { onClose(); onAbrirCobro(p); }}
-                        className="flex-1 h-10 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2"
+                        className="flex-1 h-10 rounded-2xl text-caption font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all border-2"
                         style={{ backgroundColor: 'var(--color-primary)15', borderColor: 'var(--color-primary)', color: 'var(--color-primary)', boxShadow: '0 4px 16px -4px var(--color-primary)40' }}
                       >
                         <TrendingUp size={13} /> Cobrar
@@ -701,7 +701,7 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
             {/* Historial pagados */}
             {pagados.length > 0 && (
               <div className="space-y-2">
-                <p className="text-[8px] font-black uppercase tracking-widest opacity-40 px-1 text-[var(--color-text)]">
+                <p className="text-caption font-black uppercase tracking-widest opacity-40 px-1 text-[var(--color-text)]">
                   Historial pagado ({pagados.length})
                 </p>
                 {pagados.map(p => (
@@ -713,17 +713,17 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
                       <CheckCircle2 size={14} style={{ color: '#22c55e' }} />
                     </div>
                     <div className="flex-1 min-w-0 text-left">
-                      <p className="text-[10px] font-black truncate text-[var(--color-text)]">{p.concepto}</p>
+                      <p className="text-caption font-black truncate text-[var(--color-text)]">{p.concepto}</p>
                       <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                        <span className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full"
+                        <span className="text-label font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full"
                           style={{ backgroundColor: 'var(--color-primary)15', color: 'var(--color-primary)' }}>
                           {tipoPagoLabel(p.id_tipo_pago)}
                         </span>
-                        {p.metodo_pago && <span className="text-[7px] opacity-30 uppercase">{p.metodo_pago}</span>}
-                        {p.fecha_pago && <span className="text-[7px] opacity-30">{new Date(p.fecha_pago).toLocaleDateString('es-MX')}</span>}
+                        {p.metodo_pago && <span className="text-label opacity-30 uppercase">{p.metodo_pago}</span>}
+                        {p.fecha_pago && <span className="text-label opacity-30">{new Date(p.fecha_pago).toLocaleDateString('es-MX')}</span>}
                       </div>
                     </div>
-                    <span className="text-sm font-black flex-shrink-0" style={{ color: '#22c55e' }}>
+                    <span className="text-datos font-black flex-shrink-0" style={{ color: '#22c55e' }}>
                       ${p.monto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
@@ -734,7 +734,7 @@ const ModalDeudorDetalle: React.FC<ModalDeudorDetalleProps> = ({
             {deudor.pagos.length === 0 && (
               <div className="py-10 text-center opacity-30">
                 <Receipt size={28} className="mx-auto mb-2"/>
-                <p className="text-[10px] font-bold uppercase">Sin registros</p>
+                <p className="text-caption font-bold uppercase">Sin registros</p>
               </div>
             )}
           </div>
@@ -767,15 +767,15 @@ class CajaErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <div className="flex flex-col items-center justify-center py-32 gap-4 text-center">
-          <div className="w-16 h-16 rounded-3xl flex items-center justify-center text-3xl"
+          <div className="w-16 h-16 rounded-3xl flex items-center justify-center text-titulo"
             style={{ background: '#ef444415', border: '1px solid rgba(239,68,68,0.3)' }}>⚠️</div>
-          <p className="text-sm font-black uppercase tracking-widest" style={{ color: '#ef4444' }}>
+          <p className="text-datos font-black uppercase tracking-widest" style={{ color: '#ef4444' }}>
             Algo salió mal en Caja y Finanzas
           </p>
-          <p className="text-[10px] opacity-40 max-w-xs">{this.state.msg}</p>
+          <p className="text-caption opacity-40 max-w-xs">{this.state.msg}</p>
           <button
             onClick={() => this.setState({ hasError: false, msg: '' })}
-            className="px-6 h-10 rounded-2xl text-white text-[10px] font-black uppercase tracking-widest"
+            className="px-6 h-10 rounded-2xl text-white text-caption font-black uppercase tracking-widest"
             style={{ background: 'var(--color-primary)' }}
           >
             Reintentar
@@ -798,8 +798,8 @@ export const CajaFinanzas: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [idescuela, setIdescuela]   = useState<number | null>(null);
   const [escuelaInfo, setEscuelaInfo] = useState<{
-    nombre: string; logo: string | null; ciudad: string; tel: string;
-  }>({ nombre: '', logo: null, ciudad: '', tel: '' });
+    nombre: string; logo: string | null; ciudad: string; estado: string; tel: string; direccion: string; email: string;
+  }>({ nombre: '', logo: null, ciudad: '', estado: '', tel: '', direccion: '', email: '' });
   const [errorMsg, setErrorMsg]     = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [saving, setSaving]         = useState(false);
@@ -881,7 +881,10 @@ export const CajaFinanzas: React.FC = () => {
           nombre: d?.nombreescuela ?? d?.escuela?.nombreescuela ?? 'Mi Escuela',
           logo:   d?.logo_url      ?? d?.escuela?.logo_url      ?? null,
           ciudad: d?.ciudad        ?? d?.escuela?.ciudad        ?? '',
+          estado: d?.estado        ?? d?.escuela?.estado        ?? '',
           tel:    d?.telefono_oficina ?? d?.escuela?.telefono_oficina ?? '',
+          direccion: d?.direccion  ?? d?.escuela?.direccion     ?? '',
+          email:  d?.email         ?? d?.escuela?.email         ?? '',
         });
       } catch {
         setErrorMsg('No se pudo obtener la escuela. Verifica tu sesión.');
@@ -1237,10 +1240,10 @@ export const CajaFinanzas: React.FC = () => {
     const localData: ReciboImpresion = {
       idpago: pago.idpago,
       escuela: {
-        nombre:    escuelaInfo.nombre || 'Dragon Negro Dojo',
-        logo_url:  escuelaInfo.logo   ?? undefined,
-        direccion: escuelaInfo.ciudad ?? undefined,
-        telefono:  escuelaInfo.tel    ?? undefined,
+        nombre:    escuelaInfo.nombre    || 'Dragon Negro Dojo',
+        logo_url:  escuelaInfo.logo      ?? undefined,
+        direccion: escuelaInfo.direccion || escuelaInfo.ciudad || undefined,
+        telefono:  escuelaInfo.tel       ?? undefined,
       },
       alumno: {
         nombre_completo: nombreAlumno,
@@ -1399,7 +1402,7 @@ export const CajaFinanzas: React.FC = () => {
             style={{ backgroundColor: '#16a34a', color: 'white' }}
           >
             <CheckCircle2 size={20} />
-            <span className="text-sm font-black uppercase tracking-tight">{successMsg}</span>
+            <span className="text-datos font-black uppercase tracking-tight">{successMsg}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -1413,7 +1416,7 @@ export const CajaFinanzas: React.FC = () => {
             style={{ backgroundColor: '#dc2626', color: 'white' }}
           >
             <AlertCircle size={20} className="flex-shrink-0" />
-            <span className="text-sm font-black tracking-tight">{errorMsg}</span>
+            <span className="text-datos font-black tracking-tight">{errorMsg}</span>
             <button onClick={() => setErrorMsg(null)} className="ml-2 opacity-70 hover:opacity-100"><X size={16} /></button>
           </motion.div>
         )}
@@ -1428,8 +1431,8 @@ export const CajaFinanzas: React.FC = () => {
               <DollarSign size={26} style={{ color: 'var(--color-primary)' }} strokeWidth={2.5} />
             </div>
             <div>
-              <h2 className="text-2xl font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">Caja y Finanzas</h2>
-              <p className="text-[8px] font-black uppercase tracking-[0.4em] mt-2 italic opacity-40 leading-none text-[var(--color-text-muted)]">Gestión Técnica de Ingresos</p>
+              <h2 className="text-subtitulo font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">Caja y Finanzas</h2>
+              <p className="text-caption font-black uppercase tracking-[0.4em] mt-2 italic opacity-40 leading-none text-[var(--color-text-muted)]">Gestión Técnica de Ingresos</p>
             </div>
           </div>
           <div className="flex flex-col gap-2 w-full md:w-auto">
@@ -1469,7 +1472,7 @@ export const CajaFinanzas: React.FC = () => {
                 title="Configurar precios de la escuela"
               >
                 <Settings size={14} strokeWidth={2.5} />
-                <span className="text-[10px] font-black uppercase italic tracking-tighter">Precios</span>
+                <span className="text-caption font-black uppercase italic tracking-tighter">Precios</span>
               </motion.button>
             </div>
           </div>
@@ -1477,21 +1480,21 @@ export const CajaFinanzas: React.FC = () => {
 
         <div className="grid grid-cols-2 gap-4 text-left">
           <div className="bg-[var(--color-background)] p-4 rounded-3xl border border-[var(--color-border)] flex flex-col items-start shadow-inner">
-            <span className="text-[8px] font-black uppercase opacity-40 tracking-widest leading-none mb-2 text-[var(--color-text)]">
+            <span className="text-caption font-black uppercase opacity-40 tracking-widest leading-none mb-2 text-[var(--color-text)]">
               {tab === 0 ? 'Por Cobrar' : 'Total Recaudado'}
             </span>
             <div className="flex items-center gap-2 mt-1">
               <DollarSign size={20} className="text-[var(--color-primary)]" />
-              <span className="text-3xl font-black tracking-tighter leading-none text-[var(--color-primary)]">
+              <span className="text-titulo font-black tracking-tighter leading-none text-[var(--color-primary)]">
                 {fmtCompacto(totalMonto, screenWidth)}
               </span>
             </div>
           </div>
           <div className="bg-[var(--color-background)] p-4 rounded-3xl border border-[var(--color-border)] flex flex-col items-start shadow-inner">
-            <span className="text-[8px] font-black uppercase opacity-40 tracking-widest leading-none mb-2 text-[var(--color-text)]">Movimientos</span>
+            <span className="text-caption font-black uppercase opacity-40 tracking-widest leading-none mb-2 text-[var(--color-text)]">Acciones</span>
             <div className="flex items-center gap-2 mt-1">
               <History size={20} className="text-[var(--color-primary)]" />
-              <span className="text-3xl font-black tracking-tighter leading-none text-[var(--color-text)]">{pagos.length}</span>
+              <span className="text-titulo font-black tracking-tighter leading-none text-[var(--color-text)]">{pagos.length}</span>
             </div>
           </div>
         </div>
@@ -1506,7 +1509,7 @@ export const CajaFinanzas: React.FC = () => {
           <button
             key={label}
             onClick={() => setTab(idx as 0 | 1)}
-            className="flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1.5"
+            className="flex-1 py-3 rounded-2xl text-caption font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1.5"
             style={tab === idx
               ? { backgroundColor: 'var(--color-primary)', color: 'white', boxShadow: '0 4px 16px -4px var(--color-primary)50' }
               : { opacity: 0.4, color: 'var(--color-text)' }
@@ -1527,18 +1530,42 @@ export const CajaFinanzas: React.FC = () => {
         <div className="max-w-2xl mx-auto space-y-3">
           {/* Stats del historial */}
           {historial && (
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: 'Total',      val: `$${historial.total_monto.toLocaleString('es-MX',{minimumFractionDigits:2})}`, color: 'var(--color-primary)' },
-                { label: 'Pagados',    val: String(historial.total_pagados),    color: '#10b981' },
-                { label: 'Pendientes', val: String(historial.total_pendientes), color: '#f97316' },
-              ].map(({ label, val, color }) => (
-                <div key={label} className="rounded-2xl p-3 text-center"
-                  style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
-                  <p className="text-lg font-black tracking-tighter leading-none" style={{ color }}>{val}</p>
-                  <p className="text-[7px] font-black uppercase tracking-widest mt-0.5" style={{ color: 'var(--color-text-muted)' }}>{label}</p>
-                </div>
-              ))}
+            <div className={screenWidth < 480 ? 'flex flex-col gap-3' : 'grid grid-cols-3 gap-3'}>
+              {screenWidth < 480 ? (
+                <>
+                  {/* Fila 1: Total + Pagados */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: 'Total',   val: `$${historial.total_monto.toLocaleString('es-MX',{minimumFractionDigits:2})}`, color: 'var(--color-primary)' },
+                      { label: 'Pagados', val: String(historial.total_pagados), color: '#10b981' },
+                    ].map(({ label, val, color }) => (
+                      <div key={label} className="rounded-2xl p-3 text-center"
+                        style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
+                        <p className="text-datos font-black tracking-tighter leading-none truncate" style={{ color }}>{val}</p>
+                        <p className="text-caption font-black uppercase tracking-widest mt-0.5" style={{ color: 'var(--color-text-muted)' }}>{label}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Fila 2: Pendientes — ancho completo */}
+                  <div className="rounded-2xl p-3 text-center"
+                    style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
+                    <p className="text-datos font-black tracking-tighter leading-none" style={{ color: '#f97316' }}>{String(historial.total_pendientes)}</p>
+                    <p className="text-caption font-black uppercase tracking-widest mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Pendientes</p>
+                  </div>
+                </>
+              ) : (
+                [
+                  { label: 'Total',      val: `$${historial.total_monto.toLocaleString('es-MX',{minimumFractionDigits:2})}`, color: 'var(--color-primary)' },
+                  { label: 'Pagados',    val: String(historial.total_pagados),    color: '#10b981' },
+                  { label: 'Pendientes', val: String(historial.total_pendientes), color: '#f97316' },
+                ].map(({ label, val, color }) => (
+                  <div key={label} className="rounded-2xl p-3 text-center"
+                    style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
+                    <p className="text-datos font-black tracking-tighter leading-none" style={{ color }}>{val}</p>
+                    <p className="text-caption font-black uppercase tracking-widest mt-0.5" style={{ color: 'var(--color-text-muted)' }}>{label}</p>
+                  </div>
+                ))
+              )}
             </div>
           )}
 
@@ -1547,7 +1574,7 @@ export const CajaFinanzas: React.FC = () => {
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 transition-colors" size={18}
               style={{ color: 'var(--color-text-muted)' }} />
             <input type="text" placeholder="Buscar alumno o concepto..."
-              className="w-full h-14 pl-14 pr-10 rounded-[1.5rem] border outline-none font-bold text-sm shadow-xl transition-all placeholder:opacity-40"
+              className="w-full h-14 pl-14 pr-10 rounded-[1.5rem] border outline-none font-bold text-datos shadow-xl transition-all placeholder:opacity-40"
               style={{ background: 'var(--color-card)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
               value={histBuscar} onChange={e => { setHistBuscar(e.target.value); setHistPagina(1); }} />
             {histBuscar && (
@@ -1562,7 +1589,7 @@ export const CajaFinanzas: React.FC = () => {
           {/* Filtros desplegables */}
           <motion.button whileTap={{ scale: 0.96 }}
             onClick={() => setHistFiltrosOpen(v => !v)}
-            className="w-full h-10 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-wider"
+            className="w-full h-10 rounded-2xl flex items-center justify-center gap-2 text-caption font-black uppercase tracking-wider"
             style={{
               background: [histEstatus,histTipo,histMetodo,histDesde,histHasta].some(Boolean) ? 'var(--color-primary)15' : 'var(--color-card)',
               border: `1px solid ${[histEstatus,histTipo,histMetodo,histDesde,histHasta].some(Boolean) ? 'var(--color-primary)50' : 'var(--color-border)'}`,
@@ -1587,9 +1614,9 @@ export const CajaFinanzas: React.FC = () => {
                       { label:'Método',  val:histMetodo,  set:setHistMetodo,  opts:[['','Todos'],['Efectivo','Efectivo'],['Transferencia','Transferencia'],['Tarjeta','Tarjeta']] },
                     ].map(({ label, val, set, opts }) => (
                       <div key={label} className="space-y-1">
-                        <label className="text-[7px] font-black uppercase tracking-widest ml-1" style={{ color:'var(--color-text-muted)' }}>{label}</label>
+                        <label className="text-label font-black uppercase tracking-widest ml-1" style={{ color:'var(--color-text-muted)' }}>{label}</label>
                         <select value={val} onChange={e => { set(e.target.value); setHistPagina(1); }}
-                          className="w-full h-9 px-2 rounded-xl text-[9px] font-bold outline-none appearance-none"
+                          className="w-full h-9 px-2 rounded-xl text-caption font-bold outline-none appearance-none"
                           style={{ background:'var(--color-background)', border:'1px solid var(--color-border)', color:'var(--color-text)' }}>
                           {opts.map(([v,l]) => <option key={v} value={v}>{l}</option>)}
                         </select>
@@ -1602,16 +1629,16 @@ export const CajaFinanzas: React.FC = () => {
                       { label:'Hasta', val:histHasta, set:setHistHasta },
                     ].map(({ label, val, set }) => (
                       <div key={label} className="space-y-1">
-                        <label className="text-[7px] font-black uppercase tracking-widest ml-1" style={{ color:'var(--color-text-muted)' }}>{label}</label>
+                        <label className="text-label font-black uppercase tracking-widest ml-1" style={{ color:'var(--color-text-muted)' }}>{label}</label>
                         <input type="date" value={val} onChange={e => { set(e.target.value); setHistPagina(1); }}
-                          className="w-full h-9 px-2 rounded-xl text-[9px] font-bold outline-none"
+                          className="w-full h-9 px-2 rounded-xl text-caption font-bold outline-none"
                           style={{ background:'var(--color-background)', border:'1px solid var(--color-border)', color:'var(--color-text)' }} />
                       </div>
                     ))}
                   </div>
                   {[histEstatus,histTipo,histMetodo,histDesde,histHasta].some(Boolean) && (
                     <button onClick={() => { setHistEstatus(''); setHistTipo(''); setHistMetodo(''); setHistDesde(''); setHistHasta(''); setHistPagina(1); }}
-                      className="w-full h-9 rounded-2xl flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-wider"
+                      className="w-full h-9 rounded-2xl flex items-center justify-center gap-2 text-caption font-black uppercase tracking-wider"
                       style={{ background:'var(--color-background)', border:'1px solid var(--color-border)', color:'var(--color-text-muted)' }}>
                       <X size={11} /> Limpiar filtros
                     </button>
@@ -1630,12 +1657,12 @@ export const CajaFinanzas: React.FC = () => {
           {histLoading ? (
             <div className="py-32 flex flex-col items-center gap-4">
               <Loader2 className="animate-spin text-[var(--color-primary)]" size={48} />
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 italic text-[var(--color-text)]">
+              <p className="text-caption font-black uppercase tracking-[0.3em] opacity-40 italic text-[var(--color-text)]">
                 Cargando historial...
               </p>
             </div>
           ) : !historial || historial.pagos.length === 0 ? (
-            <div className="py-32 text-center opacity-30 italic font-black uppercase text-sm tracking-widest text-[var(--color-text)]">
+            <div className="py-32 text-center opacity-30 italic font-black uppercase text-datos tracking-widest text-[var(--color-text)]">
               Sin registros en el historial
             </div>
           ) : (
@@ -1672,32 +1699,32 @@ export const CajaFinanzas: React.FC = () => {
                     <div className="flex-1 min-w-0 text-left">
                       <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                         <span
-                          className="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+                          className="text-label font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
                           style={{ backgroundColor: `${estatusColor(p.estatus ?? 0)}20`, color: estatusColor(p.estatus ?? 0) }}
                         >
                           {estatusLabel(p.estatus ?? 0)}
                         </span>
-                        <span className="text-[8px] font-bold uppercase opacity-40 text-[var(--color-text)]">
+                        <span className="text-caption font-bold uppercase opacity-40 text-[var(--color-text)]">
                           {TIPO_PAGO_LABEL[p.id_tipo_pago] ?? 'Otro'}
                         </span>
                       </div>
-                      <p className="text-sm font-black italic uppercase tracking-tighter text-[var(--color-text)] truncate leading-tight">
+                      <p className="text-datos font-black italic uppercase tracking-tighter text-[var(--color-text)] truncate leading-tight">
                         {p.alumno?.nombres} {p.alumno?.apellidopaterno}
                       </p>
-                      <p className="text-[10px] font-bold opacity-50 text-[var(--color-text-muted)] truncate">
+                      <p className="text-caption font-bold opacity-50 text-[var(--color-text-muted)] truncate">
                         {p.concepto}
                       </p>
                       <div className="flex items-center gap-3 mt-1 flex-wrap">
                         {p.metodo_pago && (
                           <span
-                            className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border"
+                            className="text-caption font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border"
                             style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
                           >
                             {p.metodo_pago}
                           </span>
                         )}
                         {p.fecha_pago && (
-                          <span className="text-[8px] font-bold opacity-40 text-[var(--color-text)] flex items-center gap-1">
+                          <span className="text-caption font-bold opacity-40 text-[var(--color-text)] flex items-center gap-1">
                             <Calendar size={9} />
                             {new Date(p.fecha_pago).toLocaleDateString('es-MX')}
                           </span>
@@ -1707,11 +1734,11 @@ export const CajaFinanzas: React.FC = () => {
 
                     {/* Monto + comprobante */}
                     <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                      <span className="text-xl font-black leading-none" style={{ color: 'var(--color-primary)' }}>
+                      <span className="text-subtitulo font-black leading-none" style={{ color: 'var(--color-primary)' }}>
                         ${Number(p.monto).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                       </span>
                       {p.url_comprobante && (
-                        <span className="text-[8px] font-black uppercase tracking-wider flex items-center gap-1 px-2 py-1 rounded-lg"
+                        <span className="text-caption font-black uppercase tracking-wider flex items-center gap-1 px-2 py-1 rounded-lg"
                           style={{ color: 'var(--color-primary)', backgroundColor: 'var(--color-primary)10' }}>
                           <Printer size={10} /> Ver recibo
                         </span>
@@ -1732,7 +1759,7 @@ export const CajaFinanzas: React.FC = () => {
                   >
                     <ChevronLeft size={16} />
                   </button>
-                  <span className="text-[9px] font-black uppercase tracking-widest opacity-50 text-[var(--color-text)]">
+                  <span className="text-caption font-black uppercase tracking-widest opacity-50 text-[var(--color-text)]">
                     Pág. {histPagina}
 
                   </span>
@@ -1766,7 +1793,7 @@ export const CajaFinanzas: React.FC = () => {
             <input
               type="text"
               placeholder="Buscar alumno..."
-              className="w-full h-12 pl-14 pr-10 bg-[var(--color-card)] backdrop-blur-xl rounded-[1.5rem] border border-[var(--color-border)] outline-none font-bold text-sm text-[var(--color-text)] shadow-xl transition-all placeholder:opacity-40 focus:border-[var(--color-primary)]"
+              className="w-full h-12 pl-14 pr-10 bg-[var(--color-card)] backdrop-blur-xl rounded-[1.5rem] border border-[var(--color-border)] outline-none font-bold text-datos text-[var(--color-text)] shadow-xl transition-all placeholder:opacity-40 focus:border-[var(--color-primary)]"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
@@ -1807,34 +1834,69 @@ export const CajaFinanzas: React.FC = () => {
             return (
               <>
                 {/* KPI Cards */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="rounded-[1.8rem] p-4 text-left border col-span-1"
-                    style={{ background: 'var(--color-card)', borderColor: 'rgba(239,68,68,0.3)' }}>
-                    <AlertTriangle size={14} style={{ color: '#ef4444' }} className="mb-2" />
-                    <p className="text-2xl font-black leading-none" style={{ color: '#ef4444' }}>
-                      ${fmtCompacto(deudaTotal, screenWidth)}
-                    </p>
-                    <p className="text-[7px] font-black uppercase tracking-widest mt-1 opacity-50">
-                      {deudorFiltroTipo === null ? 'Total adeudado' : `Adeudo ${TIPOS_FILTRO.find(t=>t.tipo===deudorFiltroTipo)?.label}`}
-                    </p>
+                {screenWidth < 480 ? (
+                  <div className="flex flex-col gap-3">
+                    {/* Fila 1: Total adeudado + Alumnos */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-[1.8rem] p-4 text-left border"
+                        style={{ background: 'var(--color-card)', borderColor: 'rgba(239,68,68,0.3)' }}>
+                        <AlertTriangle size={14} style={{ color: '#ef4444' }} className="mb-2" />
+                        <p className="text-subtitulo font-black leading-none" style={{ color: '#ef4444' }}>
+                          ${fmtCompacto(deudaTotal, screenWidth)}
+                        </p>
+                        <p className="text-label font-black uppercase tracking-widest mt-1 opacity-50">
+                          {deudorFiltroTipo === null ? 'Total adeudado' : `Adeudo ${TIPOS_FILTRO.find(t=>t.tipo===deudorFiltroTipo)?.label}`}
+                        </p>
+                      </div>
+                      <div className="rounded-[1.8rem] p-4 text-left border"
+                        style={{ background: 'var(--color-card)', borderColor: 'var(--color-border)' }}>
+                        <Users size={14} style={{ color: 'var(--color-primary)' }} className="mb-2" />
+                        <p className="text-subtitulo font-black leading-none" style={{ color: 'var(--color-text)' }}>
+                          {alumnosConDeudaTipo}
+                        </p>
+                        <p className="text-label font-black uppercase tracking-widest mt-1 opacity-50">Alumnos</p>
+                      </div>
+                    </div>
+                    {/* Fila 2: Recargos — ancho completo */}
+                    <div className="rounded-[1.8rem] p-4 text-left border"
+                      style={{ background: recargosAcumulados > 0 ? '#ef444410' : 'var(--color-card)', borderColor: recargosAcumulados > 0 ? 'rgba(239,68,68,0.25)' : 'var(--color-border)' }}>
+                      <TrendingUp size={14} style={{ color: recargosAcumulados > 0 ? '#ef4444' : 'var(--color-text-muted)' }} className="mb-2" />
+                      <p className="text-subtitulo font-black leading-none" style={{ color: recargosAcumulados > 0 ? '#ef4444' : 'var(--color-text-muted)' }}>
+                        ${fmtCompacto(recargosAcumulados, screenWidth)}
+                      </p>
+                      <p className="text-label font-black uppercase tracking-widest mt-1 opacity-50">Recargos (+$50/sem)</p>
+                    </div>
                   </div>
-                  <div className="rounded-[1.8rem] p-4 text-left border"
-                    style={{ background: 'var(--color-card)', borderColor: 'var(--color-border)' }}>
-                    <Users size={14} style={{ color: 'var(--color-primary)' }} className="mb-2" />
-                    <p className="text-2xl font-black leading-none" style={{ color: 'var(--color-text)' }}>
-                      {alumnosConDeudaTipo}
-                    </p>
-                    <p className="text-[7px] font-black uppercase tracking-widest mt-1 opacity-50">Alumnos</p>
+                ) : (
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="rounded-[1.8rem] p-4 text-left border col-span-1"
+                      style={{ background: 'var(--color-card)', borderColor: 'rgba(239,68,68,0.3)' }}>
+                      <AlertTriangle size={14} style={{ color: '#ef4444' }} className="mb-2" />
+                      <p className="text-subtitulo font-black leading-none" style={{ color: '#ef4444' }}>
+                        ${fmtCompacto(deudaTotal, screenWidth)}
+                      </p>
+                      <p className="text-label font-black uppercase tracking-widest mt-1 opacity-50">
+                        {deudorFiltroTipo === null ? 'Total adeudado' : `Adeudo ${TIPOS_FILTRO.find(t=>t.tipo===deudorFiltroTipo)?.label}`}
+                      </p>
+                    </div>
+                    <div className="rounded-[1.8rem] p-4 text-left border"
+                      style={{ background: 'var(--color-card)', borderColor: 'var(--color-border)' }}>
+                      <Users size={14} style={{ color: 'var(--color-primary)' }} className="mb-2" />
+                      <p className="text-subtitulo font-black leading-none" style={{ color: 'var(--color-text)' }}>
+                        {alumnosConDeudaTipo}
+                      </p>
+                      <p className="text-label font-black uppercase tracking-widest mt-1 opacity-50">Alumnos</p>
+                    </div>
+                    <div className="rounded-[1.8rem] p-4 text-left border"
+                      style={{ background: recargosAcumulados > 0 ? '#ef444410' : 'var(--color-card)', borderColor: recargosAcumulados > 0 ? 'rgba(239,68,68,0.25)' : 'var(--color-border)' }}>
+                      <TrendingUp size={14} style={{ color: recargosAcumulados > 0 ? '#ef4444' : 'var(--color-text-muted)' }} className="mb-2" />
+                      <p className="text-subtitulo font-black leading-none" style={{ color: recargosAcumulados > 0 ? '#ef4444' : 'var(--color-text-muted)' }}>
+                        ${fmtCompacto(recargosAcumulados, screenWidth)}
+                      </p>
+                      <p className="text-label font-black uppercase tracking-widest mt-1 opacity-50">Recargos (+$50/sem)</p>
+                    </div>
                   </div>
-                  <div className="rounded-[1.8rem] p-4 text-left border"
-                    style={{ background: recargosAcumulados > 0 ? '#ef444410' : 'var(--color-card)', borderColor: recargosAcumulados > 0 ? 'rgba(239,68,68,0.25)' : 'var(--color-border)' }}>
-                    <TrendingUp size={14} style={{ color: recargosAcumulados > 0 ? '#ef4444' : 'var(--color-text-muted)' }} className="mb-2" />
-                    <p className="text-2xl font-black leading-none" style={{ color: recargosAcumulados > 0 ? '#ef4444' : 'var(--color-text-muted)' }}>
-                      ${fmtCompacto(recargosAcumulados, screenWidth)}
-                    </p>
-                    <p className="text-[7px] font-black uppercase tracking-widest mt-1 opacity-50">Recargos (+$50/sem)</p>
-                  </div>
-                </div>
+                )}
 
                 {/* Chips filtro tipo */}
                 <div className="flex gap-2 flex-wrap">
@@ -1849,14 +1911,14 @@ export const CajaFinanzas: React.FC = () => {
                       <button
                         key={String(tipo)}
                         onClick={() => setDeudorFiltroTipo(tipo)}
-                        className="flex items-center gap-1.5 px-3 h-8 rounded-2xl text-[8px] font-black uppercase tracking-widest transition-all border"
+                        className="flex items-center gap-1.5 px-3 h-8 rounded-2xl text-caption font-black uppercase tracking-widest transition-all border"
                         style={isActive
                           ? { backgroundColor: color, color: '#fff', borderColor: 'transparent', boxShadow: `0 4px 12px -4px ${color}60` }
                           : { backgroundColor: 'var(--color-card)', color: 'var(--color-text-muted)', borderColor: 'var(--color-border)' }
                         }
                       >
                         {label}
-                        <span className="px-1.5 py-0.5 rounded-full text-[7px] font-black"
+                        <span className="px-1.5 py-0.5 rounded-full text-label font-black"
                           style={isActive
                             ? { backgroundColor: 'rgba(255,255,255,0.25)', color: '#fff' }
                             : { backgroundColor: `${color}20`, color }
@@ -1874,12 +1936,12 @@ export const CajaFinanzas: React.FC = () => {
           {loading ? (
             <div className="py-32 flex flex-col items-center gap-4">
               <Loader2 className="animate-spin text-[var(--color-primary)]" size={48} />
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 italic text-[var(--color-text)]">Cargando...</p>
+              <p className="text-caption font-black uppercase tracking-[0.3em] opacity-40 italic text-[var(--color-text)]">Cargando...</p>
             </div>
           ) : deudoresAgrupados.length === 0 ? (
             <div className="py-32 text-center space-y-3">
               <CheckCircle2 size={40} className="mx-auto text-emerald-500 opacity-60" />
-              <p className="text-sm font-black uppercase italic tracking-tighter opacity-40 text-[var(--color-text)]">
+              <p className="text-datos font-black uppercase italic tracking-tighter opacity-40 text-[var(--color-text)]">
                 {searchTerm ? 'Sin resultados para la búsqueda' : 'Sin cobros pendientes 🎉'}
               </p>
             </div>
@@ -1926,7 +1988,7 @@ export const CajaFinanzas: React.FC = () => {
 
                     <div className="flex items-center gap-3 ml-1">
                       {/* Avatar */}
-                      <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 font-black text-sm"
+                      <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 font-black text-datos"
                         style={{
                           background: d.maxAtraso?.urgencia === 'vencido' ? '#ef444412' : '#f9731612',
                           color:      d.maxAtraso?.urgencia === 'vencido' ? '#ef4444'   : '#f97316',
@@ -1938,9 +2000,9 @@ export const CajaFinanzas: React.FC = () => {
                       {/* Info central */}
                       <div className="flex-1 min-w-0 text-left space-y-1">
                         {/* Nombre — prominente */}
-                        <p className="text-[15px] font-black uppercase italic tracking-tighter truncate leading-none text-[var(--color-text)]">
+                        <p className="text-datos font-black uppercase italic tracking-tighter truncate leading-none text-[var(--color-text)]">
                           {d.nombreCompleto.startsWith('Alumno #')
-                            ? <span className="opacity-40 text-[11px]">{d.nombreCompleto}</span>
+                            ? <span className="opacity-40 text-label">{d.nombreCompleto}</span>
                             : d.nombreCompleto
                           }
                         </p>
@@ -1948,14 +2010,14 @@ export const CajaFinanzas: React.FC = () => {
                         {/* Badges: cinta + desglose por tipo con montos */}
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {d.cintaNivel && (
-                            <span className="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border"
+                            <span className="text-label font-black uppercase tracking-widest px-2 py-0.5 rounded-full border"
                               style={{ backgroundColor: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}>
                               🥋 {d.cintaNivel}
                             </span>
                           )}
                           {(d.desgloseDeuda ?? []).map((t: DesgloseTipo) => (
                             <span key={t.tipo}
-                              className="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full flex items-center gap-1"
+                              className="text-label font-black uppercase tracking-widest px-2 py-0.5 rounded-full flex items-center gap-1"
                               style={{ backgroundColor: `${t.color}18`, color: t.color, border: `1px solid ${t.color}30` }}>
                               {t.label}
                               <span className="opacity-70 font-bold normal-case tracking-normal">
@@ -1968,7 +2030,7 @@ export const CajaFinanzas: React.FC = () => {
                         {/* Días atraso / días hábiles restantes */}
                         {d.maxAtraso && d.maxAtraso.diasCorridos > 0 ? (
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[8px] font-black uppercase tracking-wider flex items-center gap-1"
+                            <span className="text-caption font-black uppercase tracking-wider flex items-center gap-1"
                               style={{ color: d.maxAtraso.urgencia === 'vencido' ? '#ef4444' : '#f97316' }}>
                               <AlertTriangle size={9} />
                               {d.maxAtraso.diasCorridos}d atraso
@@ -1977,14 +2039,14 @@ export const CajaFinanzas: React.FC = () => {
                               </span>
                             </span>
                             {d.maxAtraso.semanasAtraso > 0 && (
-                              <span className="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full"
+                              <span className="text-label font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full"
                                 style={{ backgroundColor: '#ef444415', color: '#ef4444' }}>
                                 +${d.maxAtraso.recargo} recargo
                               </span>
                             )}
                           </div>
                         ) : d.maxAtraso && d.maxAtraso.diasHabilesRestantes > 0 ? (
-                          <span className="text-[8px] font-black uppercase tracking-wider flex items-center gap-1" style={{ color: '#22c55e' }}>
+                          <span className="text-caption font-black uppercase tracking-wider flex items-center gap-1" style={{ color: '#22c55e' }}>
                             <Clock size={9} />
                             {d.maxAtraso.diasHabilesRestantes} día{d.maxAtraso.diasHabilesRestantes !== 1 ? 's' : ''} hábil{d.maxAtraso.diasHabilesRestantes !== 1 ? 'es' : ''} para pagar
                           </span>
@@ -1994,15 +2056,15 @@ export const CajaFinanzas: React.FC = () => {
                       {/* Monto con recargo */}
                       <div className="text-right shrink-0 flex items-center gap-1">
                         <div>
-                          <p className="text-base font-black leading-none" style={{ color: '#ef4444' }}>
+                          <p className="text-datos font-black leading-none" style={{ color: '#ef4444' }}>
                             ${d.totalDeuda.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                           </p>
                           {d.totalConRecargo !== undefined && d.totalConRecargo > d.totalDeuda && (
-                            <p className="text-[8px] font-black mt-0.5 text-right" style={{ color: '#ef4444', opacity: 0.65 }}>
+                            <p className="text-caption font-black mt-0.5 text-right" style={{ color: '#ef4444', opacity: 0.65 }}>
                               +${(d.totalConRecargo - d.totalDeuda).toFixed(0)} recargo
                             </p>
                           )}
-                          <p className="text-[7px] opacity-30 font-bold mt-0.5 text-right text-[var(--color-text-muted)]">adeudo</p>
+                          <p className="text-label opacity-30 font-bold mt-0.5 text-right text-[var(--color-text-muted)]">adeudo</p>
                         </div>
                         <ChevronRight size={14} className="opacity-20 ml-1" />
                       </div>
@@ -2049,16 +2111,16 @@ export const CajaFinanzas: React.FC = () => {
                   {pasoRecibo === 'form'
                     ? <><div className="p-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.2)" }}><DollarSign size={20} /></div>
                        <div>
-                         <p className="text-lg font-black italic uppercase tracking-tighter leading-none">Registrar Pago</p>
-                         <p className="text-[8px] font-black uppercase tracking-[0.3em] opacity-60 mt-1">Módulo de Tesorería</p>
+                         <p className="text-seccion font-black italic uppercase tracking-tighter leading-none">Registrar Pago</p>
+                         <p className="text-caption font-black uppercase tracking-[0.3em] opacity-60 mt-1">Módulo de Tesorería</p>
                        </div></>
                     : <><motion.button whileTap={{ scale: 0.9 }} onClick={() => setPasoRecibo('form')}
                          className="p-2 rounded-xl mr-1" style={{ background: "rgba(255,255,255,0.2)" }}>
                          <ArrowLeft size={16} />
                        </motion.button>
                        <div>
-                         <p className="text-lg font-black italic uppercase tracking-tighter leading-none">Recibo de Pago</p>
-                         <p className="text-[8px] font-black uppercase tracking-[0.3em] opacity-60 mt-1">Sube el comprobante firmado</p>
+                         <p className="text-seccion font-black italic uppercase tracking-tighter leading-none">Recibo de Pago</p>
+                         <p className="text-caption font-black uppercase tracking-[0.3em] opacity-60 mt-1">Sube el comprobante firmado</p>
                        </div></>
                   }
                 </div>
@@ -2081,9 +2143,9 @@ export const CajaFinanzas: React.FC = () => {
                       style={{ background: 'var(--color-background)' }}>
                       <div className="flex items-center gap-2 mb-2 opacity-50">
                         <UserCircle size={12} style={{ color: 'var(--color-text)' }} />
-                        <span className="text-[8px] font-black uppercase tracking-widest" style={{ color: 'var(--color-text)' }}>Alumno en ventanilla</span>
+                        <span className="text-caption font-black uppercase tracking-widest" style={{ color: 'var(--color-text)' }}>Alumno en ventanilla</span>
                       </div>
-                      <p className="text-lg font-black italic" style={{ color: 'var(--color-text)' }}>
+                      <p className="text-seccion font-black italic" style={{ color: 'var(--color-text)' }}>
                         {selectedPago.alumno?.nombres
                           ? `${selectedPago.alumno.nombres} ${selectedPago.alumno.apellidopaterno ?? ''}`
                           : (nombresCache[selectedPago.idalumno] ?? `Alumno #${selectedPago.idalumno}`)
@@ -2092,8 +2154,8 @@ export const CajaFinanzas: React.FC = () => {
                       <div className="mt-4 pt-4 space-y-2" style={{ borderTop: '1px solid var(--color-border)' }}>
                         {/* Monto base */}
                         <div className="flex justify-between items-center">
-                          <span className="text-xs font-bold opacity-60" style={{ color: 'var(--color-text-muted)' }}>{selectedPago.concepto}</span>
-                          <span className="text-xl font-black" style={{ color: 'var(--color-primary)' }}>
+                          <span className="text-label font-bold opacity-60" style={{ color: 'var(--color-text-muted)' }}>{selectedPago.concepto}</span>
+                          <span className="text-subtitulo font-black" style={{ color: 'var(--color-primary)' }}>
                             ${selectedPago.monto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                           </span>
                         </div>
@@ -2101,17 +2163,17 @@ export const CajaFinanzas: React.FC = () => {
                         {infoAtrasoSelected && infoAtrasoSelected.recargo > 0 && (
                           <>
                             <div className="flex justify-between items-center">
-                              <span className="text-[10px] font-black flex items-center gap-1.5" style={{ color: '#ef4444' }}>
+                              <span className="text-caption font-black flex items-center gap-1.5" style={{ color: '#ef4444' }}>
                                 <AlertTriangle size={11} />
                                 Recargo por atraso ({infoAtrasoSelected.semanasAtraso} sem. × $50)
                               </span>
-                              <span className="text-base font-black" style={{ color: '#ef4444' }}>
+                              <span className="text-datos font-black" style={{ color: '#ef4444' }}>
                                 +${infoAtrasoSelected.recargo.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                               </span>
                             </div>
                             <div className="flex justify-between items-center pt-2 mt-1" style={{ borderTop: '1px solid rgba(239,68,68,0.2)' }}>
-                              <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#ef4444' }}>Total a cobrar</span>
-                              <span className="text-2xl font-black" style={{ color: '#ef4444' }}>
+                              <span className="text-caption font-black uppercase tracking-widest" style={{ color: '#ef4444' }}>Total a cobrar</span>
+                              <span className="text-subtitulo font-black" style={{ color: '#ef4444' }}>
                                 ${infoAtrasoSelected.montoConRecargo.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                               </span>
                             </div>
@@ -2125,10 +2187,10 @@ export const CajaFinanzas: React.FC = () => {
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2" style={{ color: 'var(--color-primary)' }}>
                           <CreditCard size={14} />
-                          <span className="text-[10px] font-black uppercase tracking-widest">Forma de Pago</span>
+                          <span className="text-caption font-black uppercase tracking-widest">Forma de Pago</span>
                         </div>
                         <button onClick={() => setDesglose([...desglose, { monto: 0, metodo: 'Transferencia' }])}
-                          className="text-[9px] font-black uppercase px-3 py-1.5 rounded-xl border"
+                          className="text-caption font-black uppercase px-3 py-1.5 rounded-xl border"
                           style={{ color: 'var(--color-primary)', borderColor: 'var(--color-primary)30', background: 'var(--color-primary)10' }}>
                           + Dividir
                         </button>
@@ -2136,9 +2198,9 @@ export const CajaFinanzas: React.FC = () => {
                       {desglose.map((item, idx) => (
                         <div key={idx} className="grid grid-cols-2 gap-3 items-end">
                           <div className="space-y-1">
-                            <label className="text-[8px] font-black uppercase ml-2 opacity-40 tracking-widest" style={{ color: 'var(--color-text)' }}>Monto</label>
+                            <label className="text-caption font-black uppercase ml-2 opacity-40 tracking-widest" style={{ color: 'var(--color-text)' }}>Monto</label>
                             <input type="number" min="0" step="0.01"
-                              className="w-full h-11 px-4 rounded-2xl border outline-none font-black text-sm shadow-inner"
+                              className="w-full h-11 px-4 rounded-2xl border outline-none font-black text-datos shadow-inner"
                               style={{ background: 'var(--color-background)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
                               onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
                               onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
@@ -2146,9 +2208,9 @@ export const CajaFinanzas: React.FC = () => {
                               onChange={e => { const u=[...desglose]; u[idx]={...u[idx],monto:Number(e.target.value)}; setDesglose(u); }} />
                           </div>
                           <div className="space-y-1">
-                            <label className="text-[8px] font-black uppercase ml-2 opacity-40 tracking-widest" style={{ color: 'var(--color-text)' }}>Método</label>
+                            <label className="text-caption font-black uppercase ml-2 opacity-40 tracking-widest" style={{ color: 'var(--color-text)' }}>Método</label>
                             <div className="flex gap-2">
-                              <select className="flex-1 h-11 px-3 rounded-2xl border outline-none font-black text-[11px] uppercase appearance-none cursor-pointer shadow-inner"
+                              <select className="flex-1 h-11 px-3 rounded-2xl border outline-none font-black text-label uppercase appearance-none cursor-pointer shadow-inner"
                                 style={{ background: 'var(--color-background)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
                                 value={item.metodo}
                                 onChange={e => { const u=[...desglose]; u[idx]={...u[idx],metodo:e.target.value as MetodoPago}; setDesglose(u); }}>
@@ -2168,7 +2230,7 @@ export const CajaFinanzas: React.FC = () => {
                           </div>
                         </div>
                       ))}
-                      <div className="flex justify-between px-3 py-2 rounded-xl text-xs font-black"
+                      <div className="flex justify-between px-3 py-2 rounded-xl text-label font-black"
                       style={Math.abs(diferenciaDesglose) < 0.01 ? { background: '#10b98118', color: '#4ade80' } : { background: '#ef444418', color: '#f87171' }}>
                         <span>Total ingresado</span>
                         <span>${totalDesglose.toLocaleString('es-MX',{minimumFractionDigits:2})}
@@ -2179,8 +2241,8 @@ export const CajaFinanzas: React.FC = () => {
 
                     {/* Notas */}
                     <div className="space-y-1">
-                      <label className="text-[8px] font-black uppercase ml-2 opacity-40 tracking-widest" style={{ color: 'var(--color-text)' }}>Notas internas</label>
-                      <textarea rows={2} className="w-full p-4 rounded-2xl border outline-none font-bold text-sm resize-none shadow-inner"
+                      <label className="text-caption font-black uppercase ml-2 opacity-40 tracking-widest" style={{ color: 'var(--color-text)' }}>Notas internas</label>
+                      <textarea rows={2} className="w-full p-4 rounded-2xl border outline-none font-bold text-datos resize-none shadow-inner"
                         style={{ background: 'var(--color-background)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
                         onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)50'}
                         onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
@@ -2194,7 +2256,7 @@ export const CajaFinanzas: React.FC = () => {
                       className="w-full h-14 font-black rounded-[2rem] flex items-center justify-center gap-3 transition-all disabled:opacity-40 border-2"
                       style={{ backgroundColor: 'var(--color-primary)15', borderColor: 'var(--color-primary)', color: 'var(--color-primary)', boxShadow: '0 6px 24px -6px var(--color-primary)40' }}>
                       <Printer size={20} />
-                      <span className="text-sm uppercase italic tracking-tighter">Imprimir Recibo de Pago</span>
+                      <span className="text-datos uppercase italic tracking-tighter">Imprimir Recibo de Pago</span>
                     </motion.button>
                   </motion.div>
                 )}
@@ -2349,7 +2411,7 @@ export const CajaFinanzas: React.FC = () => {
                         whileTap={{ scale: 0.97 }}
                         onClick={captureYImprimir}
                         disabled={capturandoRecibo}
-                        className="w-full h-12 rounded-2xl flex items-center justify-center gap-2 font-black text-[11px] uppercase tracking-widest transition-all disabled:opacity-60"
+                        className="w-full h-12 rounded-2xl flex items-center justify-center gap-2 font-black text-label uppercase tracking-widest transition-all disabled:opacity-60"
                         style={{
                           background: reciboImpreso ? 'var(--color-background)' : 'var(--color-primary)',
                           border: reciboImpreso ? '1px solid var(--color-border)' : 'none',
@@ -2378,10 +2440,10 @@ export const CajaFinanzas: React.FC = () => {
                               onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="text-[9px] font-black uppercase tracking-widest" style={{ color: '#10b981' }}>
+                              <p className="text-caption font-black uppercase tracking-widest" style={{ color: '#10b981' }}>
                                 ✓ Recibo capturado automáticamente
                               </p>
-                              <p className="text-[8px] opacity-60" style={{ color: '#10b981' }}>
+                              <p className="text-caption opacity-60" style={{ color: '#10b981' }}>
                                 Se adjuntará al confirmar el pago
                               </p>
                             </div>
@@ -2391,7 +2453,7 @@ export const CajaFinanzas: React.FC = () => {
 
                       {/* Hint si aún no imprimió */}
                       {!reciboImpreso && (
-                        <p className="text-center text-[8px] font-black uppercase tracking-widest opacity-40"
+                        <p className="text-center text-caption font-black uppercase tracking-widest opacity-40"
                           style={{ color: 'var(--color-text-muted)' }}>
                           Imprime primero para habilitar el cobro
                         </p>
@@ -2411,7 +2473,7 @@ export const CajaFinanzas: React.FC = () => {
                         }}>
                         {saving
                           ? <Loader2 className="animate-spin" size={20} />
-                          : <><CheckCircle2 size={20} /><span className="text-sm uppercase italic tracking-tighter">Confirmar Pago</span></>
+                          : <><CheckCircle2 size={20} /><span className="text-datos uppercase italic tracking-tighter">Confirmar Pago</span></>
                         }
                       </motion.button>
 
@@ -2471,7 +2533,7 @@ export const CajaFinanzas: React.FC = () => {
             >
               {/* Barra de acciones */}
               <div className="flex items-center justify-between w-full">
-                <span className="text-[10px] font-black uppercase tracking-widest text-white opacity-60">
+                <span className="text-caption font-black uppercase tracking-widest text-white opacity-60">
                   Comprobante de pago
                 </span>
                 <div className="flex items-center gap-2">
@@ -2479,7 +2541,7 @@ export const CajaFinanzas: React.FC = () => {
                     href={comprobanteViewer}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 h-9 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 text-white transition-all hover:brightness-110"
+                    className="px-4 h-9 rounded-2xl text-caption font-black uppercase tracking-widest flex items-center gap-2 text-white transition-all hover:brightness-110"
                     style={{ background: 'var(--color-primary)' }}
                   >
                     <ExternalLink size={12} /> Abrir
@@ -2511,18 +2573,18 @@ export const CajaFinanzas: React.FC = () => {
                 <div className="hidden items-center justify-center py-16 flex-col gap-3"
                   style={{ background: '#1a1a1a' }}>
                   <FileText size={32} style={{ color: '#555' }} />
-                  <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#555' }}>
+                  <p className="text-caption font-black uppercase tracking-widest" style={{ color: '#555' }}>
                     No se pudo cargar la imagen
                   </p>
                   <a href={comprobanteViewer} target="_blank" rel="noopener noreferrer"
-                    className="text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-xl"
+                    className="text-caption font-black uppercase tracking-widest px-4 py-2 rounded-xl"
                     style={{ background: 'var(--color-primary)', color: '#fff' }}>
                     Abrir en navegador
                   </a>
                 </div>
               </div>
 
-              <p className="text-[8px] font-bold uppercase tracking-widest opacity-30 text-white">
+              <p className="text-caption font-bold uppercase tracking-widest opacity-30 text-white">
                 Toca fuera para cerrar
               </p>
             </motion.div>
@@ -2570,10 +2632,10 @@ export const CajaFinanzas: React.FC = () => {
                 <DollarSign size={20} />
               </div>
               <div>
-                <h3 className="text-lg font-black uppercase tracking-tighter leading-none">
+                <h3 className="text-seccion font-black uppercase tracking-tighter leading-none">
                   Configuración de Precios
                 </h3>
-                <p className="text-[8px] font-black uppercase tracking-[0.2em] opacity-70 mt-1">
+                <p className="text-caption font-black uppercase tracking-[0.2em] opacity-70 mt-1">
                   Gestiona las tarifas del Dojo
                 </p>
               </div>
@@ -2591,7 +2653,7 @@ export const CajaFinanzas: React.FC = () => {
         <div className="flex border-b border-[var(--color-border)] px-4 pt-3 gap-2">
           <button
             onClick={() => setPreciosTab('config')}
-            className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-t-xl transition-all ${
+            className={`px-4 py-2 text-caption font-black uppercase tracking-wider rounded-t-xl transition-all ${
               preciosTab === 'config'
                 ? 'text-[var(--color-primary)] border-b-2 border-[var(--color-primary)]'
                 : 'text-[var(--color-text-muted)] opacity-60 hover:opacity-100'
@@ -2601,7 +2663,7 @@ export const CajaFinanzas: React.FC = () => {
           </button>
           <button
             onClick={() => setPreciosTab('historial')}
-            className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-t-xl transition-all ${
+            className={`px-4 py-2 text-caption font-black uppercase tracking-wider rounded-t-xl transition-all ${
               preciosTab === 'historial'
                 ? 'text-[var(--color-primary)] border-b-2 border-[var(--color-primary)]'
                 : 'text-[var(--color-text-muted)] opacity-60 hover:opacity-100'
@@ -2617,9 +2679,9 @@ export const CajaFinanzas: React.FC = () => {
             <div className="space-y-5">
               {/* Mensualidad */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[var(--color-text)]">
-                  <span className="text-base">📅</span> Mensualidad
-                  <span className="text-[8px] font-normal opacity-40">— Cobro recurrente mensual</span>
+                <label className="flex items-center gap-2 text-caption font-black uppercase tracking-wider text-[var(--color-text)]">
+                  <span className="text-datos">📅</span> Mensualidad
+                  <span className="text-caption font-normal opacity-40">— Cobro recurrente mensual</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] font-black">$</span>
@@ -2629,7 +2691,7 @@ export const CajaFinanzas: React.FC = () => {
                     step="10"
                     value={preciosForm.mensualidad_default}
                     onChange={e => setPreciosForm(prev => prev ? { ...prev, mensualidad_default: parseFloat(e.target.value) || 0 } : prev)}
-                    className="w-full h-11 pl-8 pr-4 rounded-xl border outline-none font-bold text-sm"
+                    className="w-full h-11 pl-8 pr-4 rounded-xl border outline-none font-bold text-datos"
                     style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
                   />
                 </div>
@@ -2637,9 +2699,9 @@ export const CajaFinanzas: React.FC = () => {
 
               {/* Inscripción */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[var(--color-text)]">
-                  <span className="text-base">📝</span> Inscripción
-                  <span className="text-[8px] font-normal opacity-40">— Por ciclo/semestre</span>
+                <label className="flex items-center gap-2 text-caption font-black uppercase tracking-wider text-[var(--color-text)]">
+                  <span className="text-datos">📝</span> Inscripción
+                  <span className="text-caption font-normal opacity-40">— Por ciclo/semestre</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] font-black">$</span>
@@ -2649,7 +2711,7 @@ export const CajaFinanzas: React.FC = () => {
                     step="10"
                     value={preciosForm.inscripcion_default}
                     onChange={e => setPreciosForm(prev => prev ? { ...prev, inscripcion_default: parseFloat(e.target.value) || 0 } : prev)}
-                    className="w-full h-11 pl-8 pr-4 rounded-xl border outline-none font-bold text-sm"
+                    className="w-full h-11 pl-8 pr-4 rounded-xl border outline-none font-bold text-datos"
                     style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
                   />
                 </div>
@@ -2657,8 +2719,8 @@ export const CajaFinanzas: React.FC = () => {
 
               {/* Examen */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[var(--color-text)]">
-                  <span className="text-base">🥋</span> Examen de Grado
+                <label className="flex items-center gap-2 text-caption font-black uppercase tracking-wider text-[var(--color-text)]">
+                  <span className="text-datos">🥋</span> Examen de Grado
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] font-black">$</span>
@@ -2668,7 +2730,7 @@ export const CajaFinanzas: React.FC = () => {
                     step="10"
                     value={preciosForm.examen_default}
                     onChange={e => setPreciosForm(prev => prev ? { ...prev, examen_default: parseFloat(e.target.value) || 0 } : prev)}
-                    className="w-full h-11 pl-8 pr-4 rounded-xl border outline-none font-bold text-sm"
+                    className="w-full h-11 pl-8 pr-4 rounded-xl border outline-none font-bold text-datos"
                     style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
                   />
                 </div>
@@ -2676,8 +2738,8 @@ export const CajaFinanzas: React.FC = () => {
 
               {/* Recargo semanal */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[var(--color-text)]">
-                  <span className="text-base">⚠️</span> Recargo por Semana de Atraso
+                <label className="flex items-center gap-2 text-caption font-black uppercase tracking-wider text-[var(--color-text)]">
+                  <span className="text-datos">⚠️</span> Recargo por Semana de Atraso
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] font-black">$</span>
@@ -2687,7 +2749,7 @@ export const CajaFinanzas: React.FC = () => {
                     step="10"
                     value={preciosForm.recargo_semanal}
                     onChange={e => setPreciosForm(prev => prev ? { ...prev, recargo_semanal: parseFloat(e.target.value) || 0 } : prev)}
-                    className="w-full h-11 pl-8 pr-4 rounded-xl border outline-none font-bold text-sm"
+                    className="w-full h-11 pl-8 pr-4 rounded-xl border outline-none font-bold text-datos"
                     style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
                   />
                 </div>
@@ -2695,8 +2757,8 @@ export const CajaFinanzas: React.FC = () => {
 
               {/* Días de gracia */}
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-[var(--color-text)]">
-                  <span className="text-base">⏳</span> Días Hábiles de Gracia
+                <label className="flex items-center gap-2 text-caption font-black uppercase tracking-wider text-[var(--color-text)]">
+                  <span className="text-datos">⏳</span> Días Hábiles de Gracia
                 </label>
                 <input
                   type="number"
@@ -2704,23 +2766,23 @@ export const CajaFinanzas: React.FC = () => {
                   max="30"
                   value={preciosForm.dias_gracia}
                   onChange={e => setPreciosForm(prev => prev ? { ...prev, dias_gracia: parseInt(e.target.value) || 0 } : prev)}
-                  className="w-full h-11 px-4 rounded-xl border outline-none font-bold text-sm"
+                  className="w-full h-11 px-4 rounded-xl border outline-none font-bold text-datos"
                   style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
                 />
               </div>
 
               {preciosError && (
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-bold bg-red-500/10 border border-red-500/30 text-red-500">
+                <div className="flex items-center gap-2 px-4 py-3 rounded-xl text-label font-bold bg-red-500/10 border border-red-500/30 text-red-500">
                   <AlertCircle size={14} /> {preciosError}
                 </div>
               )}
 
               {/* Info adicional */}
               <div className="p-3 rounded-xl bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/20">
-                <p className="text-[8px] font-black uppercase tracking-wider text-[var(--color-primary)] mb-1">
+                <p className="text-caption font-black uppercase tracking-wider text-[var(--color-primary)] mb-1">
                   ℹ️ Información
                 </p>
-                <p className="text-[9px] opacity-60 leading-relaxed">
+                <p className="text-caption opacity-60 leading-relaxed">
                   Los precios se aplicarán a los nuevos cargos generados automáticamente. 
                   Los cargos existentes mantienen el precio con el que fueron creados.
                 </p>
@@ -2747,10 +2809,10 @@ export const CajaFinanzas: React.FC = () => {
               {preciosHistorial.length === 0 ? (
                 <div className="py-16 text-center">
                   <FileText size={32} className="mx-auto mb-3 opacity-30" />
-                  <p className="text-[10px] font-black uppercase tracking-wider opacity-40">
+                  <p className="text-caption font-black uppercase tracking-wider opacity-40">
                     Sin cambios registrados en el historial
                   </p>
-                  <p className="text-[8px] opacity-30 mt-1">
+                  <p className="text-caption opacity-30 mt-1">
                     Los cambios se registrarán automáticamente al guardar
                   </p>
                 </div>
@@ -2759,15 +2821,15 @@ export const CajaFinanzas: React.FC = () => {
                   <div key={i} className="p-4 rounded-xl border" style={{ background: 'var(--color-background)', borderColor: 'var(--color-border)' }}>
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <p className="text-[9px] font-black text-[var(--color-primary)]">
+                        <p className="text-caption font-black text-[var(--color-primary)]">
                           {new Date(h.fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}
                         </p>
-                        <p className="text-[7px] opacity-40 uppercase tracking-wider mt-1">
+                        <p className="text-label opacity-40 uppercase tracking-wider mt-1">
                           por {h.actualizado_por || 'admin'}
                         </p>
                       </div>
                       <div className="text-right">
-                        <span className="text-[7px] font-black uppercase tracking-wider px-2 py-1 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+                        <span className="text-label font-black uppercase tracking-wider px-2 py-1 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
                           Versión #{preciosHistorial.length - i}
                         </span>
                       </div>
@@ -2775,10 +2837,10 @@ export const CajaFinanzas: React.FC = () => {
                     <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[var(--color-border)]">
                       {Object.entries(h.precios || {}).map(([key, value]) => (
                         <div key={key} className="flex justify-between items-center">
-                          <span className="text-[8px] opacity-50 capitalize">
+                          <span className="text-caption opacity-50 capitalize">
                             {key.replace(/_/g, ' ').replace('default', '')}
                           </span>
-                          <span className="text-[9px] font-black">${String(value)}</span>
+                          <span className="text-caption font-black">${String(value)}</span>
                         </div>
                       ))}
                     </div>
@@ -2817,10 +2879,10 @@ export const CajaFinanzas: React.FC = () => {
                   <Bell size={22} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">
+                  <h3 className="text-subtitulo font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">
                     Notificación Masiva
                   </h3>
-                  <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mt-1 text-[var(--color-text-muted)]">
+                  <p className="text-caption font-black uppercase tracking-widest opacity-40 mt-1 text-[var(--color-text-muted)]">
                     {deudoresAgrupados.length} alumnos con deuda pendiente
                   </p>
                 </div>
@@ -2828,7 +2890,7 @@ export const CajaFinanzas: React.FC = () => {
 
               {/* Selector de tipo */}
               <div className="space-y-2">
-                <p className="text-[8px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)]">Tipo de notificación</p>
+                <p className="text-caption font-black uppercase tracking-widest opacity-40 text-[var(--color-text)]">Tipo de notificación</p>
                 {([
                   { tipo: 'aviso_previo',   label: '⏰ Aviso previo',        desc: 'Faltan días para el vencimiento' },
                   { tipo: 'pago_pendiente', label: '📋 Pago pendiente',       desc: 'Recordatorio de cobro pendiente' },
@@ -2845,8 +2907,8 @@ export const CajaFinanzas: React.FC = () => {
                       : { background: 'var(--color-background)', borderColor: 'var(--color-border)', color: 'var(--color-text)' }
                     }>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-black">{label}{disabled ? ' — Próximamente' : ''}</p>
-                      <p className="text-[9px] opacity-50 mt-0.5">{desc}</p>
+                      <p className="text-label font-black">{label}{disabled ? ' — Próximamente' : ''}</p>
+                      <p className="text-caption opacity-50 mt-0.5">{desc}</p>
                     </div>
                     {notifTipo === tipo && !disabled && (
                       <CheckCircle2 size={14} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
@@ -2859,12 +2921,12 @@ export const CajaFinanzas: React.FC = () => {
               {notifResultado && (
                 <div className="rounded-2xl p-4 space-y-2"
                   style={{ background: notifResultado.fallidos === 0 ? '#10b98115' : '#f9731615', border: `1px solid ${notifResultado.fallidos === 0 ? '#10b98130' : '#f9731630'}` }}>
-                  <p className="text-[10px] font-black uppercase tracking-widest"
+                  <p className="text-caption font-black uppercase tracking-widest"
                     style={{ color: notifResultado.fallidos === 0 ? '#10b981' : '#f97316' }}>
                     {notifResultado.enviados} enviadas · {notifResultado.fallidos} fallidas de {notifResultado.total}
                   </p>
                   {notifResultado.fallidos > 0 && (
-                    <p className="text-[9px] opacity-60 text-[var(--color-text-muted)]">
+                    <p className="text-caption opacity-60 text-[var(--color-text-muted)]">
                       Los fallidos pueden ser alumnos sin correo de tutor registrado.
                     </p>
                   )}
@@ -2915,17 +2977,17 @@ export const CajaFinanzas: React.FC = () => {
                 >
                   <Calendar size={32} />
                 </div>
-                <h3 className="text-3xl font-black italic uppercase tracking-tighter text-[var(--color-text)] leading-none">Cargar Mensualidades</h3>
-                <p className="text-sm font-bold text-[var(--color-text-muted)] leading-relaxed opacity-70 italic">
+                <h3 className="text-titulo font-black italic uppercase tracking-tighter text-[var(--color-text)] leading-none">Cargar Mensualidades</h3>
+                <p className="text-datos font-bold text-[var(--color-text-muted)] leading-relaxed opacity-70 italic">
                   Uso manual para corrección o migración. En operación normal los cargos se generan automáticamente cada mes.
                 </p>
               </div>
 
               <div className="space-y-5">
                 <div className="space-y-2">
-                  <label className="text-[8px] font-black uppercase ml-3 opacity-40 tracking-widest text-[var(--color-text)]">Mes</label>
+                  <label className="text-caption font-black uppercase ml-3 opacity-40 tracking-widest text-[var(--color-text)]">Mes</label>
                   <input type="month"
-                    className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] outline-none font-black text-sm text-[var(--color-text)] shadow-inner"
+                    className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] outline-none font-black text-datos text-[var(--color-text)] shadow-inner"
                     onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
                     onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
                     value={genMes} onChange={e => setGenMes(e.target.value)}
@@ -2933,18 +2995,18 @@ export const CajaFinanzas: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[8px] font-black uppercase ml-3 opacity-40 tracking-widest text-[var(--color-text)]">Monto por defecto ($)</label>
+                    <label className="text-caption font-black uppercase ml-3 opacity-40 tracking-widest text-[var(--color-text)]">Monto por defecto ($)</label>
                     <input type="number" min="1" step="0.01" placeholder="Ej. 500"
-                      className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] outline-none font-black text-sm text-[var(--color-text)] shadow-inner"
+                      className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] outline-none font-black text-datos text-[var(--color-text)] shadow-inner"
                       onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
                       onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
                       value={genMonto} onChange={e => setGenMonto(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[8px] font-black uppercase ml-3 opacity-40 tracking-widest text-[var(--color-text)]">Día de cobro (1-28)</label>
+                    <label className="text-caption font-black uppercase ml-3 opacity-40 tracking-widest text-[var(--color-text)]">Día de cobro (1-28)</label>
                     <input type="number" min="1" max="28" placeholder="1"
-                      className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] outline-none font-black text-sm text-[var(--color-text)] shadow-inner"
+                      className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-[var(--color-border)] outline-none font-black text-datos text-[var(--color-text)] shadow-inner"
                       onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary)'}
                       onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
                       value={genDiaCobro} onChange={e => setGenDiaCobro(e.target.value)}
@@ -2962,7 +3024,7 @@ export const CajaFinanzas: React.FC = () => {
                   >
                     <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${genSobrescribir ? 'left-6' : 'left-0.5'}`} />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-widest opacity-60 text-[var(--color-text)]">
+                  <span className="text-label font-black uppercase tracking-widest opacity-60 text-[var(--color-text)]">
                     Sobrescribir cargos existentes
                   </span>
                 </label>
@@ -2972,7 +3034,7 @@ export const CajaFinanzas: React.FC = () => {
                 style={{ backgroundColor: 'var(--color-primary)08', borderColor: 'var(--color-primary)30' }}
               >
                 <ShieldAlert size={20} style={{ color: 'var(--color-primary)', marginTop: 2 }} />
-                <p className="text-[10px] font-black uppercase tracking-widest leading-normal" style={{ color: 'var(--color-primary)' }}>
+                <p className="text-caption font-black uppercase tracking-widest leading-normal" style={{ color: 'var(--color-primary)' }}>
                   El monto individual configurado por alumno prevalece sobre el monto por defecto.
                 </p>
               </div>
@@ -2980,7 +3042,7 @@ export const CajaFinanzas: React.FC = () => {
               {genError && (
                 <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-500 border border-red-500 text-red-400">
                   <AlertCircle size={16} />
-                  <span className="text-xs font-bold">{genError}</span>
+                  <span className="text-label font-bold">{genError}</span>
                 </div>
               )}
 

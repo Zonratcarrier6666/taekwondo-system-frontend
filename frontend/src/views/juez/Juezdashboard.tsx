@@ -160,7 +160,7 @@ const BottomNav: React.FC<{ active: string; onChange: (id: string) => void; T: T
                   exit={{ opacity: 0, y: -4 }}
                   className="relative flex flex-col items-center gap-0.5">
                   <Icon size={18} style={{ color: T.cyan }} strokeWidth={2.5} />
-                  <span className="text-[7px] font-black uppercase tracking-wider" style={{ color: T.cyan }}>
+                  <span className="text-xs font-black uppercase tracking-wider" style={{ color: T.cyan }}>
                     {label}
                   </span>
                 </motion.div>
@@ -1044,7 +1044,7 @@ export const JuezDashboard: React.FC = () => {
               <p className="text-xs font-black uppercase italic tracking-tighter leading-none" style={{ color: T.text }}>
                 TKW System
               </p>
-              <p className="text-[7px] font-black uppercase tracking-[0.3em] mt-0.5 leading-none" style={{ color: T.cyan }}>
+              <p className="text-xs font-black uppercase tracking-[0.3em] mt-0.5 leading-none" style={{ color: T.cyan }}>
                 Juez
               </p>
             </div>
@@ -1097,7 +1097,7 @@ export const JuezDashboard: React.FC = () => {
                 <p className="text-[9px] font-black uppercase italic tracking-tighter leading-none max-w-[80px] truncate" style={{ color: T.text }}>
                   {user?.nombre || user?.username || 'Juez'}
                 </p>
-                <p className="text-[7px] font-bold uppercase tracking-widest mt-0.5 leading-none" style={{ color: T.cyan }}>
+                <p className="text-xs font-bold uppercase tracking-widest mt-0.5 leading-none" style={{ color: T.cyan }}>
                   Juez
                 </p>
               </div>

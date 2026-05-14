@@ -269,11 +269,11 @@ const ModalResultado: React.FC<{
                 }}>
                 <p className="text-[9px] font-black uppercase italic tracking-tighter truncate"
                   style={{ color: T.text }}>{item.comp.nombre}</p>
-                <p className="text-[7px] font-bold mt-0.5 truncate" style={{ color: T.textDim }}>
+                <p className="text-xs font-bold mt-0.5 truncate" style={{ color: T.textDim }}>
                   {item.comp.cinta} · {item.comp.escuela}
                 </p>
                 {item.esGanador && (
-                  <p className="text-[7px] font-black uppercase tracking-wider mt-1"
+                  <p className="text-xs font-black uppercase tracking-wider mt-1"
                     style={{ color: T.green }}>✓ Ganador</p>
                 )}
               </div>
@@ -368,7 +368,7 @@ const CombateCard: React.FC<{
             {esBye ? 'BYE — Pasa directo' : finalizado ? 'Finalizado' : 'Pendiente'}
           </span>
         </div>
-        <span className="text-[7px] font-black" style={{ color: T.textDim }}>
+        <span className="text-xs font-black" style={{ color: T.textDim }}>
           #{combate.idcombate}
         </span>
       </div>
@@ -386,7 +386,7 @@ const CombateCard: React.FC<{
         <>
           <div className="flex items-center gap-2">
             <div className="flex-1 h-px" style={{ background: T.border }} />
-            <span className="text-[7px] font-black uppercase tracking-wider px-1"
+            <span className="text-xs font-black uppercase tracking-wider px-1"
               style={{ color: T.textDim }}>vs</span>
             <div className="flex-1 h-px" style={{ background: T.border }} />
           </div>
@@ -448,7 +448,7 @@ const BracketVisualizer: React.FC<{
               style={{ background: T.surface, border: `1px solid ${T.border}` }}>
               <p className="text-[9px] font-black uppercase tracking-widest"
                 style={{ color: T.violetHi }}>{ronda.nombre_ronda}</p>
-              <p className="text-[7px] font-black uppercase tracking-wider mt-0.5"
+              <p className="text-xs font-black uppercase tracking-wider mt-0.5"
                 style={{ color: T.textDim }}>
                 {ronda.combates.filter(c => c.estatus === 'finalizado').length}/{ronda.combates.length} completados
               </p>
@@ -491,7 +491,7 @@ const BracketVisualizer: React.FC<{
               >
                 <Crown size={32} style={{ color: T.yellow, margin: '0 auto 10px' }} />
               </motion.div>
-              <p className="text-[7px] font-black uppercase tracking-widest mb-2" style={{ color: T.yellow }}>
+              <p className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: T.yellow }}>
                 🏆 Campeón
               </p>
               <p className="text-xs font-black uppercase italic tracking-tighter leading-tight"
@@ -589,7 +589,7 @@ const DetalleCombates: React.FC<{
               transition={{ duration: 1.5, repeat: Infinity }}
               className="w-1.5 h-1.5 rounded-full"
               style={{ background: T.green }} />
-            <span className="text-[7px] font-black uppercase tracking-widest" style={{ color: T.green }}>
+            <span className="text-xs font-black uppercase tracking-widest" style={{ color: T.green }}>
               Live
             </span>
           </div>
@@ -622,7 +622,7 @@ const DetalleCombates: React.FC<{
               <p className="text-xl font-black tracking-tighter leading-none" style={{ color: T.text }}>
                 {item.value}
               </p>
-              <p className="text-[7px] font-black uppercase tracking-widest mt-1" style={{ color: T.textDim }}>
+              <p className="text-xs font-black uppercase tracking-widest mt-1" style={{ color: T.textDim }}>
                 {item.label}
               </p>
             </motion.div>
@@ -669,7 +669,7 @@ const DetalleCombates: React.FC<{
                     <p className="text-xl font-black tracking-tighter" style={{ color: T.green }}>
                       {categoriaActual.finalizados}
                     </p>
-                    <p className="text-[7px] font-black uppercase tracking-widest" style={{ color: T.textDim }}>
+                    <p className="text-xs font-black uppercase tracking-widest" style={{ color: T.textDim }}>
                       Done
                     </p>
                   </div>
@@ -678,7 +678,7 @@ const DetalleCombates: React.FC<{
                     <p className="text-xl font-black tracking-tighter" style={{ color: T.orange }}>
                       {categoriaActual.pendientes}
                     </p>
-                    <p className="text-[7px] font-black uppercase tracking-widest" style={{ color: T.textDim }}>
+                    <p className="text-xs font-black uppercase tracking-widest" style={{ color: T.textDim }}>
                       Pend.
                     </p>
                   </div>
@@ -697,7 +697,7 @@ const DetalleCombates: React.FC<{
                   )}
                 </div>
                 {ultimoUpdate && (
-                  <span className="text-[7px] font-bold" style={{ color: T.textDim }}>
+                  <span className="text-xs font-bold" style={{ color: T.textDim }}>
                     ↻ {ultimoUpdate}
                   </span>
                 )}

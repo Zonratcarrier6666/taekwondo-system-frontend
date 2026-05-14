@@ -144,7 +144,7 @@ const PantallaCombate: React.FC<{
                   {escuela ?? ''}
                 </p>
                 {cinta && (
-                  <span className="inline-block mt-1 px-2 py-0.5 rounded-lg text-[7px] font-black uppercase"
+                  <span className="inline-block mt-1 px-2 py-0.5 rounded-lg text-xs font-black uppercase"
                     style={{
                       background: `${colorC || '#888'}18`,
                       color:       colorC || '#888',

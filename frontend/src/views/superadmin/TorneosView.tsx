@@ -889,7 +889,7 @@ const Step5Credenciales: React.FC<{
             <div className="grid grid-cols-2 gap-2">
               {/* Usuario */}
               <div className="space-y-1">
-                <p className="text-[7px] font-black uppercase tracking-widest" style={{ color: T.textDim }}>
+                <p className="text-xs font-black uppercase tracking-widest" style={{ color: T.textDim }}>
                   Usuario
                 </p>
                 <div className="flex items-center gap-1">
@@ -912,7 +912,7 @@ const Step5Credenciales: React.FC<{
 
               {/* Contraseña */}
               <div className="space-y-1">
-                <p className="text-[7px] font-black uppercase tracking-widest" style={{ color: T.textDim }}>
+                <p className="text-xs font-black uppercase tracking-widest" style={{ color: T.textDim }}>
                   Contraseña
                 </p>
                 <div className="flex items-center gap-1">
@@ -1478,7 +1478,7 @@ const DetalleTorneo: React.FC<{
           </div>
           <div>
             <p className="text-xs font-black uppercase italic tracking-tighter" style={{ color: T.text }}>Inscritos</p>
-            <p className="text-[7px] font-black uppercase tracking-widest" style={{ color: T.textDim }}>
+            <p className="text-xs font-black uppercase tracking-widest" style={{ color: T.textDim }}>
               {inscritos.length} registros
             </p>
           </div>
@@ -1515,19 +1515,19 @@ const DetalleTorneo: React.FC<{
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-black uppercase italic tracking-tighter truncate"
                       style={{ color: T.text }}>{nombre}</p>
-                    <p className="text-[7px] font-bold" style={{ color: T.textDim }}>
+                    <p className="text-xs font-bold" style={{ color: T.textDim }}>
                       {insc.peso_declarado ? `${insc.peso_declarado} kg` : '—'}
                       {insc.edad_al_momento ? ` · ${insc.edad_al_momento} años` : ''}
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <span className="px-1.5 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-wider"
+                    <span className="px-1.5 py-0.5 rounded-lg text-xs font-black uppercase tracking-wider"
                       style={{ background: pagado ? `${T.green}20` : `${T.red}20`,
                         color: pagado ? T.green : T.red }}>
                       {pagado ? 'Pagado' : 'Pendiente'}
                     </span>
                     {chk && (
-                      <span className="px-1.5 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-wider"
+                      <span className="px-1.5 py-0.5 rounded-lg text-xs font-black uppercase tracking-wider"
                         style={{ background: `${T.cyan}20`, color: T.cyan }}>
                         ✓ Check
                       </span>

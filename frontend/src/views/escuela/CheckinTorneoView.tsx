@@ -41,10 +41,10 @@ const Gafete: React.FC<{ data: GafeteData }> = ({ data }) => (
     {/* Header */}
     <div className="px-4 py-3 text-center"
       style={{ background: 'linear-gradient(135deg, #1e1b4b, #312e81)' }}>
-      <p className="text-[8px] font-black uppercase tracking-[0.3em] text-white opacity-70">
+      <p className="text-caption font-black uppercase tracking-[0.3em] text-white opacity-70">
         {data.torneo}
       </p>
-      <p className="text-[9px] font-black uppercase tracking-wider text-white mt-0.5">
+      <p className="text-caption font-black uppercase tracking-wider text-white mt-0.5">
         {data.fecha_torneo} · {data.sede}
       </p>
     </div>
@@ -55,16 +55,16 @@ const Gafete: React.FC<{ data: GafeteData }> = ({ data }) => (
         <img src={data.foto} alt="" className="w-16 h-16 rounded-full object-cover mx-auto mb-2"
           style={{ border: '2px solid #e2e8f0' }} />
       ) : (
-        <div className="w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center text-xl font-black"
+        <div className="w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center text-subtitulo font-black"
           style={{ background: '#e0e7ff', color: '#4338ca' }}>
           {data.nombre_alumno.charAt(0)}
         </div>
       )}
-      <p className="text-[12px] font-black uppercase italic tracking-tighter leading-tight"
+      <p className="text-label font-black uppercase italic tracking-tighter leading-tight"
         style={{ color: '#1e1b4b' }}>
         {data.nombre_alumno}
       </p>
-      <p className="text-[9px] font-bold mt-0.5" style={{ color: '#64748b' }}>
+      <p className="text-caption font-bold mt-0.5" style={{ color: '#64748b' }}>
         {data.escuela}
       </p>
     </div>
@@ -72,7 +72,7 @@ const Gafete: React.FC<{ data: GafeteData }> = ({ data }) => (
     {/* Categoría */}
     <div className="mx-4 mb-3 px-3 py-1.5 rounded-xl text-center"
       style={{ background: '#f1f5f9', border: '1px solid #e2e8f0' }}>
-      <p className="text-[8px] font-black uppercase tracking-wider" style={{ color: '#475569' }}>
+      <p className="text-caption font-black uppercase tracking-wider" style={{ color: '#475569' }}>
         {data.categoria}
       </p>
     </div>
@@ -148,11 +148,11 @@ const ModalGafete: React.FC<{
               <QrCode size={18} style={{ color: 'var(--color-primary)' }} />
             </div>
             <div>
-              <p className="text-sm font-black uppercase italic tracking-tighter"
+              <p className="text-datos font-black uppercase italic tracking-tighter"
                 style={{ color: 'var(--color-text)' }}>
                 Gafetes Generados
               </p>
-              <p className="text-[8px] font-black uppercase tracking-widest"
+              <p className="text-caption font-black uppercase tracking-widest"
                 style={{ color: 'var(--color-text-muted)' }}>
                 {gafetes.length} competidor{gafetes.length !== 1 ? 'es' : ''}
               </p>
@@ -160,7 +160,7 @@ const ModalGafete: React.FC<{
           </div>
           <div className="flex items-center gap-2">
             <motion.button whileTap={{ scale: 0.9 }} onClick={handleImprimir}
-              className="flex items-center gap-2 px-4 h-10 rounded-2xl text-[10px] font-black uppercase tracking-wider"
+              className="flex items-center gap-2 px-4 h-10 rounded-2xl text-caption font-black uppercase tracking-wider"
               style={{ background: 'var(--color-primary)', color: '#fff' }}>
               <Printer size={13} /> Imprimir todos
             </motion.button>
@@ -181,7 +181,7 @@ const ModalGafete: React.FC<{
                 <motion.button
                   whileTap={{ scale: 0.93 }}
                   onClick={() => handleDescargarPDF(g)}
-                  className="flex items-center gap-1.5 px-3 h-7 rounded-xl text-[8px] font-black uppercase tracking-wider"
+                  className="flex items-center gap-1.5 px-3 h-7 rounded-xl text-caption font-black uppercase tracking-wider"
                   style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
                   <Download size={10} /> PDF
                 </motion.button>
@@ -245,7 +245,7 @@ const CompetidorRow: React.FC<{
       <img src={comp.foto} alt="" className="w-10 h-10 rounded-xl object-cover flex-shrink-0"
         style={{ border: '1px solid var(--color-border)' }} />
     ) : (
-      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black flex-shrink-0"
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-label font-black flex-shrink-0"
         style={{ background: 'var(--color-primary)15', color: 'var(--color-primary)' }}>
         {comp.nombre_alumno.charAt(0)}
       </div>
@@ -253,12 +253,12 @@ const CompetidorRow: React.FC<{
 
     {/* Info */}
     <div className="flex-1 min-w-0">
-      <p className="text-[11px] font-black uppercase italic tracking-tighter truncate"
+      <p className="text-label font-black uppercase italic tracking-tighter truncate"
         style={{ color: 'var(--color-text)' }}>
         {comp.nombre_alumno}
       </p>
       <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-        <span className="text-[7px] font-black uppercase px-1.5 py-0.5 rounded-lg"
+        <span className="text-label font-black uppercase px-1.5 py-0.5 rounded-lg"
           style={{
             background: `${comp.color_cinta || '#888'}20`,
             color: comp.color_cinta || '#888',
@@ -266,17 +266,17 @@ const CompetidorRow: React.FC<{
           }}>
           {comp.cinta}
         </span>
-        <span className="text-[8px] font-bold" style={{ color: 'var(--color-text-muted)' }}>
+        <span className="text-caption font-bold" style={{ color: 'var(--color-text-muted)' }}>
           {comp.edad} años · {comp.categoria}
         </span>
         {comp.estatus_checkin && (
-          <span className="text-[7px] font-black uppercase px-1.5 py-0.5 rounded-lg"
+          <span className="text-label font-black uppercase px-1.5 py-0.5 rounded-lg"
             style={{ background: '#10b98120', color: '#10b981' }}>
             ✓ Check-in
           </span>
         )}
       </div>
-      <p className="text-[8px] font-bold mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+      <p className="text-caption font-bold mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
         {comp.escuela}
       </p>
     </div>
@@ -286,7 +286,7 @@ const CompetidorRow: React.FC<{
       <div className="flex items-center gap-2 flex-shrink-0">
         <input type="number" placeholder="kg" value={peso}
           onChange={e => onPeso(e.target.value)}
-          className="w-14 text-center text-[10px] font-black rounded-xl py-1.5 px-2 outline-none"
+          className="w-14 text-center text-caption font-black rounded-xl py-1.5 px-2 outline-none"
           style={{
             background: 'var(--color-card)',
             border: '1px solid var(--color-border)',
@@ -456,11 +456,11 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
           <ChevronLeft size={16} style={{ color: 'var(--color-text-muted)' }} />
         </motion.button>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-black uppercase italic tracking-tighter truncate"
+          <p className="text-datos font-black uppercase italic tracking-tighter truncate"
             style={{ color: 'var(--color-text)' }}>
             Check-in
           </p>
-          <p className="text-[8px] font-black uppercase tracking-widest"
+          <p className="text-caption font-black uppercase tracking-widest"
             style={{ color: 'var(--color-text-muted)' }}>
             {torneo?.nombre ?? `Torneo #${idtorneo}`}
           </p>
@@ -485,10 +485,10 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
               style={{ background: `${color}18`, border: `1px solid ${color}30` }}>
               <Icon size={13} style={{ color }} />
             </div>
-            <p className="text-xl font-black tracking-tighter leading-none" style={{ color }}>
+            <p className="text-subtitulo font-black tracking-tighter leading-none" style={{ color }}>
               {val}
             </p>
-            <p className="text-[7px] font-black uppercase tracking-widest mt-1"
+            <p className="text-label font-black uppercase tracking-widest mt-1"
               style={{ color: 'var(--color-text-muted)' }}>{label}</p>
           </div>
         ))}
@@ -499,9 +499,9 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
         <div className="rounded-2xl p-3"
           style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
           <div className="flex justify-between mb-2">
-            <span className="text-[8px] font-black uppercase tracking-wider"
+            <span className="text-caption font-black uppercase tracking-wider"
               style={{ color: 'var(--color-text-muted)' }}>Progreso check-in</span>
-            <span className="text-[8px] font-black" style={{ color: '#10b981' }}>
+            <span className="text-caption font-black" style={{ color: '#10b981' }}>
               {Math.round((conCheckin.length / totalPagados) * 100)}%
             </span>
           </div>
@@ -523,7 +523,7 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
             className="flex items-center gap-2 p-3 rounded-2xl"
             style={{ background: '#ef444415', border: '1px solid #ef444430' }}>
             <AlertCircle size={13} color="#ef4444" />
-            <span className="text-[10px] font-bold" style={{ color: '#ef4444' }}>{errorMsg}</span>
+            <span className="text-caption font-bold" style={{ color: '#ef4444' }}>{errorMsg}</span>
             <button onClick={() => setErrorMsg('')} className="ml-auto">
               <X size={12} color="#ef4444" />
             </button>
@@ -539,7 +539,7 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
         ].map(t => (
           <motion.button key={t.id} whileTap={{ scale: 0.95 }}
             onClick={() => setTab(t.id as any)}
-            className="flex-1 h-9 rounded-2xl text-[9px] font-black uppercase tracking-wider"
+            className="flex-1 h-9 rounded-2xl text-caption font-black uppercase tracking-wider"
             style={{
               background: tab === t.id ? 'var(--color-primary)15' : 'var(--color-card)',
               border: `1px solid ${tab === t.id ? 'var(--color-primary)60' : 'var(--color-border)'}`,
@@ -556,7 +556,7 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
           style={{ color: 'var(--color-text-muted)' }} />
         <input type="text" placeholder="Buscar por nombre o escuela..."
           value={buscar} onChange={e => setBuscar(e.target.value)}
-          className="w-full h-12 pl-11 pr-4 rounded-2xl text-sm font-bold outline-none"
+          className="w-full h-12 pl-11 pr-4 rounded-2xl text-datos font-bold outline-none"
           style={{
             background: 'var(--color-card)',
             border: '1px solid var(--color-border)',
@@ -568,7 +568,7 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
       {tab === 'pendientes' && filtrados.length > 0 && (
         <div className="flex items-center gap-3">
           <motion.button whileTap={{ scale: 0.95 }} onClick={toggleTodos}
-            className="flex-1 h-9 rounded-2xl text-[9px] font-black uppercase tracking-wider"
+            className="flex-1 h-9 rounded-2xl text-caption font-black uppercase tracking-wider"
             style={{
               background: 'var(--color-surface)',
               border: '1px solid var(--color-border)',
@@ -580,7 +580,7 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
           {seleccionados.size > 0 && (
             <motion.button whileTap={{ scale: 0.95 }} onClick={handleCheckinLote}
               disabled={cargandoLote}
-              className="flex items-center gap-2 px-4 h-9 rounded-2xl text-[9px] font-black uppercase tracking-wider"
+              className="flex items-center gap-2 px-4 h-9 rounded-2xl text-caption font-black uppercase tracking-wider"
               style={{ background: 'var(--color-primary)', color: '#fff' }}>
               {cargandoLote
                 ? <Loader2 size={12} className="animate-spin" />
@@ -599,7 +599,7 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
         <div className="flex flex-col items-center py-16 gap-3 rounded-[2rem]"
           style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
           <UserCheck size={28} style={{ color: 'var(--color-text-muted)' }} />
-          <p className="text-[10px] font-black uppercase tracking-wider"
+          <p className="text-caption font-black uppercase tracking-wider"
             style={{ color: 'var(--color-text-muted)' }}>
             {tab === 'pendientes' ? '¡Todos han hecho check-in!' : 'Sin check-ins aún'}
           </p>
@@ -630,7 +630,7 @@ const CheckinTorneoView: React.FC<CheckinTorneoViewProps> = ({ idtorneo, onVolve
             exit={{ opacity: 0 }}
             onClick={() => setModalAbierto(true)}
             whileTap={{ scale: 0.96 }}
-            className="w-full flex items-center justify-center gap-2 h-12 rounded-2xl text-[10px] font-black uppercase tracking-wider"
+            className="w-full flex items-center justify-center gap-2 h-12 rounded-2xl text-caption font-black uppercase tracking-wider"
             style={{ background: 'var(--color-primary)', color: '#fff' }}>
             <Printer size={14} />
             Ver e Imprimir {gafetes.length} Gafete{gafetes.length !== 1 ? 's' : ''}

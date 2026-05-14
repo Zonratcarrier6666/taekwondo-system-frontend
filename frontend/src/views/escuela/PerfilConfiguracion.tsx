@@ -123,7 +123,7 @@ const ThemeCard = ({
 
     {/* Label */}
     <span
-      className={`text-[7px] font-black uppercase tracking-wide leading-none text-center truncate w-full ${
+      className={`text-label font-black uppercase tracking-wide leading-none text-center truncate w-full ${
         selected ? 'text-[var(--color-text)]' : 'text-[var(--color-text-muted)]'
       }`}
     >
@@ -151,11 +151,11 @@ const ThemeGroup = ({
   <div className="space-y-3">
     <div className="flex items-center gap-2">
       <Icon size={12} className="text-[var(--color-primary)]" />
-      <span className="text-[8px] font-black uppercase tracking-[0.2em] text-[var(--color-text-muted)] opacity-60">
+      <span className="text-caption font-black uppercase tracking-[0.2em] text-[var(--color-text-muted)] opacity-60">
         {title}
       </span>
       <div className="flex-1 h-px bg-[var(--color-border)]/30" />
-      <span className="text-[7px] font-black text-[var(--color-text-muted)] opacity-40">
+      <span className="text-label font-black text-[var(--color-text-muted)] opacity-40">
         {temas.length}
       </span>
     </div>
@@ -269,7 +269,7 @@ const NivelSelector: React.FC<{ value: string; onChange: (v: string) => void }> 
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-[9px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">
+      <span className="text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)]">
         Nivel / Grado *
       </span>
       <button
@@ -279,7 +279,7 @@ const NivelSelector: React.FC<{ value: string; onChange: (v: string) => void }> 
           ${open ? 'border-[var(--color-primary)]' : 'border-[var(--color-border)]'}
           bg-[var(--color-background)]/60`}
       >
-        <span className={`text-sm font-bold ${value ? 'text-[var(--color-text)]' : 'text-[var(--color-text-muted)]'}`}>
+        <span className={`text-datos font-bold ${value ? 'text-[var(--color-text)]' : 'text-[var(--color-text-muted)]'}`}>
           {value || 'Seleccionar nivel...'}
         </span>
         <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
@@ -299,14 +299,14 @@ const NivelSelector: React.FC<{ value: string; onChange: (v: string) => void }> 
             className="p-3 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-2xl"
           >
             {/* Kups */}
-            <p className="text-[8px] font-black uppercase tracking-widest text-[var(--color-text-muted)] opacity-50 mb-2 px-1">
+            <p className="text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)] opacity-50 mb-2 px-1">
               Kup (Cinturón de Color)
             </p>
             <div className="grid grid-cols-5 gap-1.5 mb-3">
               {kups.map(n => (
                 <button key={n.value} type="button"
                   onClick={() => { onChange(n.value); setOpen(false); }}
-                  className={`py-2 px-1 rounded-xl text-[10px] font-black transition-all text-center
+                  className={`py-2 px-1 rounded-xl text-caption font-black transition-all text-center
                     ${value === n.value
                       ? 'bg-[var(--color-primary)] text-white scale-105'
                       : 'bg-[var(--color-background)]/60 text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:scale-105'}`}
@@ -316,14 +316,14 @@ const NivelSelector: React.FC<{ value: string; onChange: (v: string) => void }> 
               ))}
             </div>
             {/* Dans */}
-            <p className="text-[8px] font-black uppercase tracking-widest text-[var(--color-text-muted)] opacity-50 mb-2 px-1">
+            <p className="text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)] opacity-50 mb-2 px-1">
               Dan (Cinturón Negro)
             </p>
             <div className="grid grid-cols-5 gap-1.5">
               {dans.map(n => (
                 <button key={n.value} type="button"
                   onClick={() => { onChange(n.value); setOpen(false); }}
-                  className={`py-2 px-1 rounded-xl text-[10px] font-black transition-all text-center
+                  className={`py-2 px-1 rounded-xl text-caption font-black transition-all text-center
                     ${value === n.value
                       ? 'bg-[var(--color-primary)] text-white scale-105'
                       : 'bg-[var(--color-background)]/60 text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:scale-105'}`}
@@ -397,7 +397,7 @@ const ColorPickerCinta: React.FC<ColorPickerCintaProps> = ({ label, value, onCha
 
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-[9px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">
+      <span className="text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)]">
         {label}{optional && <span className="ml-1 opacity-40">(opcional)</span>}
       </span>
 
@@ -414,7 +414,7 @@ const ColorPickerCinta: React.FC<ColorPickerCintaProps> = ({ label, value, onCha
           className="w-10 h-5 rounded-sm border border-white/10 shadow-inner shrink-0"
           style={{ background: currentHex || 'transparent', borderStyle: currentHex ? 'solid' : 'dashed' }}
         />
-        <span className="text-xs font-bold text-[var(--color-text)] flex-1 text-left">
+        <span className="text-label font-bold text-[var(--color-text)] flex-1 text-left">
           {value || <span className="text-[var(--color-text-muted)] font-normal">Sin color</span>}
         </span>
         <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
@@ -465,7 +465,7 @@ const ColorPickerCinta: React.FC<ColorPickerCintaProps> = ({ label, value, onCha
                         </div>
                       )}
                     </div>
-                    <span className="text-[7px] font-bold text-[var(--color-text-muted)] leading-none truncate w-full text-center">
+                    <span className="text-label font-bold text-[var(--color-text-muted)] leading-none truncate w-full text-center">
                       {isEmpty ? 'Nada' : p.label}
                     </span>
                   </button>
@@ -569,7 +569,7 @@ const CintasBlock: React.FC = () => {
         {cintaToast && (
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className={`absolute top-4 right-4 z-20 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold shadow-lg
+            className={`absolute top-4 right-4 z-20 flex items-center gap-2 px-3 py-2 rounded-xl text-label font-bold shadow-lg
               ${cintaToast.ok ? 'bg-[var(--color-primary)]/90 text-white' : 'bg-red-500/90 text-white'}`}
           >
             {cintaToast.ok ? <CheckCircle2 size={13}/> : <AlertTriangle size={13}/>}
@@ -582,19 +582,19 @@ const CintasBlock: React.FC = () => {
       <div className="flex items-center justify-between mb-5 pb-2 border-b border-[var(--color-border)]/30">
         <div className="flex items-center gap-2">
           <Award size={16} className="text-[var(--color-primary)]" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Cintas & Grados</span>
-          <span className="text-[9px] text-[var(--color-text-muted)] opacity-50">({cintas.length})</span>
+          <span className="text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)]">Cintas & Grados</span>
+          <span className="text-caption text-[var(--color-text-muted)] opacity-50">({cintas.length})</span>
         </div>
         <div className="flex gap-2">
           {(cintas.length === 0 || esGlobal) && (
             <button onClick={handleImportarC} disabled={importingC}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-[var(--color-background)]/60 border border-[var(--color-border)] text-[9px] font-bold text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors disabled:opacity-40">
+              className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-[var(--color-background)]/60 border border-[var(--color-border)] text-caption font-bold text-[var(--color-text-muted)] hover:text-[var(--color-text)] transition-colors disabled:opacity-40">
               {importingC ? <Loader2 size={11} className="animate-spin"/> : <Download size={11}/>}
               Importar
             </button>
           )}
           <button onClick={openCreateC}
-            className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-[var(--color-primary)] text-white text-[9px] font-bold">
+            className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-[var(--color-primary)] text-white text-caption font-bold">
             <Plus size={11}/> Nueva
           </button>
         </div>
@@ -602,7 +602,7 @@ const CintasBlock: React.FC = () => {
 
       {/* Banner global */}
       {esGlobal && (
-        <div className="mb-3 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-1.5 text-amber-400 text-[9px] font-medium">
+        <div className="mb-3 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-1.5 text-amber-400 text-caption font-medium">
           <AlertTriangle size={11}/> Catálogo global. Importa o crea cintas propias para personalizar.
         </div>
       )}
@@ -611,7 +611,7 @@ const CintasBlock: React.FC = () => {
       {loadingC ? (
         <div className="flex justify-center py-8"><Loader2 size={24} className="animate-spin text-[var(--color-primary)]"/></div>
       ) : cintas.length === 0 ? (
-        <p className="text-center text-[var(--color-text-muted)] text-xs py-6 opacity-50">Sin cintas. Crea la primera o importa el catálogo.</p>
+        <p className="text-center text-[var(--color-text-muted)] text-label py-6 opacity-50">Sin cintas. Crea la primera o importa el catálogo.</p>
       ) : (
         <div className="flex flex-col gap-1.5 max-h-64 overflow-y-auto pr-1">
           {cintas.map((c, i) => (
@@ -620,12 +620,12 @@ const CintasBlock: React.FC = () => {
               <GripVertical size={12} className="text-[var(--color-text-muted)] opacity-20 shrink-0"/>
               <div className="w-20 shrink-0"><CintaBelt color={c.color} stripe={c.color_stripe} height={5}/></div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[var(--color-text)] truncate">
+                <p className="text-label font-bold text-[var(--color-text)] truncate">
                   {c.nivelkupdan} <span className="font-normal text-[var(--color-text-muted)]">· {c.color}</span>
                 </p>
-                {c.significado && <p className="text-[9px] text-[var(--color-text-muted)] truncate opacity-60">{c.significado}</p>}
+                {c.significado && <p className="text-caption text-[var(--color-text-muted)] truncate opacity-60">{c.significado}</p>}
               </div>
-              {c.orden != null && <span className="text-[9px] font-black text-[var(--color-text-muted)] opacity-30 shrink-0">#{c.orden}</span>}
+              {c.orden != null && <span className="text-caption font-black text-[var(--color-text-muted)] opacity-30 shrink-0">#{c.orden}</span>}
               {!esGlobal && (
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                   <button onClick={() => openEditC(c)} className="w-6 h-6 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center text-[var(--color-primary)]"><Pencil size={10}/></button>
@@ -647,15 +647,15 @@ const CintasBlock: React.FC = () => {
               transition={{type:'spring',bounce:0.2,duration:0.3}}
               className="bg-[var(--color-card)] rounded-3xl border border-[var(--color-border)] p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-sm font-black text-[var(--color-text)]">{editingC ? 'Editar cinta' : 'Nueva cinta'}</h2>
+                <h2 className="text-datos font-black text-[var(--color-text)]">{editingC ? 'Editar cinta' : 'Nueva cinta'}</h2>
                 <button onClick={() => setModalC(false)} className="w-7 h-7 rounded-xl bg-[var(--color-border)] flex items-center justify-center text-[var(--color-text-muted)]"><X size={14}/></button>
               </div>
               {/* Preview */}
               <div className="flex items-center gap-3 mb-4 p-3 rounded-2xl bg-[var(--color-background)]/60">
                 <div className="w-28"><CintaBelt color={formC.color} stripe={formC.color_stripe} height={7}/></div>
                 <div>
-                  <p className="text-sm font-bold text-[var(--color-text)]">{formC.nivelkupdan || 'Nivel...'}</p>
-                  <p className="text-xs text-[var(--color-text-muted)]">{formC.color || 'Color...'}</p>
+                  <p className="text-datos font-bold text-[var(--color-text)]">{formC.nivelkupdan || 'Nivel...'}</p>
+                  <p className="text-label text-[var(--color-text-muted)]">{formC.color || 'Color...'}</p>
                 </div>
               </div>
               <div className="flex flex-col gap-3">
@@ -677,9 +677,9 @@ const CintasBlock: React.FC = () => {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5 w-16">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Orden</span>
+                    <span className="text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)]">Orden</span>
                     <input type="number" value={formC.orden} onChange={e => setFormC(f => ({...f, orden: e.target.value}))}
-                      placeholder="#" className="w-full px-2 py-2.5 rounded-xl bg-[var(--color-background)]/60 border border-[var(--color-border)] text-[var(--color-text)] text-sm outline-none focus:border-[var(--color-primary)] transition-colors text-center"/>
+                      placeholder="#" className="w-full px-2 py-2.5 rounded-xl bg-[var(--color-background)]/60 border border-[var(--color-border)] text-[var(--color-text)] text-datos outline-none focus:border-[var(--color-primary)] transition-colors text-center"/>
                   </div>
                 </div>
                 <ColorPickerCinta
@@ -690,10 +690,10 @@ const CintasBlock: React.FC = () => {
                 />
                 <textarea value={formC.significado} onChange={e => setFormC(f => ({...f, significado: e.target.value}))}
                   placeholder="Significado (opcional)" rows={2}
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-background)]/60 border border-[var(--color-border)] text-[var(--color-text)] text-sm outline-none focus:border-[var(--color-primary)] transition-colors resize-none"/>
+                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-background)]/60 border border-[var(--color-border)] text-[var(--color-text)] text-datos outline-none focus:border-[var(--color-primary)] transition-colors resize-none"/>
               </div>
               <motion.button whileTap={{scale:0.97}} onClick={handleSaveC} disabled={savingC}
-                className="mt-4 w-full py-3 rounded-2xl bg-[var(--color-primary)] text-white font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50">
+                className="mt-4 w-full py-3 rounded-2xl bg-[var(--color-primary)] text-white font-bold text-datos flex items-center justify-center gap-2 disabled:opacity-50">
                 {savingC ? <Loader2 size={16} className="animate-spin"/> : <Award size={16}/>}
                 {editingC ? 'Guardar cambios' : 'Crear cinta'}
               </motion.button>
@@ -713,14 +713,14 @@ const CintasBlock: React.FC = () => {
               className="bg-[var(--color-card)] rounded-3xl border border-[var(--color-border)] p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center"><Trash2 size={16} className="text-red-400"/></div>
-                <h2 className="font-black text-sm text-[var(--color-text)]">Eliminar cinta</h2>
+                <h2 className="font-black text-datos text-[var(--color-text)]">Eliminar cinta</h2>
               </div>
-              <p className="text-xs text-[var(--color-text-muted)] mb-5">
+              <p className="text-label text-[var(--color-text-muted)] mb-5">
                 ¿Eliminar <strong className="text-[var(--color-text)]">{deleteC.nivelkupdan}</strong>? Esta acción no se puede deshacer.
               </p>
               <div className="flex gap-2">
-                <button onClick={() => setDeleteC(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--color-border)] text-xs font-semibold text-[var(--color-text-muted)]">Cancelar</button>
-                <button onClick={handleDeleteC} disabled={savingC} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 disabled:opacity-50">
+                <button onClick={() => setDeleteC(null)} className="flex-1 py-2.5 rounded-xl border border-[var(--color-border)] text-label font-semibold text-[var(--color-text-muted)]">Cancelar</button>
+                <button onClick={handleDeleteC} disabled={savingC} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-label font-bold flex items-center justify-center gap-1.5 disabled:opacity-50">
                   {savingC ? <Loader2 size={14} className="animate-spin"/> : <Trash2 size={14}/>} Eliminar
                 </button>
               </div>
@@ -832,10 +832,10 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
         </div>
 
         <div className="text-center mt-6">
-          <h2 className="text-xl font-black italic uppercase tracking-tighter text-[var(--color-text)] leading-tight">
+          <h2 className="text-subtitulo font-black italic uppercase tracking-tighter text-[var(--color-text)] leading-tight">
             {formData.nombreescuela || 'Institución'}
           </h2>
-          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--color-text-muted)] mt-1 opacity-60">
+          <p className="text-caption font-black uppercase tracking-[0.3em] text-[var(--color-text-muted)] mt-1 opacity-60">
             {formData.lema || 'Disciplina ante todo'}
           </p>
         </div>
@@ -846,7 +846,7 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
         <div className="bg-[var(--color-card)]/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-[var(--color-border)] shadow-xl">
           <div className="flex items-center gap-2 mb-5 pb-2 border-b border-[var(--color-border)]/30">
             <Sparkles size={16} className="text-[var(--color-primary)]" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Identidad Maestra</span>
+            <span className="text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)]">Identidad Maestra</span>
           </div>
           <div className="space-y-4">
             <input
@@ -854,14 +854,14 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
               value={formData.nombreescuela || ''}
               onChange={handleChange}
               placeholder="Nombre Institucional"
-              className="w-full h-12 px-5 rounded-2xl bg-[var(--color-background)]/50 border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] transition-all"
+              className="w-full h-12 px-5 rounded-2xl bg-[var(--color-background)]/50 border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-datos text-[var(--color-text)] transition-all"
             />
             <input
               name="lema"
               value={formData.lema || ''}
               onChange={handleChange}
               placeholder="Eslogan o Lema"
-              className="w-full h-12 px-5 rounded-2xl bg-[var(--color-background)]/50 border border-transparent focus:border-[var(--color-primary)] outline-none font-bold italic text-sm text-[var(--color-text)] transition-all"
+              className="w-full h-12 px-5 rounded-2xl bg-[var(--color-background)]/50 border border-transparent focus:border-[var(--color-primary)] outline-none font-bold italic text-datos text-[var(--color-text)] transition-all"
             />
           </div>
         </div>
@@ -870,7 +870,7 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
         <div className="bg-[var(--color-card)]/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-[var(--color-border)] shadow-xl">
           <div className="flex items-center gap-2 mb-5 pb-2 border-b border-[var(--color-border)]/30">
             <Globe size={16} className="text-[var(--color-primary)]" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Localización y Contacto</span>
+            <span className="text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)]">Localización y Contacto</span>
           </div>
           <div className="space-y-4">
             <div className="relative">
@@ -880,7 +880,7 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
                 value={formData.telefono_oficina || ''}
                 onChange={e => setFormData(p => ({ ...p, telefono_oficina: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
                 placeholder="Teléfono (10 dígitos)"
-                className="w-full h-12 pl-11 pr-4 rounded-2xl bg-[var(--color-background)]/50 border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] transition-all"
+                className="w-full h-12 pl-11 pr-4 rounded-2xl bg-[var(--color-background)]/50 border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-datos text-[var(--color-text)] transition-all"
               />
             </div>
             <div className="relative">
@@ -890,7 +890,7 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
                 value={formData.direccion || ''}
                 onChange={handleChange}
                 placeholder="Dirección Física Completa"
-                className="w-full h-12 pl-12 pr-5 rounded-2xl bg-[var(--color-background)]/50 border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-xs text-[var(--color-text)] transition-all"
+                className="w-full h-12 pl-12 pr-5 rounded-2xl bg-[var(--color-background)]/50 border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-label text-[var(--color-text)] transition-all"
               />
             </div>
             <div className="relative">
@@ -900,7 +900,7 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
                 value={formData.correo_escuela || ''}
                 onChange={handleChange}
                 placeholder="E-mail Institucional"
-                className="w-full h-12 pl-11 pr-4 rounded-2xl bg-[var(--color-background)]/50 border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] transition-all"
+                className="w-full h-12 pl-11 pr-4 rounded-2xl bg-[var(--color-background)]/50 border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-datos text-[var(--color-text)] transition-all"
               />
             </div>
           </div>
@@ -912,7 +912,7 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
               <Palette size={16} className="text-[var(--color-primary)]" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">
+              <span className="text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)]">
                 Ambiente Visual
               </span>
             </div>
@@ -927,7 +927,7 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
               >
                 <span style={{ fontSize: 12 }}>{temaActivo.icon}</span>
                 <span
-                  className="text-[8px] font-black uppercase tracking-wider"
+                  className="text-caption font-black uppercase tracking-wider"
                   style={{ color: temaActivo.color }}
                 >
                   {temaActivo.label}
@@ -973,8 +973,8 @@ export const PerfilConfiguracion: React.FC<Props> = ({ initialEscuela }) => {
               <>
                 <Save size={24} />
                 <div className="flex flex-col items-start leading-none">
-                  <span className="text-lg uppercase italic tracking-tighter">Sincronizar Dojo</span>
-                  <span className="text-[8px] opacity-50 uppercase tracking-widest font-bold mt-1">Guardar cambios en Render</span>
+                  <span className="text-seccion uppercase italic tracking-tighter">Sincronizar Dojo</span>
+                  <span className="text-caption opacity-50 uppercase tracking-widest font-bold mt-1">Guardar cambios en Render</span>
                 </div>
               </>
             )}

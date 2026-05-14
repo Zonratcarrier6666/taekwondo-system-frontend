@@ -283,7 +283,7 @@ export const ModalReciboImpresion: React.FC<Props> = ({ open, onClose, data }) =
           <div className="no-print flex gap-3 w-full">
             <button
               onClick={() => data && imprimirRecibo(data, accent, data.escuela?.nombre ?? 'Dojo')}
-              className="flex-1 h-11 text-white font-black text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 transition-all hover:brightness-110 shadow-lg"
+              className="flex-1 h-11 text-white font-black text-label uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 transition-all hover:brightness-110 shadow-lg"
               style={{ background: accent, boxShadow: `0 4px 16px -4px ${accent}60` }}
             >
               <Printer size={15} /> Imprimir
@@ -305,7 +305,7 @@ export const ModalReciboImpresion: React.FC<Props> = ({ open, onClose, data }) =
             {!data ? (
               <div className="py-20 flex flex-col items-center gap-3">
                 <Loader2 className="animate-spin text-gray-300" size={32} />
-                <p className="text-xs text-gray-400 uppercase tracking-widest">Generando recibo...</p>
+                <p className="text-label text-gray-400 uppercase tracking-widest">Generando recibo...</p>
               </div>
             ) : (
               <>
@@ -326,17 +326,17 @@ export const ModalReciboImpresion: React.FC<Props> = ({ open, onClose, data }) =
                       </div>
                     )}
                     <div>
-                      <p className="text-[12px] font-black uppercase tracking-wide text-white leading-tight">
+                      <p className="text-label font-black uppercase tracking-wide text-white leading-tight">
                         {data.escuela?.nombre ?? 'Dragon Negro Dojo'}
                       </p>
-                      <p className="text-[9px] mt-0.5" style={{ color: '#888' }}>
+                      <p className="text-caption mt-0.5" style={{ color: '#888' }}>
                         {[data.escuela?.direccion, data.escuela?.telefono ? `Tel. ${data.escuela.telefono}` : ''].filter(Boolean).join('  ·  ')}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="text-[7px] font-black uppercase tracking-widest" style={{ color: '#666' }}>Comprobante de Pago</p>
-                    <p className="text-[16px] font-black tracking-tight text-white mt-0.5">{folio}</p>
+                    <p className="text-datos font-black tracking-tight text-white mt-0.5">{folio}</p>
                     <span className="text-[7px] font-black uppercase px-2 py-0.5 rounded mt-1 inline-block"
                       style={{ background: esPagado ? '#059669' : accent, color: '#fff', letterSpacing: '0.1em' }}>
                       {data.metadata?.status_texto ?? 'PENDIENTE'}
@@ -359,8 +359,8 @@ export const ModalReciboImpresion: React.FC<Props> = ({ open, onClose, data }) =
                       ...(data.pago?.monto_texto ? [{ label: 'En letra', value: data.pago.monto_texto }] : []),
                     ].map(({ label, value }) => (
                       <div key={label} className="flex justify-between items-baseline gap-2 mb-2">
-                        <span className="text-[8px] font-bold uppercase tracking-wide flex-shrink-0" style={{ color: '#aaa' }}>{label}:</span>
-                        <span className="text-[9px] font-bold text-right" style={{ color: '#111', maxWidth: '58%' }}>{value}</span>
+                        <span className="text-caption font-bold uppercase tracking-wide flex-shrink-0" style={{ color: '#aaa' }}>{label}:</span>
+                        <span className="text-caption font-bold text-right" style={{ color: '#111', maxWidth: '58%' }}>{value}</span>
                       </div>
                     ))}
 
@@ -369,7 +369,7 @@ export const ModalReciboImpresion: React.FC<Props> = ({ open, onClose, data }) =
                       <div className="mt-3 pt-3" style={{ borderTop: '1px solid #eee' }}>
                         <p className="text-[7px] font-black uppercase tracking-widest mb-2" style={{ color: '#bbb' }}>Forma de Pago</p>
                         {data.pago.desglose.map((d, i) => (
-                          <div key={i} className="flex justify-between text-[9px] mb-1">
+                          <div key={i} className="flex justify-between text-caption mb-1">
                             <span className="uppercase tracking-wide" style={{ color: '#888' }}>{d.metodo}</span>
                             <span className="font-bold" style={{ color: '#111' }}>
                               $ {Number(d.monto).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
@@ -387,14 +387,14 @@ export const ModalReciboImpresion: React.FC<Props> = ({ open, onClose, data }) =
                     {recargo > 0 && (
                       <>
                         <div className="flex justify-between mb-1.5">
-                          <span className="text-[8px]" style={{ color: '#888' }}>Base</span>
-                          <span className="text-[9px] font-bold" style={{ color: '#333' }}>
+                          <span className="text-caption" style={{ color: '#888' }}>Base</span>
+                          <span className="text-caption font-bold" style={{ color: '#333' }}>
                             ${(totalFinal - recargo).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                           </span>
                         </div>
                         <div className="flex justify-between mb-3 pb-2" style={{ borderBottom: '1px solid #eee' }}>
-                          <span className="text-[8px]" style={{ color: '#c0392b' }}>Recargo</span>
-                          <span className="text-[9px] font-bold" style={{ color: '#c0392b' }}>
+                          <span className="text-caption" style={{ color: '#c0392b' }}>Recargo</span>
+                          <span className="text-caption font-bold" style={{ color: '#c0392b' }}>
                             +${recargo.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                           </span>
                         </div>
@@ -403,7 +403,7 @@ export const ModalReciboImpresion: React.FC<Props> = ({ open, onClose, data }) =
 
                     <div style={{ borderTop: '2px solid #111', paddingTop: 8 }}>
                       <p className="text-[7px] font-black uppercase tracking-widest mb-1" style={{ color: '#aaa' }}>Total</p>
-                      <p className="text-[24px] font-black leading-none" style={{ color: accent, letterSpacing: '-0.02em' }}>
+                      <p className="text-subtitulo font-black leading-none" style={{ color: accent, letterSpacing: '-0.02em' }}>
                         ${totalFinal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                       </p>
                     </div>
@@ -414,13 +414,13 @@ export const ModalReciboImpresion: React.FC<Props> = ({ open, onClose, data }) =
                 <div className="flex items-end justify-between px-4 py-3">
                   <div>
                     <div className="mb-1" style={{ width: 110, borderBottom: '1px solid #111' }} />
-                    <p className="text-[8px] uppercase tracking-widest" style={{ color: '#aaa' }}>Firma / Sello</p>
+                    <p className="text-caption uppercase tracking-widest" style={{ color: '#aaa' }}>Firma / Sello</p>
                   </div>
                   <div className="text-right">
                     <p className="text-[7px] uppercase tracking-widest leading-relaxed" style={{ color: '#bbb', maxWidth: 120 }}>
                       Documento válido como comprobante de pago
                     </p>
-                    <p className="text-[8px] font-bold mt-0.5" style={{ color: '#999' }}>
+                    <p className="text-caption font-bold mt-0.5" style={{ color: '#999' }}>
                       {new Date().toLocaleDateString('es-MX')}
                     </p>
                   </div>

@@ -177,7 +177,7 @@ const BottomNav: React.FC<{
                   exit={{ opacity: 0, y: -4 }}
                   className="relative flex flex-col items-center gap-0.5">
                   <Icon size={18} style={{ color: T.orange }} strokeWidth={2.5} />
-                  <span className="text-[7px] font-black uppercase tracking-wider"
+                  <span className="text-xs font-black uppercase tracking-wider"
                     style={{ color: T.orange }}>{label}</span>
                 </motion.div>
               ) : (
@@ -318,7 +318,7 @@ const ModalCheckin: React.FC<{
             <div key={label} className="rounded-2xl p-3 text-center"
               style={{ background: T.surface, border: `1px solid ${T.border}` }}>
               <p className="text-[10px] font-black" style={{ color: T.text }}>{val}</p>
-              <p className="text-[7px] font-black uppercase tracking-widest mt-0.5" style={{ color: T.textDim }}>
+              <p className="text-xs font-black uppercase tracking-widest mt-0.5" style={{ color: T.textDim }}>
                 {label}
               </p>
             </div>
@@ -1320,7 +1320,7 @@ const TabLista: React.FC<{
             <div key={label} className="rounded-2xl p-3 text-center"
               style={{ background: T.card, border: `1px solid ${T.border}`, borderTop: `2px solid ${color}` }}>
               <p className="text-2xl font-black tracking-tighter" style={{ color }}>{val}</p>
-              <p className="text-[7px] font-black uppercase tracking-widest mt-0.5" style={{ color: T.textDim }}>
+              <p className="text-xs font-black uppercase tracking-widest mt-0.5" style={{ color: T.textDim }}>
                 {label}
               </p>
             </div>
@@ -1578,7 +1578,7 @@ export const StaffTorneoApp: React.FC = () => {
               <p className="text-xs font-black uppercase italic tracking-tighter leading-none" style={{ color: T.text }}>
                 TKW System
               </p>
-              <p className="text-[7px] font-black uppercase tracking-[0.3em] mt-0.5 leading-none" style={{ color: T.orange }}>
+              <p className="text-xs font-black uppercase tracking-[0.3em] mt-0.5 leading-none" style={{ color: T.orange }}>
                 Staff
               </p>
             </div>
@@ -1645,7 +1645,7 @@ export const StaffTorneoApp: React.FC = () => {
                 <p className="text-[9px] font-black uppercase italic tracking-tighter leading-none max-w-[80px] truncate" style={{ color: T.text }}>
                   {user?.nombre || user?.username || 'Staff'}
                 </p>
-                <p className="text-[7px] font-bold uppercase tracking-widest mt-0.5 leading-none" style={{ color: T.orange }}>
+                <p className="text-xs font-bold uppercase tracking-widest mt-0.5 leading-none" style={{ color: T.orange }}>
                   Staff
                 </p>
               </div>

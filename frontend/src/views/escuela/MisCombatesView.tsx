@@ -92,7 +92,7 @@ const CompetidorSlot: React.FC<{
   >
     {/* Avatar */}
     <div
-      className="w-8 h-8 rounded-xl flex items-center justify-center text-[10px] font-black flex-shrink-0"
+      className="w-8 h-8 rounded-xl flex items-center justify-center text-caption font-black flex-shrink-0"
       style={{
         background: esPropia
           ? 'var(--color-primary)25'
@@ -110,7 +110,7 @@ const CompetidorSlot: React.FC<{
       {comp ? (
         <>
           <div className="flex items-center gap-1.5">
-            <p className="text-[10px] font-black uppercase italic tracking-tighter truncate leading-none text-[var(--color-text)]">
+            <p className="text-caption font-black uppercase italic tracking-tighter truncate leading-none text-[var(--color-text)]">
               {comp.nombre}
             </p>
             {esPropia && (
@@ -125,13 +125,13 @@ const CompetidorSlot: React.FC<{
           <div className="flex items-center gap-1.5 mt-1">
             <span className="w-2 h-2 rounded-full flex-shrink-0"
               style={{ background: comp.color_cinta || '#888' }} />
-            <p className="text-[8px] font-bold truncate leading-none text-[var(--color-text-muted)]">
+            <p className="text-caption font-bold truncate leading-none text-[var(--color-text-muted)]">
               {comp.cinta} · {comp.escuela}
             </p>
           </div>
         </>
       ) : (
-        <p className="text-[9px] font-black uppercase tracking-wider text-[var(--color-text-muted)]">
+        <p className="text-caption font-black uppercase tracking-wider text-[var(--color-text-muted)]">
           Por definir
         </p>
       )}
@@ -140,7 +140,7 @@ const CompetidorSlot: React.FC<{
     {/* Puntos */}
     <div className="flex items-center gap-1.5 flex-shrink-0">
       {puntos > 0 && (
-        <span className="text-lg font-black leading-none"
+        <span className="text-seccion font-black leading-none"
           style={{ color: esGanador ? '#22c55e' : 'var(--color-text-muted)' }}>
           {puntos}
         </span>
@@ -233,7 +233,7 @@ const CombateCard: React.FC<{
               <Circle size={10} style={{ color: '#f97316' }} />
             </motion.div>
           )}
-          <span className="text-[8px] font-black uppercase tracking-widest"
+          <span className="text-caption font-black uppercase tracking-widest"
             style={{
               color: finalizado
                 ? escuelaGano ? '#22c55e' : '#94a3b8'
@@ -250,7 +250,7 @@ const CombateCard: React.FC<{
               : 'En Curso'}
           </span>
         </div>
-        <span className="text-[7px] font-black text-[var(--color-text-muted)]">
+        <span className="text-label font-black text-[var(--color-text-muted)]">
           #{combate.idcombate}
         </span>
       </div>
@@ -267,7 +267,7 @@ const CombateCard: React.FC<{
         <>
           <div className="flex items-center gap-2">
             <div className="flex-1 h-px" style={{ background: 'var(--color-border)' }} />
-            <span className="text-[7px] font-black uppercase tracking-wider px-1 text-[var(--color-text-muted)]">vs</span>
+            <span className="text-label font-black uppercase tracking-wider px-1 text-[var(--color-text-muted)]">vs</span>
             <div className="flex-1 h-px" style={{ background: 'var(--color-border)' }} />
           </div>
           <CompetidorSlot
@@ -290,7 +290,7 @@ const BracketVisualizer: React.FC<{
   nombreEscuela: string;
 }> = ({ categoria, nombreEscuela }) => {
   if (!categoria.rondas.length) return (
-    <p className="text-center text-[10px] font-black uppercase tracking-wider py-12 text-[var(--color-text-muted)]">
+    <p className="text-center text-caption font-black uppercase tracking-wider py-12 text-[var(--color-text-muted)]">
       Sin combates generados
     </p>
   );
@@ -304,10 +304,10 @@ const BracketVisualizer: React.FC<{
             {/* Header ronda */}
             <div className="text-center px-3 py-2 rounded-2xl"
               style={{ background: 'var(--color-background)', border: '1px solid var(--color-border)' }}>
-              <p className="text-[9px] font-black uppercase tracking-widest text-[var(--color-primary)]">
+              <p className="text-caption font-black uppercase tracking-widest text-[var(--color-primary)]">
                 {ronda.nombre_ronda}
               </p>
-              <p className="text-[7px] font-black uppercase tracking-wider mt-0.5 text-[var(--color-text-muted)]">
+              <p className="text-label font-black uppercase tracking-wider mt-0.5 text-[var(--color-text-muted)]">
                 {ronda.combates.filter(c => c.estatus === 'finalizado').length}/{ronda.combates.length} completados
               </p>
             </div>
@@ -347,19 +347,19 @@ const BracketVisualizer: React.FC<{
               >
                 <Crown size={32} style={{ color: '#fbbf24', margin: '0 auto 10px' }} />
               </motion.div>
-              <p className="text-[7px] font-black uppercase tracking-widest mb-2 text-[#fbbf24]">
+              <p className="text-label font-black uppercase tracking-widest mb-2 text-[#fbbf24]">
                 🏆 Campeón
               </p>
-              <p className="text-xs font-black uppercase italic tracking-tighter leading-tight text-[var(--color-text)]">
+              <p className="text-label font-black uppercase italic tracking-tighter leading-tight text-[var(--color-text)]">
                 {categoria.campeon.nombre}
               </p>
-              <p className="text-[8px] font-bold mt-1 text-[var(--color-text-muted)]">
+              <p className="text-caption font-bold mt-1 text-[var(--color-text-muted)]">
                 {categoria.campeon.escuela}
               </p>
               <div className="mt-2 flex items-center justify-center gap-1.5">
                 <span className="w-2 h-2 rounded-full"
                   style={{ background: categoria.campeon.color_cinta || '#888' }} />
-                <span className="text-[8px] font-bold text-[var(--color-text-muted)]">
+                <span className="text-caption font-bold text-[var(--color-text-muted)]">
                   {categoria.campeon.cinta}
                 </span>
               </div>
@@ -438,10 +438,10 @@ const DetalleMisCombates: React.FC<{
           <ChevronLeft size={16} className="text-[var(--color-text-muted)]" />
         </motion.button>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-black uppercase italic tracking-tighter truncate text-[var(--color-text)]">
+          <p className="text-datos font-black uppercase italic tracking-tighter truncate text-[var(--color-text)]">
             {torneo.nombre}
           </p>
-          <p className="text-[8px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">
+          <p className="text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)]">
             {fmtFecha(torneo.fecha)} · {torneo.sede}
           </p>
         </div>
@@ -454,7 +454,7 @@ const DetalleMisCombates: React.FC<{
                 animate={{ opacity: [0.4, 1, 0.4] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
                 className="w-1.5 h-1.5 rounded-full bg-[#22c55e]" />
-              <span className="text-[7px] font-black uppercase tracking-widest text-[#22c55e]">
+              <span className="text-label font-black uppercase tracking-widest text-[#22c55e]">
                 Live
               </span>
             </div>
@@ -483,10 +483,10 @@ const DetalleMisCombates: React.FC<{
                 style={{ background: `${item.color}20`, border: `1px solid ${item.color}30` }}>
                 <item.icon size={13} style={{ color: item.color }} />
               </div>
-              <p className="text-xl font-black tracking-tighter leading-none text-[var(--color-text)]">
+              <p className="text-subtitulo font-black tracking-tighter leading-none text-[var(--color-text)]">
                 {item.value}
               </p>
-              <p className="text-[7px] font-black uppercase tracking-widest mt-1 text-[var(--color-text-muted)]">
+              <p className="text-label font-black uppercase tracking-widest mt-1 text-[var(--color-text-muted)]">
                 {item.label}
               </p>
             </motion.div>
@@ -509,7 +509,7 @@ const DetalleMisCombates: React.FC<{
               return (
                 <motion.button key={cat.idcategoria} whileTap={{ scale: 0.93 }}
                   onClick={() => setCatActiva(cat.idcategoria)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-caption font-black uppercase tracking-wider"
                   style={{
                     background: isActive ? 'var(--color-primary)15' : 'var(--color-background)',
                     border: `1px solid ${isActive ? 'var(--color-primary)60' : 'var(--color-border)'}`,
@@ -529,17 +529,17 @@ const DetalleMisCombates: React.FC<{
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="text-center">
-                    <p className="text-xl font-black tracking-tighter text-[#22c55e]">
+                    <p className="text-subtitulo font-black tracking-tighter text-[#22c55e]">
                       {categoriaActual.finalizados}
                     </p>
-                    <p className="text-[7px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Done</p>
+                    <p className="text-label font-black uppercase tracking-widest text-[var(--color-text-muted)]">Done</p>
                   </div>
                   <div className="w-px h-8 bg-[var(--color-border)]" />
                   <div className="text-center">
-                    <p className="text-xl font-black tracking-tighter text-[#f97316]">
+                    <p className="text-subtitulo font-black tracking-tighter text-[#f97316]">
                       {categoriaActual.pendientes}
                     </p>
-                    <p className="text-[7px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Pend.</p>
+                    <p className="text-label font-black uppercase tracking-widest text-[var(--color-text-muted)]">Pend.</p>
                   </div>
                   {categoriaActual.campeon && (
                     <>
@@ -547,7 +547,7 @@ const DetalleMisCombates: React.FC<{
                       <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
                         style={{ background: '#fbbf2415', border: '1px solid #fbbf2430' }}>
                         <Crown size={10} style={{ color: '#fbbf24' }} />
-                        <span className="text-[8px] font-black uppercase tracking-wider text-[#fbbf24]">
+                        <span className="text-caption font-black uppercase tracking-wider text-[#fbbf24]">
                           {categoriaActual.campeon.nombre.split(' ')[0]}
                         </span>
                       </div>
@@ -555,7 +555,7 @@ const DetalleMisCombates: React.FC<{
                   )}
                 </div>
                 {ultimoUpdate && (
-                  <span className="text-[7px] font-bold text-[var(--color-text-muted)]">
+                  <span className="text-label font-bold text-[var(--color-text-muted)]">
                     ↻ {ultimoUpdate}
                   </span>
                 )}
@@ -593,7 +593,7 @@ const DetalleMisCombates: React.FC<{
             style={{ background: 'var(--color-primary)15', border: '1px solid var(--color-primary)30' }}>
             <Swords size={28} style={{ color: 'var(--color-primary)' }} />
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-center text-[var(--color-text-muted)]">
+          <p className="text-caption font-black uppercase tracking-[0.3em] text-center text-[var(--color-text-muted)]">
             No hay combates de tu escuela<br />en este torneo aún.
           </p>
         </motion.div>
@@ -605,7 +605,7 @@ const DetalleMisCombates: React.FC<{
             transition={{ duration: 1.4, repeat: Infinity, ease: 'linear' }}
             className="w-12 h-12 rounded-full"
             style={{ border: '3px solid var(--color-border)', borderTop: '3px solid var(--color-primary)' }} />
-          <p className="text-[9px] font-black uppercase tracking-[0.4em] animate-pulse text-[var(--color-text-muted)]">
+          <p className="text-caption font-black uppercase tracking-[0.4em] animate-pulse text-[var(--color-text-muted)]">
             Cargando brackets...
           </p>
         </div>
@@ -652,29 +652,29 @@ const TorneoCard: React.FC<{
         <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl"
           style={{ background: `${estatus.color}18`, border: `1px solid ${estatus.color}30` }}>
           <span className="w-1.5 h-1.5 rounded-full" style={{ background: estatus.color }} />
-          <span className="text-[8px] font-black uppercase tracking-widest" style={{ color: estatus.color }}>
+          <span className="text-caption font-black uppercase tracking-widest" style={{ color: estatus.color }}>
             {estatus.label}
           </span>
         </div>
       </div>
 
-      <p className="text-sm font-black uppercase italic tracking-tighter leading-tight mb-1 text-[var(--color-text)]">
+      <p className="text-datos font-black uppercase italic tracking-tighter leading-tight mb-1 text-[var(--color-text)]">
         {torneo.nombre}
       </p>
-      <p className="text-[8px] font-black uppercase tracking-widest mb-4 text-[var(--color-text-muted)]">
+      <p className="text-caption font-black uppercase tracking-widest mb-4 text-[var(--color-text-muted)]">
         ID #{torneo.idtorneo}
       </p>
 
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-1.5">
           <Calendar size={9} style={{ color: '#06b6d4' }} />
-          <span className="text-[9px] font-bold text-[var(--color-text-muted)]">
+          <span className="text-caption font-bold text-[var(--color-text-muted)]">
             {fmtFecha(torneo.fecha)}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
           <Shield size={9} style={{ color: '#f97316' }} />
-          <span className="text-[9px] font-bold truncate max-w-[120px] text-[var(--color-text-muted)]">
+          <span className="text-caption font-bold truncate max-w-[120px] text-[var(--color-text-muted)]">
             {torneo.sede}
           </span>
         </div>
@@ -683,7 +683,7 @@ const TorneoCard: React.FC<{
       <div className="flex items-center justify-end mt-3 pt-3"
         style={{ borderTop: '1px solid var(--color-border)' }}>
         <div className="flex items-center gap-1" style={{ color: 'var(--color-primary)' }}>
-          <span className="text-[9px] font-black uppercase tracking-wider">Ver Mis Combates</span>
+          <span className="text-caption font-black uppercase tracking-wider">Ver Mis Combates</span>
           <ChevronRight size={12} />
         </div>
       </div>
@@ -742,10 +742,10 @@ const MisCombatesView: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <p className="text-lg font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">
+          <p className="text-seccion font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">
             Mis Combates
           </p>
-          <p className="text-[8px] font-black uppercase tracking-[0.3em] mt-1 text-[var(--color-text-muted)]">
+          <p className="text-caption font-black uppercase tracking-[0.3em] mt-1 text-[var(--color-text-muted)]">
             {nombreEscuela
               ? `Brackets de ${nombreEscuela}`
               : 'Torneos de tu academia'}
@@ -769,10 +769,10 @@ const MisCombatesView: React.FC = () => {
             <Shield size={13} style={{ color: 'var(--color-primary)' }} />
           </div>
           <div>
-            <p className="text-[7px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">
+            <p className="text-label font-black uppercase tracking-widest text-[var(--color-text-muted)]">
               Filtrando por escuela
             </p>
-            <p className="text-[10px] font-black uppercase italic tracking-tight text-[var(--color-primary)]">
+            <p className="text-caption font-black uppercase italic tracking-tight text-[var(--color-primary)]">
               {nombreEscuela}
             </p>
           </div>
@@ -787,7 +787,7 @@ const MisCombatesView: React.FC = () => {
           { id: 'todos',    label: 'Todos'     },
         ] as const).map(f => (
           <motion.button key={f.id} whileTap={{ scale: 0.92 }} onClick={() => setFiltro(f.id)}
-            className="h-8 px-3 rounded-xl text-[9px] font-black uppercase tracking-wider"
+            className="h-8 px-3 rounded-xl text-caption font-black uppercase tracking-wider"
             style={{
               background: filtro === f.id ? 'var(--color-primary)15' : 'var(--color-card)',
               border: `1px solid ${filtro === f.id ? 'var(--color-primary)60' : 'var(--color-border)'}`,
@@ -805,7 +805,7 @@ const MisCombatesView: React.FC = () => {
             transition={{ duration: 1.4, repeat: Infinity, ease: 'linear' }}
             className="w-12 h-12 rounded-full"
             style={{ border: '3px solid var(--color-border)', borderTop: '3px solid var(--color-primary)' }} />
-          <p className="text-[9px] font-black uppercase tracking-[0.4em] animate-pulse text-[var(--color-text-muted)]">
+          <p className="text-caption font-black uppercase tracking-[0.4em] animate-pulse text-[var(--color-text-muted)]">
             Cargando torneos...
           </p>
         </div>
@@ -815,7 +815,7 @@ const MisCombatesView: React.FC = () => {
             style={{ background: 'var(--color-primary)15', border: '1px solid var(--color-primary)40' }}>
             <Swords size={28} style={{ color: 'var(--color-primary)' }} />
           </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-center text-[var(--color-text-muted)]">
+          <p className="text-caption font-black uppercase tracking-[0.3em] text-center text-[var(--color-text-muted)]">
             {filtro === 'en_curso'
               ? 'Sin torneos en curso actualmente.'
               : 'Sin torneos en este filtro'}

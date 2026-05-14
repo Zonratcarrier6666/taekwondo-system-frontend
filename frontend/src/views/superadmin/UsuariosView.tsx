@@ -420,7 +420,7 @@ const TipoCard: React.FC<{ meta: TipoMeta; onClick: () => void; T: Tema }> = ({ 
       </p>
       <div className="flex flex-wrap gap-1">
         {meta.permisos.map(p => (
-          <span key={p} className="px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-wider"
+          <span key={p} className="px-2 py-0.5 rounded-lg text-xs font-black uppercase tracking-wider"
             style={{ background: `${meta.color}15`, color: meta.color }}>{p}</span>
         ))}
       </div>
@@ -593,7 +593,7 @@ const ModalCrearUsuario: React.FC<{
                   <div key={s} className="w-5 h-1 rounded-full"
                     style={{ background: paso >= s ? (meta?.color ?? '#7c3aed') : T.border }} />
                 ))}
-                <span className="text-[7px] font-black uppercase tracking-widest ml-1"
+                <span className="text-xs font-black uppercase tracking-widest ml-1"
                   style={{ color: T.textDim }}>Paso {paso}/2</span>
               </div>
             </div>
@@ -803,7 +803,7 @@ const UsuariosView: React.FC<{ T: Tema }> = ({ T }) => {
             <p className="text-xs font-black uppercase italic tracking-tighter" style={{ color: T.text }}>
               Directorio
             </p>
-            <p className="text-[7px] font-black uppercase tracking-widest" style={{ color: T.textDim }}>
+            <p className="text-xs font-black uppercase tracking-widest" style={{ color: T.textDim }}>
               {filtrados.length} resultado{filtrados.length !== 1 ? 's' : ''}
             </p>
           </div>

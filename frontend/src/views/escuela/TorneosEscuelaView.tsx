@@ -35,7 +35,7 @@ const fmtFecha = (f: string) =>
 //  BADGE DE CINTA
 // ─────────────────────────────────────────────────────────────
 const CintaBadge: React.FC<{ cinta: string; color: string }> = ({ cinta, color }) => (
-  <span className="px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-wider"
+  <span className="px-2 py-0.5 rounded-lg text-caption font-black uppercase tracking-wider"
     style={{ background: `${color}25`, color, border: `1px solid ${color}40` }}>
     {cinta}
   </span>
@@ -72,9 +72,9 @@ const TorneoCard: React.FC<{
             <Trophy size={18} style={{ color: est.color }} />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-black uppercase italic tracking-tighter leading-tight truncate"
+            <p className="text-datos font-black uppercase italic tracking-tighter leading-tight truncate"
               style={{ color: 'var(--color-text)' }}>{torneo.nombre}</p>
-            <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg mt-1 inline-block"
+            <span className="text-caption font-black uppercase tracking-widest px-2 py-0.5 rounded-lg mt-1 inline-block"
               style={{ background: `${est.color}18`, color: est.color }}>
               {est.label}
             </span>
@@ -93,7 +93,7 @@ const TorneoCard: React.FC<{
         ].map(({ icon: Icon, text }) => (
           <div key={text} className="flex items-center gap-1.5">
             <Icon size={10} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
-            <span className="text-[9px] font-bold truncate" style={{ color: 'var(--color-text-muted)' }}>{text}</span>
+            <span className="text-caption font-bold truncate" style={{ color: 'var(--color-text-muted)' }}>{text}</span>
           </div>
         ))}
       </div>
@@ -103,19 +103,19 @@ const TorneoCard: React.FC<{
         <div className="flex flex-wrap gap-1.5 pt-2"
           style={{ borderTop: '1px solid var(--color-border)' }}>
           {torneo.cinta_minima && (
-            <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-wider"
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-caption font-black uppercase tracking-wider"
               style={{ background: 'var(--color-surface)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }}>
               🥋 Cinta {torneo.cinta_minima}–{torneo.cinta_maxima ?? '∞'}
             </span>
           )}
           {torneo.edad_minima && (
-            <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-wider"
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-caption font-black uppercase tracking-wider"
               style={{ background: 'var(--color-surface)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }}>
               🎂 {torneo.edad_minima}–{torneo.edad_maxima ?? '∞'} años
             </span>
           )}
           {torneo.peso_minimo && (
-            <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-wider"
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-caption font-black uppercase tracking-wider"
               style={{ background: 'var(--color-surface)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }}>
               ⚖️ {torneo.peso_minimo}–{torneo.peso_maximo ?? '∞'} kg
             </span>
@@ -163,24 +163,24 @@ const AlumnoRow: React.FC<{
     </motion.button>
 
     {/* Avatar */}
-    <div className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs flex-shrink-0"
+    <div className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-label flex-shrink-0"
       style={{ background: 'var(--color-primary)20', color: 'var(--color-primary)', border: '1px solid var(--color-primary)25' }}>
       {alumno.nombres[0]}{alumno.apellidopaterno[0]}
     </div>
 
     {/* Info */}
     <div className="flex-1 min-w-0">
-      <p className="text-[11px] font-black uppercase italic tracking-tighter truncate"
+      <p className="text-label font-black uppercase italic tracking-tighter truncate"
         style={{ color: 'var(--color-text)' }}>
         {alumno.nombres} {alumno.apellidopaterno}
       </p>
       <div className="flex items-center gap-2 mt-0.5 flex-wrap">
         <CintaBadge cinta={alumno.cinta} color={alumno.color_cinta} />
-        <span className="text-[8px] font-bold" style={{ color: 'var(--color-text-muted)' }}>
+        <span className="text-caption font-bold" style={{ color: 'var(--color-text-muted)' }}>
           {alumno.edad} años
         </span>
         {alumno.ya_inscrito && (
-          <span className="text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-lg"
+          <span className="text-caption font-black uppercase tracking-wider px-1.5 py-0.5 rounded-lg"
             style={{ background: '#10b98120', color: '#10b981' }}>
             Ya inscrito
           </span>
@@ -199,7 +199,7 @@ const AlumnoRow: React.FC<{
             value={peso}
             onChange={e => onPeso(e.target.value)}
             placeholder="kg"
-            className="w-16 text-center text-[11px] font-black rounded-xl py-1.5 px-2 outline-none"
+            className="w-16 text-center text-label font-black rounded-xl py-1.5 px-2 outline-none"
             style={{
               background: 'var(--color-card)',
               border: '1px solid var(--color-border)',
@@ -328,9 +328,9 @@ const ModalInscripcion: React.FC<{
               <Users size={18} style={{ color: 'var(--color-primary)' }} />
             </div>
             <div>
-              <p className="text-sm font-black uppercase italic tracking-tighter leading-tight"
+              <p className="text-datos font-black uppercase italic tracking-tighter leading-tight"
                 style={{ color: 'var(--color-text)' }}>Inscribir Alumnos</p>
-              <p className="text-[8px] font-black uppercase tracking-widest truncate max-w-[200px]"
+              <p className="text-caption font-black uppercase tracking-widest truncate max-w-[200px]"
                 style={{ color: 'var(--color-text-muted)' }}>{torneo.nombre}</p>
             </div>
           </div>
@@ -351,11 +351,11 @@ const ModalInscripcion: React.FC<{
               <Check size={36} color="#10b981" />
             </motion.div>
             <div className="text-center space-y-1">
-              <p className="text-xl font-black uppercase italic tracking-tighter"
+              <p className="text-subtitulo font-black uppercase italic tracking-tighter"
                 style={{ color: 'var(--color-text)' }}>
                 {resultado.inscritos} alumno{resultado.inscritos !== 1 ? 's' : ''} inscrito{resultado.inscritos !== 1 ? 's' : ''}
               </p>
-              <p className="text-[9px] font-bold" style={{ color: 'var(--color-text-muted)' }}>
+              <p className="text-caption font-bold" style={{ color: 'var(--color-text-muted)' }}>
                 Se generó un pago pendiente para cada alumno y se notificó al tutor.
               </p>
             </div>
@@ -363,11 +363,11 @@ const ModalInscripcion: React.FC<{
             {resultado.errores.length > 0 && (
               <div className="w-full rounded-2xl p-3 space-y-1"
                 style={{ background: '#f9731615', border: '1px solid #f9731630' }}>
-                <p className="text-[9px] font-black uppercase tracking-wider" style={{ color: '#f97316' }}>
+                <p className="text-caption font-black uppercase tracking-wider" style={{ color: '#f97316' }}>
                   {resultado.errores.length} con error:
                 </p>
                 {resultado.errores.map((e: any) => (
-                  <p key={e.idalumno} className="text-[9px] font-bold" style={{ color: '#f97316' }}>
+                  <p key={e.idalumno} className="text-caption font-bold" style={{ color: '#f97316' }}>
                     • Alumno #{e.idalumno}: {e.error}
                   </p>
                 ))}
@@ -376,7 +376,7 @@ const ModalInscripcion: React.FC<{
 
             <div className="flex gap-3 w-full">
               <motion.button whileTap={{ scale: 0.95 }} onClick={onClose}
-                className="flex-1 h-11 rounded-2xl text-[10px] font-black uppercase tracking-widest"
+                className="flex-1 h-11 rounded-2xl text-caption font-black uppercase tracking-widest"
                 style={{ background: 'var(--color-primary)', color: '#fff' }}>
                 Cerrar
               </motion.button>
@@ -392,7 +392,7 @@ const ModalInscripcion: React.FC<{
               ].map(t => (
                 <motion.button key={t.id} whileTap={{ scale: 0.95 }}
                   onClick={() => setTab(t.id as any)}
-                  className="flex-1 h-8 rounded-xl text-[9px] font-black uppercase tracking-wider"
+                  className="flex-1 h-8 rounded-xl text-caption font-black uppercase tracking-wider"
                   style={{
                     background: tab === t.id ? 'var(--color-primary)22' : 'var(--color-surface)',
                     border: `1px solid ${tab === t.id ? 'var(--color-primary)60' : 'var(--color-border)'}`,
@@ -408,7 +408,7 @@ const ModalInscripcion: React.FC<{
               <div className="mx-5 mt-3 flex items-start gap-2 p-3 rounded-2xl flex-shrink-0"
                 style={{ background: 'var(--color-primary)10', border: '1px solid var(--color-primary)20' }}>
                 <Info size={12} style={{ color: 'var(--color-primary)', flexShrink: 0, marginTop: 1 }} />
-                <p className="text-[9px] font-bold leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+                <p className="text-caption font-bold leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
                   Selecciona a los alumnos e ingresa su <strong style={{ color: 'var(--color-primary)' }}>peso actual</strong> para un matchmaking más justo. El peso es opcional pero recomendado.
                 </p>
               </div>
@@ -430,7 +430,7 @@ const ModalInscripcion: React.FC<{
                 elegibles.length === 0 ? (
                   <div className="flex flex-col items-center py-10 gap-3">
                     <Users size={28} style={{ color: 'var(--color-text-muted)' }} />
-                    <p className="text-[10px] font-black uppercase tracking-wider text-center"
+                    <p className="text-caption font-black uppercase tracking-wider text-center"
                       style={{ color: 'var(--color-text-muted)' }}>
                       Ningún alumno cumple los requisitos
                     </p>
@@ -443,11 +443,11 @@ const ModalInscripcion: React.FC<{
                         onClick={toggleTodos}
                         className="w-full flex items-center justify-between p-3 rounded-2xl mb-1"
                         style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-                        <span className="text-[9px] font-black uppercase tracking-wider"
+                        <span className="text-caption font-black uppercase tracking-wider"
                           style={{ color: 'var(--color-text-muted)' }}>
                           {seleccionados.size === disponibles.length ? 'Deseleccionar todos' : 'Seleccionar todos'}
                         </span>
-                        <span className="text-[9px] font-black px-2 py-0.5 rounded-lg"
+                        <span className="text-caption font-black px-2 py-0.5 rounded-lg"
                           style={{ background: 'var(--color-primary)20', color: 'var(--color-primary)' }}>
                           {seleccionados.size}/{disponibles.length}
                         </span>
@@ -472,7 +472,7 @@ const ModalInscripcion: React.FC<{
                 noEleg.length === 0 ? (
                   <div className="flex flex-col items-center py-10 gap-3">
                     <Check size={28} style={{ color: '#10b981' }} />
-                    <p className="text-[10px] font-black uppercase tracking-wider"
+                    <p className="text-caption font-black uppercase tracking-wider"
                       style={{ color: 'var(--color-text-muted)' }}>
                       Todos los alumnos son elegibles
                     </p>
@@ -489,13 +489,13 @@ const ModalInscripcion: React.FC<{
                         <ShieldAlert size={12} color="#f97316" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-black uppercase italic tracking-tighter"
+                        <p className="text-label font-black uppercase italic tracking-tighter"
                           style={{ color: 'var(--color-text)' }}>
                           {a.nombres} {a.apellidopaterno}
                         </p>
                         <div className="flex flex-wrap gap-1 mt-0.5">
                           {a.razones_no_elegible.map(r => (
-                            <span key={r} className="text-[8px] font-bold px-1.5 py-0.5 rounded-lg"
+                            <span key={r} className="text-caption font-bold px-1.5 py-0.5 rounded-lg"
                               style={{ background: '#f9731615', color: '#f97316' }}>
                               {r}
                             </span>
@@ -516,7 +516,7 @@ const ModalInscripcion: React.FC<{
                   className="mx-5 flex items-center gap-2 p-3 rounded-2xl flex-shrink-0"
                   style={{ background: '#ef444415', border: '1px solid #ef444430' }}>
                   <AlertCircle size={12} color="#ef4444" style={{ flexShrink: 0 }} />
-                  <p className="text-[9px] font-bold" style={{ color: '#ef4444' }}>{error}</p>
+                  <p className="text-caption font-bold" style={{ color: '#ef4444' }}>{error}</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -525,13 +525,13 @@ const ModalInscripcion: React.FC<{
             <div className="flex gap-3 px-5 py-4 flex-shrink-0"
               style={{ borderTop: '1px solid var(--color-border)' }}>
               <motion.button whileTap={{ scale: 0.95 }} onClick={onClose}
-                className="flex-1 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest"
+                className="flex-1 h-12 rounded-2xl text-caption font-black uppercase tracking-widest"
                 style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
                 Cancelar
               </motion.button>
               <motion.button whileTap={{ scale: 0.95 }} onClick={handleInscribir}
                 disabled={enviando || seleccionados.size === 0}
-                className="flex-[2] h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
+                className="flex-[2] h-12 rounded-2xl text-caption font-black uppercase tracking-widest flex items-center justify-center gap-2"
                 style={{
                   background: `linear-gradient(135deg, var(--color-primary), var(--color-primary-dark, var(--color-primary)))`,
                   color: '#fff',
@@ -590,9 +590,9 @@ const TorneosEscuelaView: React.FC<{
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-lg font-black uppercase italic tracking-tighter leading-none"
+          <p className="text-seccion font-black uppercase italic tracking-tighter leading-none"
             style={{ color: 'var(--color-text)' }}>Torneos</p>
-          <p className="text-[8px] font-black uppercase tracking-[0.3em] mt-1"
+          <p className="text-caption font-black uppercase tracking-[0.3em] mt-1"
             style={{ color: 'var(--color-text-muted)' }}>
             Inscribe a tus alumnos
           </p>
@@ -609,11 +609,11 @@ const TorneosEscuelaView: React.FC<{
             style={{ background: '#10b98115', border: '1px solid #10b98130' }}>
             <Check size={16} color="#10b981" style={{ flexShrink: 0, marginTop: 1 }} />
             <div className="flex-1">
-              <p className="text-[11px] font-black uppercase italic tracking-tighter"
+              <p className="text-label font-black uppercase italic tracking-tighter"
                 style={{ color: '#10b981' }}>
                 ¡{exito.inscritos} alumno{exito.inscritos !== 1 ? 's' : ''} inscrito{exito.inscritos !== 1 ? 's' : ''}!
               </p>
-              <p className="text-[9px] font-bold mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+              <p className="text-caption font-bold mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
                 {exito.torneo} — Se generó pago pendiente y se notificó al tutor.
               </p>
             </div>
@@ -637,7 +637,7 @@ const TorneosEscuelaView: React.FC<{
         <div className="flex flex-col items-center py-16 gap-4 rounded-[2rem]"
           style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)' }}>
           <Trophy size={32} style={{ color: 'var(--color-text-muted)' }} />
-          <p className="text-[10px] font-black uppercase tracking-wider"
+          <p className="text-caption font-black uppercase tracking-wider"
             style={{ color: 'var(--color-text-muted)' }}>
             No hay torneos disponibles
           </p>
@@ -653,7 +653,7 @@ const TorneosEscuelaView: React.FC<{
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => onAbrirCheckin(t.idtorneo)}
-                  className="w-full flex items-center justify-center gap-2 h-9 rounded-2xl text-[9px] font-black uppercase tracking-wider -mt-1"
+                  className="w-full flex items-center justify-center gap-2 h-9 rounded-2xl text-caption font-black uppercase tracking-wider -mt-1"
                   style={{
                     background: 'rgba(16,185,129,0.1)',
                     border: '1px solid rgba(16,185,129,0.3)',

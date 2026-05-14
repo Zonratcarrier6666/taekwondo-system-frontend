@@ -176,7 +176,7 @@ const DonutChart: React.FC<{
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-xl font-black tracking-tighter leading-none" style={{ color: T.text }}>{total}</span>
-          <span className="text-[7px] font-black uppercase tracking-wider mt-0.5" style={{ color: T.textDim }}>total</span>
+          <span className="text-xs font-black uppercase tracking-wider mt-0.5" style={{ color: T.textDim }}>total</span>
         </div>
       </div>
       <div className="space-y-2.5 flex-1">
@@ -332,7 +332,7 @@ const EscuelasGrid: React.FC<{
           <p className="text-[8px] font-black uppercase tracking-widest mt-1 leading-none"
             style={{ color: T.textDim }}>ID #{esc.idescuela}</p>
           <div className="flex items-center gap-2 mt-2.5">
-            <span className="px-2 py-1 rounded-lg text-[7px] font-black uppercase tracking-wider"
+            <span className="px-2 py-1 rounded-lg text-xs font-black uppercase tracking-wider"
               style={{ backgroundColor: T.violetLo, color: T.violetHi, border: `1px solid ${T.violet}25` }}>
               Activa
             </span>
@@ -483,7 +483,7 @@ const BottomNav: React.FC<{
                 <motion.div key="a" initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.7 }} className="flex flex-col items-center gap-1 px-4">
                   <Icon size={14} style={{ color: T.violetHi }} />
-                  <span className="text-[7px] font-black uppercase tracking-widest whitespace-nowrap"
+                  <span className="text-xs font-black uppercase tracking-widest whitespace-nowrap"
                     style={{ color: T.violetHi }}>{label}</span>
                 </motion.div>
               ) : (
@@ -628,7 +628,7 @@ const DashboardHome: React.FC<{ T: typeof DARK }> = ({ T }) => {
             <div className="text-left">
               <p className="text-xs font-black uppercase italic tracking-tighter leading-none"
                 style={{ color: T.text }}>Distribución por Rol</p>
-              <p className="text-[7px] font-black uppercase tracking-widest mt-0.5 leading-none"
+              <p className="text-xs font-black uppercase tracking-widest mt-0.5 leading-none"
                 style={{ color: T.textDim }}>Usuarios del sistema</p>
             </div>
           </div>
@@ -650,7 +650,7 @@ const DashboardHome: React.FC<{ T: typeof DARK }> = ({ T }) => {
             <div className="text-left">
               <p className="text-xs font-black uppercase italic tracking-tighter leading-none"
                 style={{ color: T.text }}>Usuarios por Rol</p>
-              <p className="text-[7px] font-black uppercase tracking-widest mt-0.5 leading-none"
+              <p className="text-xs font-black uppercase tracking-widest mt-0.5 leading-none"
                 style={{ color: T.textDim }}>Comparativa de accesos</p>
             </div>
           </div>
@@ -687,7 +687,7 @@ const DashboardHome: React.FC<{ T: typeof DARK }> = ({ T }) => {
             <div className="text-left">
               <p className="text-xs font-black uppercase italic tracking-tighter leading-none"
                 style={{ color: T.text }}>Escuelas Registradas</p>
-              <p className="text-[7px] font-black uppercase tracking-widest mt-0.5 leading-none"
+              <p className="text-xs font-black uppercase tracking-widest mt-0.5 leading-none"
                 style={{ color: T.textDim }}>{escuelas.length} unidades activas</p>
             </div>
           </div>
@@ -715,7 +715,7 @@ const DashboardHome: React.FC<{ T: typeof DARK }> = ({ T }) => {
           <div className="text-left">
             <p className="text-xs font-black uppercase italic tracking-tighter leading-none"
               style={{ color: T.text }}>Directorio de Usuarios</p>
-            <p className="text-[7px] font-black uppercase tracking-widest mt-0.5 leading-none"
+            <p className="text-xs font-black uppercase tracking-widest mt-0.5 leading-none"
               style={{ color: T.textDim }}>{usuariosLista.length} registros activos</p>
           </div>
         </div>
@@ -799,7 +799,7 @@ export const SuperAdminDashboard: React.FC = () => {
               <p className="text-xs font-black uppercase italic tracking-tighter leading-none" style={{ color: T.text }}>
                 TKW System
               </p>
-              <p className="text-[7px] font-black uppercase tracking-[0.3em] mt-0.5 leading-none" style={{ color: T.violet }}>
+              <p className="text-xs font-black uppercase tracking-[0.3em] mt-0.5 leading-none" style={{ color: T.violet }}>
                 Super Admin
               </p>
             </div>
@@ -852,7 +852,7 @@ export const SuperAdminDashboard: React.FC = () => {
               <div className="text-left hidden sm:block">
                 <p className="text-[9px] font-black uppercase italic tracking-tighter leading-none"
                   style={{ color: T.text }}>{user?.nombre || user?.name || 'Superadmin'}</p>
-                <p className="text-[7px] font-bold uppercase tracking-widest mt-0.5 leading-none"
+                <p className="text-xs font-bold uppercase tracking-widest mt-0.5 leading-none"
                   style={{ color: T.violet }}>{user?.role}</p>
               </div>
               <motion.span animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2, repeat: Infinity }}

@@ -114,8 +114,8 @@ const BeltRingChart = ({ data }: { data: BeltStat[] }) => {
         })}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-xl font-black italic tracking-tighter leading-none text-[var(--color-text)]">{total}</span>
-        <span className="text-[6px] font-black uppercase text-[var(--color-text-muted)] tracking-widest mt-0.5">Alumnos</span>
+        <span className="text-subtitulo font-black italic tracking-tighter leading-none text-[var(--color-text)]">{total}</span>
+        <span className="text-[10px] font-black uppercase text-[var(--color-text-muted)] tracking-widest mt-0.5">Alumnos</span>
       </div>
     </div>
   );
@@ -136,7 +136,7 @@ const BarChart = ({ data, h = 80 }: { data: { label: string; value: number }[]; 
               animate={{ height: `${(d.value / max) * 100}%` }}
               transition={{ duration: 0.9, delay: i * 0.05, ease: 'easeOut' }} />
           </div>
-          <span className="text-[6px] font-black uppercase text-[var(--color-text-muted)] opacity-50">{d.label}</span>
+          <span className="text-caption font-black uppercase text-[var(--color-text-muted)] opacity-50">{d.label}</span>
         </div>
       ))}
     </div>
@@ -192,10 +192,10 @@ const StatCard = ({ icon: Icon, label, value, sub, accent, delay = 0, onClick }:
         style={{ backgroundColor: accent ? `${accent}18` : 'var(--color-primary)18' }}>
         <Icon size={16} style={{ color: accent ?? 'var(--color-primary)' }} />
       </div>
-      {sub && <span className="text-[7px] font-black uppercase tracking-wide opacity-50 text-[var(--color-text-muted)]">{sub}</span>}
+      {sub && <span className="text-label font-black uppercase tracking-wide opacity-50 text-[var(--color-text-muted)]">{sub}</span>}
     </div>
-    <p className="text-[7px] font-black uppercase tracking-widest leading-none opacity-40 text-[var(--color-text-muted)]">{label}</p>
-    <p className="text-2xl font-black italic tracking-tighter leading-none text-[var(--color-text)]">{value}</p>
+    <p className="text-label font-black uppercase tracking-widest leading-none opacity-40 text-[var(--color-text-muted)]">{label}</p>
+    <p className="text-subtitulo font-black italic tracking-tighter leading-none text-[var(--color-text)]">{value}</p>
   </motion.div>
 );
 
@@ -211,13 +211,13 @@ const AsistenciaModal = ({ count, onClose }: { count: number; onClose: () => voi
         <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
           <CheckCircle size={32} className="text-emerald-500" />
         </div>
-        <p className="text-[8px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-2">Asistencia Hoy</p>
+        <p className="text-caption font-black uppercase tracking-[0.3em] text-emerald-500 mb-2">Asistencia Hoy</p>
         <p className="text-7xl font-black italic tracking-tighter text-[var(--color-text)] leading-none mb-2">{count}</p>
-        <p className="text-[9px] text-[var(--color-text-muted)] font-black uppercase tracking-widest opacity-50">
+        <p className="text-label text-[var(--color-text-muted)] font-black uppercase tracking-widest opacity-50">
           {count === 1 ? 'alumno presente' : 'alumnos presentes'}
         </p>
         <button onClick={onClose}
-          className="mt-6 px-6 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest text-white active:scale-95 transition-transform"
+          className="mt-6 px-6 py-2.5 rounded-2xl text-label font-black uppercase tracking-widest text-white active:scale-95 transition-transform"
           style={{ backgroundColor: 'var(--color-primary)' }}>
           Cerrar
         </button>
@@ -258,32 +258,32 @@ const BirthdayModal = ({ alumno, onClose }: { alumno: any; onClose: () => void }
             <div className="w-16 h-16 rounded-2xl bg-pink-500/10 flex items-center justify-center mx-auto mb-3">
               <Cake size={30} className="text-pink-500" />
             </div>
-            <p className="text-[8px] font-black uppercase tracking-[0.3em] text-pink-500">¡Feliz Cumpleaños!</p>
-            <p className="text-lg font-black italic uppercase tracking-tighter text-[var(--color-text)] mt-1">
+            <p className="text-caption font-black uppercase tracking-[0.3em] text-pink-500">¡Feliz Cumpleaños!</p>
+            <p className="text-seccion font-black italic uppercase tracking-tighter text-[var(--color-text)] mt-1">
               {alumno.nombres} {alumno.apellidopaterno}
             </p>
-            <p className="text-[8px] text-[var(--color-text-muted)] font-black opacity-50">{alumno.edad} años · {alumno.fecha_display}</p>
+            <p className="text-caption text-[var(--color-text-muted)] font-black opacity-50">{alumno.edad} años · {alumno.fecha_display}</p>
           </div>
 
           <div className="bg-[var(--color-background)] rounded-2xl p-4 mb-4">
-            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)] opacity-60 mb-2">Mensaje sugerido</p>
-            <p className="text-[11px] text-[var(--color-text)] leading-relaxed font-medium">{selectedMsg}</p>
+            <p className="text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)] opacity-60 mb-2">Mensaje sugerido</p>
+            <p className="text-label text-[var(--color-text)] leading-relaxed font-medium">{selectedMsg}</p>
           </div>
 
           <div className="space-y-2">
             <button onClick={() => setSelectedMsg(BIRTHDAY_MESSAGES[Math.floor(Math.random() * BIRTHDAY_MESSAGES.length)])}
-              className="w-full py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest border border-pink-500/30 text-pink-500 active:scale-95 transition-transform hover:bg-pink-500/10">
+              className="w-full py-2.5 rounded-2xl text-label font-black uppercase tracking-widest border border-pink-500/30 text-pink-500 active:scale-95 transition-transform hover:bg-pink-500/10">
               Otro mensaje
             </button>
             <button onClick={copyToClipboard}
-              className="w-full py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest text-white active:scale-95 transition-transform flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-2xl text-label font-black uppercase tracking-widest text-white active:scale-95 transition-transform flex items-center justify-center gap-2"
               style={{ backgroundColor: copied ? '#22c55e' : '#ec4899' }}>
               {copied ? '✓ ¡Copiado!' : 'Copiar mensaje'}
             </button>
           </div>
 
           <button onClick={onClose}
-            className="mt-3 w-full py-2 text-[8px] font-black uppercase tracking-widest text-[var(--color-text-muted)] opacity-40 hover:opacity-70 transition-opacity">
+            className="mt-3 w-full py-2 text-caption font-black uppercase tracking-widest text-[var(--color-text-muted)] opacity-40 hover:opacity-70 transition-opacity">
             Cerrar
           </button>
         </motion.div>
@@ -320,9 +320,9 @@ const VistaInicio = ({ stats, onNavigate }: { stats: DashboardEscuela; onNavigat
             <div className="w-7 h-7 bg-indigo-500/10 rounded-lg flex items-center justify-center">
               <PieIcon size={14} className="text-indigo-500" />
             </div>
-            <span className="text-[9px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Grados Kup</span>
+            <span className="text-label font-black uppercase tracking-widest text-[var(--color-text-muted)]">Grados Kup</span>
           </div>
-          <h3 className="text-lg font-black italic uppercase text-[var(--color-text)]">Distribución</h3>
+          <h3 className="text-seccion font-black italic uppercase text-[var(--color-text)]">Distribución</h3>
           <div className="grid grid-cols-2 gap-x-3 gap-y-1 mt-2">
             {stats.distribucion_cintas.slice(0, 4).map((c, i) => (
               <div key={i} className="flex items-center gap-1.5">
@@ -334,7 +334,7 @@ const VistaInicio = ({ stats, onNavigate }: { stats: DashboardEscuela; onNavigat
                       style={{ backgroundColor: beltHex(c.color_stripe) }} />
                   )}
                 </div>
-                <span className="text-[8px] font-black uppercase truncate opacity-70 text-[var(--color-text)]">
+                <span className="text-caption font-black uppercase truncate opacity-70 text-[var(--color-text)]">
                   {c.nivelkupdan || c.color}: {c.count}
                 </span>
               </div>
@@ -352,12 +352,12 @@ const VistaInicio = ({ stats, onNavigate }: { stats: DashboardEscuela; onNavigat
               <div className="w-7 h-7 bg-emerald-500/10 rounded-lg flex items-center justify-center">
                 <BarChart3 size={14} className="text-emerald-500" />
               </div>
-              <span className="text-[9px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Esta Semana</span>
+              <span className="text-label font-black uppercase tracking-widest text-[var(--color-text-muted)]">Esta Semana</span>
             </div>
-            <h3 className="text-lg font-black italic uppercase text-[var(--color-text)]">Ingresos</h3>
+            <h3 className="text-seccion font-black italic uppercase text-[var(--color-text)]">Ingresos</h3>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-black tracking-tighter leading-none" style={{ color: 'var(--color-primary)' }}>
+            <p className="text-subtitulo font-black tracking-tighter leading-none" style={{ color: 'var(--color-primary)' }}>
               ${fmt(stats.ingresos_mes_actual)}
             </p>
             {cambio !== null && (
@@ -366,7 +366,7 @@ const VistaInicio = ({ stats, onNavigate }: { stats: DashboardEscuela; onNavigat
                   ? <TrendingUp size={10} className="text-emerald-500" />
                   : <TrendingDown size={10} className="text-red-500" />
                 }
-                <span className={`text-[8px] font-black ${cambio >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                <span className={`text-caption font-black ${cambio >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
                   {cambio >= 0 ? '+' : ''}{cambio}% vs mes ant.
                 </span>
               </div>
@@ -384,7 +384,7 @@ const VistaInicio = ({ stats, onNavigate }: { stats: DashboardEscuela; onNavigat
               style={{ backgroundColor: 'var(--color-primary)18' }}>
               <TrendingUp size={14} style={{ color: 'var(--color-primary)' }} />
             </div>
-            <span className="text-[9px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Tendencia 6 Meses</span>
+            <span className="text-label font-black uppercase tracking-widest text-[var(--color-text-muted)]">Tendencia 6 Meses</span>
           </div>
           <LineChart data={stats.ingresos_6_meses} />
         </div>
@@ -397,9 +397,9 @@ const VistaInicio = ({ stats, onNavigate }: { stats: DashboardEscuela; onNavigat
             <div className="w-7 h-7 bg-emerald-500/10 rounded-lg flex items-center justify-center">
               <Users size={14} className="text-emerald-500" />
             </div>
-            <span className="text-[9px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Asistencia Semanal</span>
+            <span className="text-label font-black uppercase tracking-widest text-[var(--color-text-muted)]">Asistencia Semanal</span>
           </div>
-          <span className="text-lg font-black italic tracking-tighter text-emerald-500">{stats.asistencia_hoy} hoy</span>
+          <span className="text-seccion font-black italic tracking-tighter text-emerald-500">{stats.asistencia_hoy} hoy</span>
         </div>
         <BarChart data={stats.asistencia_semana.map(d => ({ label: d.label, value: d.presentes }))} h={64} />
       </div>
@@ -409,15 +409,15 @@ const VistaInicio = ({ stats, onNavigate }: { stats: DashboardEscuela; onNavigat
         <div onClick={() => onNavigate('caja')}
           className="bg-[var(--color-card)] p-5 rounded-[2rem] border border-[var(--color-border)] shadow-xl text-center flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition-transform hover:shadow-2xl hover:border-orange-500/30">
           <AlertTriangle className="text-orange-500 mb-1" size={22} />
-          <p className="text-[8px] font-black uppercase text-[var(--color-text-muted)] tracking-widest">Deuda Vencida</p>
-          <p className="text-xl font-black italic text-[var(--color-text)]">{stats.alumnos_deuda_vencida.length}</p>
-          <p className="text-[7px] text-orange-500 font-black">${fmt(stats.deuda_total_pendiente)}</p>
+          <p className="text-caption font-black uppercase text-[var(--color-text-muted)] tracking-widest">Deuda Vencida</p>
+          <p className="text-subtitulo font-black italic text-[var(--color-text)]">{stats.alumnos_deuda_vencida.length}</p>
+          <p className="text-label text-orange-500 font-black">${fmt(stats.deuda_total_pendiente)}</p>
         </div>
         <div onClick={() => onNavigate('combates')}
           className="bg-[var(--color-card)] p-5 rounded-[2rem] border border-[var(--color-border)] shadow-xl text-center flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition-transform hover:shadow-2xl hover:border-purple-500/30">
           <Target className="text-purple-500 mb-1" size={22} />
-          <p className="text-[8px] font-black uppercase text-[var(--color-text-muted)] tracking-widest">En Torneo</p>
-          <p className="text-xl font-black italic text-[var(--color-text)]">{stats.alumnos_torneo_count}</p>
+          <p className="text-caption font-black uppercase text-[var(--color-text-muted)] tracking-widest">En Torneo</p>
+          <p className="text-subtitulo font-black italic text-[var(--color-text)]">{stats.alumnos_torneo_count}</p>
         </div>
       </div>
 
@@ -426,21 +426,21 @@ const VistaInicio = ({ stats, onNavigate }: { stats: DashboardEscuela; onNavigat
         <div className="bg-[var(--color-card)]/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-orange-500/20 shadow-2xl space-y-2">
           <div onClick={() => onNavigate('caja')} className="flex items-center gap-2 mb-3 cursor-pointer">
             <AlertTriangle size={14} className="text-orange-500" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-orange-500">Deuda Vencida +30 días</span>
+            <span className="text-label font-black uppercase tracking-widest text-orange-500">Deuda Vencida +30 días</span>
           </div>
           {stats.alumnos_deuda_vencida.slice(0, 5).map((a, i) => (
             <div key={i} onClick={() => onNavigate('caja')}
               className="flex items-center justify-between gap-3 p-3 rounded-2xl cursor-pointer active:scale-95 transition-transform hover:bg-orange-500/10"
               style={{ backgroundColor: 'var(--color-background)' }}>
               <div className="text-left min-w-0">
-                <p className="text-[11px] font-black uppercase italic tracking-tighter truncate text-[var(--color-text)]">
+                <p className="text-label font-black uppercase italic tracking-tighter truncate text-[var(--color-text)]">
                   {a.nombres} {a.apellidopaterno}
                 </p>
-                <p className="text-[8px] text-[var(--color-text-muted)] opacity-60 truncate">{a.concepto}</p>
+                <p className="text-caption text-[var(--color-text-muted)] opacity-60 truncate">{a.concepto}</p>
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="text-sm font-black text-orange-500">${fmt(a.monto)}</p>
-                <p className="text-[7px] font-black opacity-40 text-[var(--color-text-muted)]">{a.dias_vencido}d vencido</p>
+                <p className="text-caption font-black text-orange-500">${fmt(a.monto)}</p>
+                <p className="text-label font-black opacity-40 text-[var(--color-text-muted)]">{a.dias_vencido}d vencido</p>
               </div>
             </div>
           ))}
@@ -452,23 +452,23 @@ const VistaInicio = ({ stats, onNavigate }: { stats: DashboardEscuela; onNavigat
         <div className="bg-[var(--color-card)]/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-[var(--color-border)] shadow-2xl space-y-2">
           <div className="flex items-center gap-2 mb-3">
             <BookOpen size={14} style={{ color: 'var(--color-primary)' }} />
-            <span className="text-[9px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Próximos Exámenes</span>
+            <span className="text-label font-black uppercase tracking-widest text-[var(--color-text-muted)]">Próximos Exámenes</span>
           </div>
           {stats.proximos_examenes.map((e, i) => (
             <div key={i} className="flex items-center justify-between gap-3 p-3 rounded-2xl"
               style={{ backgroundColor: 'var(--color-background)' }}>
               <div className="text-left min-w-0">
-                <p className="text-[11px] font-black uppercase italic tracking-tighter truncate text-[var(--color-text)]">
+                <p className="text-label font-black uppercase italic tracking-tighter truncate text-[var(--color-text)]">
                   {e.nombre_examen}
                 </p>
-                <p className="text-[8px] text-[var(--color-text-muted)] opacity-60">{e.lugar}</p>
+                <p className="text-caption text-[var(--color-text-muted)] opacity-60">{e.lugar}</p>
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="text-[9px] font-black" style={{ color: 'var(--color-primary)' }}>
+                <p className="text-label font-black" style={{ color: 'var(--color-primary)' }}>
                   {new Date(e.fecha_programada + 'T00:00:00').toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}
                 </p>
                 {e.costo_examen ? (
-                  <p className="text-[7px] opacity-40 font-black text-[var(--color-text-muted)]">${fmt(e.costo_examen)}</p>
+                  <p className="text-label opacity-40 font-black text-[var(--color-text-muted)]">${fmt(e.costo_examen)}</p>
                 ) : null}
               </div>
             </div>
@@ -481,18 +481,18 @@ const VistaInicio = ({ stats, onNavigate }: { stats: DashboardEscuela; onNavigat
         <div className="bg-[var(--color-card)]/80 backdrop-blur-xl p-6 rounded-[2.5rem] border border-pink-500/20 shadow-2xl space-y-2">
           <div className="flex items-center gap-2 mb-3">
             <Cake size={14} className="text-pink-500" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-pink-500">Cumpleaños Esta Semana</span>
+            <span className="text-label font-black uppercase tracking-widest text-pink-500">Cumpleaños Esta Semana</span>
           </div>
           {stats.cumpleanos_proximos.map((a, i) => (
             <div key={i} onClick={() => setBirthdayAlumno(a)}
               className="flex items-center justify-between gap-3 p-3 rounded-2xl cursor-pointer active:scale-95 transition-transform hover:bg-pink-500/10"
               style={{ backgroundColor: 'var(--color-background)' }}>
-              <p className="text-[11px] font-black uppercase italic tracking-tighter text-[var(--color-text)]">
+              <p className="text-label font-black uppercase italic tracking-tighter text-[var(--color-text)]">
                 {a.nombres} {a.apellidopaterno}
               </p>
               <div className="text-right flex-shrink-0">
-                <p className="text-[9px] font-black text-pink-500">{a.fecha_display}</p>
-                <p className="text-[7px] opacity-40 font-black text-[var(--color-text-muted)]">{a.edad} años</p>
+                <p className="text-label font-black text-pink-500">{a.fecha_display}</p>
+                <p className="text-label opacity-40 font-black text-[var(--color-text-muted)]">{a.edad} años</p>
               </div>
             </div>
           ))}
@@ -555,7 +555,7 @@ export const EscuelaDashboard: React.FC = () => {
   if (loading) return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--color-background)]">
       <Loader2 className="animate-spin text-[var(--color-primary)] mb-4" size={48} />
-      <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--color-text-muted)] animate-pulse">
+      <p className="text-label font-black uppercase tracking-[0.3em] text-[var(--color-text-muted)] animate-pulse">
         Sincronizando Dojo...
       </p>
     </div>
@@ -577,8 +577,8 @@ export const EscuelaDashboard: React.FC = () => {
               }
             </div>
             <div>
-              <p className="text-[7px] font-black uppercase tracking-[0.3em] text-[var(--color-primary)] leading-none mb-0.5 opacity-70">Unidad Activa</p>
-              <h1 className="text-xs font-black italic uppercase tracking-tighter truncate max-w-[140px] text-[var(--color-text)]">
+              <p className="text-label font-black uppercase tracking-[0.3em] text-[var(--color-primary)] leading-none mb-0.5 opacity-70">Unidad Activa</p>
+              <h1 className="text-label font-black italic uppercase tracking-tighter truncate max-w-[140px] text-[var(--color-text)]">
                 {escuela?.nombreescuela || 'Mi Academia'}
               </h1>
             </div>

@@ -78,11 +78,11 @@ const InputField: React.FC<{
   type?: string; required?: boolean; placeholder?: string;
 }> = ({ label, name, value, onChange, type='text', required, placeholder }) => (
   <div className="space-y-1">
-    <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest flex items-center gap-1">
+    <label className="text-label font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest flex items-center gap-1">
       {label} {required && <span className="text-red-500">*</span>}
     </label>
     <input type={type} placeholder={placeholder}
-      className="w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-bold text-[11px] text-[var(--color-text)] shadow-inner transition-all placeholder:opacity-20"
+      className="w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-bold text-label text-[var(--color-text)] shadow-inner transition-all placeholder:opacity-20"
       value={value} onChange={e => onChange(name, e.target.value)}/>
   </div>
 );
@@ -104,16 +104,16 @@ const CardExamen: React.FC<{ examen: Examen; onClick: () => void; onEdit: () => 
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className={`text-[7px] font-black uppercase px-2 py-0.5 rounded-full ${pasado ? 'bg-slate-500/20 text-slate-400' : 'bg-[var(--color-primary)]/15 text-[var(--color-primary)]'}`}>
+            <span className={`text-label font-black uppercase px-2 py-0.5 rounded-full ${pasado ? 'bg-slate-500/20 text-slate-400' : 'bg-[var(--color-primary)]/15 text-[var(--color-primary)]'}`}>
               {pasado ? 'Realizado' : 'Próximo'}
             </span>
             {tienePDF && (
-              <span className="text-[7px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center gap-1">
+              <span className="text-label font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center gap-1">
                 <FileText size={8}/> PDF
               </span>
             )}
           </div>
-          <h3 className="text-[14px] font-black uppercase italic tracking-tighter text-[var(--color-text)] leading-tight">
+          <h3 className="text-datos font-black uppercase italic tracking-tighter text-[var(--color-text)] leading-tight">
             {examen.nombre_examen}
           </h3>
         </div>
@@ -133,22 +133,22 @@ const CardExamen: React.FC<{ examen: Examen; onClick: () => void; onEdit: () => 
       <div className="grid grid-cols-2 gap-2 text-[var(--color-text-muted)]">
         <div className="flex items-center gap-1.5">
           <Calendar size={10} className="text-[var(--color-primary)] flex-shrink-0"/>
-          <span className="text-[9px] font-bold truncate">{formatFecha(examen.fecha_programada)}</span>
+          <span className="text-caption font-bold truncate">{formatFecha(examen.fecha_programada)}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <DollarSign size={10} className="text-emerald-500 flex-shrink-0"/>
-          <span className="text-[9px] font-bold">${Number(examen.costo_examen || 0).toLocaleString('es-MX')}</span>
+          <span className="text-caption font-bold">${Number(examen.costo_examen || 0).toLocaleString('es-MX')}</span>
         </div>
         {examen.lugar && (
           <div className="flex items-center gap-1.5 col-span-2">
             <MapPin size={10} className="text-red-400 flex-shrink-0"/>
-            <span className="text-[9px] font-bold truncate">{examen.lugar}</span>
+            <span className="text-caption font-bold truncate">{examen.lugar}</span>
           </div>
         )}
         {examen.sinodal && (
           <div className="flex items-center gap-1.5 col-span-2">
             <UserIcon size={10} className="text-purple-400 flex-shrink-0"/>
-            <span className="text-[9px] font-bold truncate">{examen.sinodal}</span>
+            <span className="text-caption font-bold truncate">{examen.sinodal}</span>
           </div>
         )}
       </div>
@@ -156,7 +156,7 @@ const CardExamen: React.FC<{ examen: Examen; onClick: () => void; onEdit: () => 
       {/* KPIs */}
       {(examen._inscritos || 0) > 0 && (
         <div className="space-y-1.5">
-          <div className="flex justify-between text-[7px] font-black uppercase tracking-widest opacity-50 text-[var(--color-text)]">
+          <div className="flex justify-between text-label font-black uppercase tracking-widest opacity-50 text-[var(--color-text)]">
             <span>{examen._inscritos} inscritos</span>
             <span>{progreso}% calificados</span>
           </div>
@@ -171,7 +171,7 @@ const CardExamen: React.FC<{ examen: Examen; onClick: () => void; onEdit: () => 
               { label:'Pendiente', val: examen._pendientes||0,  color:'#f97316' },
             ].map(({ label, val, color }) => (
               <div key={label} className="text-center py-1.5 rounded-xl" style={{ background:'var(--color-background)' }}>
-                <p className="text-sm font-black leading-none" style={{ color }}>{val}</p>
+                <p className="text-datos font-black leading-none" style={{ color }}>{val}</p>
                 <p className="text-[6px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] mt-0.5">{label}</p>
               </div>
             ))}
@@ -181,7 +181,7 @@ const CardExamen: React.FC<{ examen: Examen; onClick: () => void; onEdit: () => 
 
       {/* Botón ver */}
       <button onClick={onClick}
-        className="w-full h-9 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all flex items-center justify-center gap-2"
+        className="w-full h-9 rounded-xl text-caption font-black uppercase tracking-widest border transition-all flex items-center justify-center gap-2"
         style={{ background:'var(--color-primary)15', borderColor:'var(--color-primary)40', color:'var(--color-primary)' }}>
         <Eye size={12}/> Ver Detalle
       </button>
@@ -433,7 +433,7 @@ const ExamenesView: React.FC = () => {
           <motion.div initial={{ opacity:0,y:-20 }} animate={{ opacity:1,y:0 }} exit={{ opacity:0,y:-20 }}
             className="fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl border border-green-500"
             style={{ backgroundColor:'#16a34a', color:'white' }}>
-            <CheckCircle2 size={18}/><span className="text-sm font-black tracking-tight">{successMsg}</span>
+            <CheckCircle2 size={18}/><span className="text-datos font-black tracking-tight">{successMsg}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -443,7 +443,7 @@ const ExamenesView: React.FC = () => {
             className="fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl border border-red-500 max-w-sm"
             style={{ backgroundColor:'#dc2626', color:'white' }}>
             <AlertCircle size={18} className="flex-shrink-0"/>
-            <span className="text-sm font-black flex-1">{errorMsg}</span>
+            <span className="text-datos font-black flex-1">{errorMsg}</span>
             <button onClick={() => setErrorMsg(null)}><X size={14}/></button>
           </motion.div>
         )}
@@ -451,72 +451,72 @@ const ExamenesView: React.FC = () => {
 
       {/* ── HEADER ── */}
       <div className="bg-[var(--color-card)] backdrop-blur-2xl p-5 rounded-[2.5rem] border border-[var(--color-border)] shadow-2xl">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            {view === 'detalle' && (
-              <button onClick={() => { setView('lista'); setExamenActivo(null); }}
-                className="p-2 rounded-xl border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-all">
-                <ChevronLeft size={16}/>
-              </button>
-            )}
-            <div className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
-              style={{ background:'var(--color-primary)20', border:'1.5px solid var(--color-primary)40' }}>
-              <GraduationCap size={22} style={{ color:'var(--color-primary)' }}/>
-            </div>
-            <div>
-              <h2 className="text-xl font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">
-                {view === 'lista' ? 'Exámenes' : (examenActivo?.nombre_examen || 'Detalle')}
-              </h2>
-              <p className="text-[7px] font-black uppercase tracking-[0.4em] mt-1 opacity-40 text-[var(--color-text-muted)]">
-                {view === 'lista' ? 'Gestión de Grados' : formatFecha(examenActivo?.fecha_programada)}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <motion.button whileTap={{ scale:0.88, rotate:-180 }} transition={{ duration:0.35 }}
-              onClick={view === 'lista' ? loadExamenes : recargarDetalle}
-              disabled={loading || loadingDetalle}
-              className="h-9 w-9 flex items-center justify-center rounded-xl border transition-all"
-              style={{ background:'var(--color-background)', borderColor:'var(--color-border)', color:'var(--color-text-muted)' }}>
-              {(loading || loadingDetalle) ? <Loader2 size={14} className="animate-spin"/> : <RefreshCw size={14}/>}
-            </motion.button>
-
-            {view === 'lista' && (
-              <motion.button whileTap={{ scale:0.95 }} onClick={abrirCrear}
-                className="h-9 px-4 rounded-xl flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-white"
-                style={{ background:'var(--color-primary)' }}>
-                <Plus size={13}/> Nuevo
-              </motion.button>
-            )}
-
-            {view === 'detalle' && examenActivo && (
-              <div className="flex gap-2">
-                {/* Upload PDF */}
-                <motion.button whileTap={{ scale:0.95 }} onClick={() => setModalPdf(true)}
-                  className="h-9 px-3 rounded-xl flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest border transition-all"
-                  style={{ background: examenActivo.archivo_pdf ? '#22c55e15' : 'var(--color-background)', borderColor: examenActivo.archivo_pdf ? '#22c55e40' : 'var(--color-border)', color: examenActivo.archivo_pdf ? '#22c55e' : 'var(--color-text-muted)' }}>
-                  <Upload size={12}/> {examenActivo.archivo_pdf ? 'PDF ✓' : 'PDF'}
-                </motion.button>
-
-                {/* Ver/Descargar PDF */}
-                {examenActivo.archivo_pdf && (
-                  <a href={examenActivo.archivo_pdf} target="_blank" rel="noreferrer"
-                    className="h-9 px-3 rounded-xl flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest border transition-all"
-                    style={{ background:'var(--color-background)', borderColor:'var(--color-border)', color:'var(--color-text-muted)' }}>
-                    <Download size={12}/> Ver
-                  </a>
-                )}
-
-                {/* Inscribir */}
-                <motion.button whileTap={{ scale:0.95 }} onClick={() => { setBuscarAlu(''); setSelAlumnos([]); setModalInscribir(true); }}
-                  className="h-9 px-3 rounded-xl flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-white"
-                  style={{ background:'var(--color-primary)' }}>
-                  <UserPlus size={12}/> Inscribir
-                </motion.button>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              {view === 'detalle' && (
+                <button onClick={() => { setView('lista'); setExamenActivo(null); }}
+                  className="p-2 rounded-xl border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-all flex-shrink-0">
+                  <ChevronLeft size={16}/>
+                </button>
+              )}
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
+                style={{ background:'var(--color-primary)20', border:'1.5px solid var(--color-primary)40' }}>
+                <GraduationCap size={22} style={{ color:'var(--color-primary)' }}/>
               </div>
-            )}
+              <div className="min-w-0">
+                <h2 className="text-subtitulo font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)] truncate">
+                  {view === 'lista' ? 'Exámenes' : (examenActivo?.nombre_examen || 'Detalle')}
+                </h2>
+                <p className="text-caption font-black uppercase tracking-[0.4em] mt-1 opacity-40 text-[var(--color-text-muted)]">
+                  {view === 'lista' ? 'Gestión de Grados' : formatFecha(examenActivo?.fecha_programada)}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-2 flex-shrink-0">
+              <motion.button whileTap={{ scale:0.88, rotate:-180 }} transition={{ duration:0.35 }}
+                onClick={view === 'lista' ? loadExamenes : recargarDetalle}
+                disabled={loading || loadingDetalle}
+                className="h-9 w-9 flex items-center justify-center rounded-xl border transition-all"
+                style={{ background:'var(--color-background)', borderColor:'var(--color-border)', color:'var(--color-text-muted)' }}>
+                {(loading || loadingDetalle) ? <Loader2 size={14} className="animate-spin"/> : <RefreshCw size={14}/>}
+              </motion.button>
+
+              {view === 'lista' && (
+                <motion.button whileTap={{ scale:0.95 }} onClick={abrirCrear}
+                  className="h-9 px-4 rounded-xl flex items-center gap-1.5 text-caption font-black uppercase tracking-widest text-white"
+                  style={{ background:'var(--color-primary)' }}>
+                  <Plus size={13}/> Nuevo
+                </motion.button>
+              )}
+            </div>
           </div>
+
+          {/* Botones de detalle — fila separada en móvil */}
+          {view === 'detalle' && examenActivo && (
+            <div className="flex gap-2 flex-wrap">
+              <motion.button whileTap={{ scale:0.95 }} onClick={() => setModalPdf(true)}
+                className="flex-1 h-9 px-3 rounded-xl flex items-center justify-center gap-1.5 text-caption font-black uppercase tracking-widest border transition-all"
+                style={{ background: examenActivo.archivo_pdf ? '#22c55e15' : 'var(--color-background)', borderColor: examenActivo.archivo_pdf ? '#22c55e40' : 'var(--color-border)', color: examenActivo.archivo_pdf ? '#22c55e' : 'var(--color-text-muted)' }}>
+                <Upload size={12}/> {examenActivo.archivo_pdf ? 'PDF ✓' : 'PDF'}
+              </motion.button>
+
+              {examenActivo.archivo_pdf && (
+                <a href={examenActivo.archivo_pdf} target="_blank" rel="noreferrer"
+                  className="flex-1 h-9 px-3 rounded-xl flex items-center justify-center gap-1.5 text-caption font-black uppercase tracking-widest border transition-all"
+                  style={{ background:'var(--color-background)', borderColor:'var(--color-border)', color:'var(--color-text-muted)' }}>
+                  <Download size={12}/> Ver
+                </a>
+              )}
+
+              <motion.button whileTap={{ scale:0.95 }} onClick={() => { setBuscarAlu(''); setSelAlumnos([]); setModalInscribir(true); }}
+                className="flex-1 h-9 px-3 rounded-xl flex items-center justify-center gap-1.5 text-caption font-black uppercase tracking-widest text-white"
+                style={{ background:'var(--color-primary)' }}>
+                <UserPlus size={12}/> Inscribir
+              </motion.button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -529,8 +529,8 @@ const ExamenesView: React.FC = () => {
         ) : examenes.length === 0 ? (
           <div className="py-20 text-center opacity-30">
             <GraduationCap size={48} className="mx-auto mb-3"/>
-            <p className="text-xs font-black uppercase tracking-widest">Sin exámenes registrados</p>
-            <button onClick={abrirCrear} className="mt-4 px-6 h-10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white" style={{ background:'var(--color-primary)' }}>
+            <p className="text-label font-black uppercase tracking-widest">Sin exámenes registrados</p>
+            <button onClick={abrirCrear} className="mt-4 px-6 h-10 rounded-2xl text-caption font-black uppercase tracking-widest text-white" style={{ background:'var(--color-primary)' }}>
               Crear primer examen
             </button>
           </div>
@@ -565,9 +565,9 @@ const ExamenesView: React.FC = () => {
               ].map(({ icon: Icon, color, label, val }) => (
                 <div key={label} className="flex items-start gap-2">
                   <Icon size={12} style={{ color }} className="flex-shrink-0 mt-0.5"/>
-                  <div>
-                    <p className="text-[6px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)]">{label}</p>
-                    <p className="text-[10px] font-black text-[var(--color-text)] truncate">{val}</p>
+                  <div className="min-w-0">
+                    <p className="text-caption font-black uppercase tracking-widest opacity-40 text-[var(--color-text)]">{label}</p>
+                    <p className="text-datos font-black text-[var(--color-text)] truncate">{val}</p>
                   </div>
                 </div>
               ))}
@@ -577,11 +577,11 @@ const ExamenesView: React.FC = () => {
             {examenActivo.alumnos.length === 0 ? (
               <div className="py-12 text-center opacity-30">
                 <Users size={36} className="mx-auto mb-3"/>
-                <p className="text-xs font-black uppercase tracking-widest">Sin alumnos inscritos</p>
+                <p className="text-label font-black uppercase tracking-widest">Sin alumnos inscritos</p>
               </div>
             ) : (
               <div className="space-y-2">
-                <p className="text-[8px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] px-1">
+                <p className="text-caption font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] px-1">
                   Alumnos inscritos ({examenActivo.alumnos.length})
                 </p>
                 {examenActivo.alumnos.map(a => {
@@ -602,22 +602,22 @@ const ExamenesView: React.FC = () => {
                           style={{ borderColor: getBeltHex(cinAnterior?.color)+'60', background:'var(--color-background)' }}>
                           {a.alumnos?.fotoalumno
                             ? <img src={a.alumnos.fotoalumno} className="w-full h-full object-cover" alt=""/>
-                            : <span className="text-sm font-black opacity-40">{nombre.charAt(0)}</span>
+                            : <span className="text-datos font-black opacity-40">{nombre.charAt(0)}</span>
                           }
                         </div>
 
                         {/* Info */}
                         <div className="flex-1 min-w-0">
-                          <p className="text-[12px] font-black uppercase italic tracking-tighter truncate text-[var(--color-text)]">{nombre}</p>
+                          <p className="text-label font-black uppercase italic tracking-tighter truncate text-[var(--color-text)]">{nombre}</p>
                           {/* Cintas: anterior → nuevo */}
                           <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                             {cinAnterior && <MiniCintaBelt colorName={cinAnterior.color} stripeName={cinAnterior.color_stripe}/>}
-                            {cinAnterior && <span className="text-[7px] opacity-50">→</span>}
+                            {cinAnterior && <span className="text-label opacity-50">→</span>}
                             {cinNuevo && cinNuevo.color !== cinAnterior?.color && (
                               <MiniCintaBelt colorName={cinNuevo.color} stripeName={cinNuevo.color_stripe}/>
                             )}
                             {cinAnterior && (
-                              <span className="text-[7px] font-bold opacity-50 text-[var(--color-text)]">{cinAnterior.nivelkupdan}</span>
+                              <span className="text-label font-bold opacity-50 text-[var(--color-text)]">{cinAnterior.nivelkupdan}</span>
                             )}
                           </div>
                         </div>
@@ -625,15 +625,15 @@ const ExamenesView: React.FC = () => {
                         {/* Estatus pago */}
                         <div className="flex-shrink-0">
                           {sinPago ? (
-                            <span className="flex items-center gap-1 text-[7px] font-black uppercase px-2 py-1 rounded-full bg-slate-500/15 text-slate-400">
+                            <span className="flex items-center gap-1 text-label font-black uppercase px-2 py-1 rounded-full bg-slate-500/15 text-slate-400">
                               <Unlock size={8}/> Sin cargo
                             </span>
                           ) : pagado ? (
-                            <span className="flex items-center gap-1 text-[7px] font-black uppercase px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-400">
+                            <span className="flex items-center gap-1 text-label font-black uppercase px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-400">
                               <CheckCheck size={8}/> Pagado
                             </span>
                           ) : (
-                            <span className="flex items-center gap-1 text-[7px] font-black uppercase px-2 py-1 rounded-full bg-orange-500/15 text-orange-400">
+                            <span className="flex items-center gap-1 text-label font-black uppercase px-2 py-1 rounded-full bg-orange-500/15 text-orange-400">
                               <Clock size={8}/> Pendiente
                             </span>
                           )}
@@ -645,11 +645,11 @@ const ExamenesView: React.FC = () => {
                         <div className="flex items-center gap-3 px-3 py-2 rounded-xl"
                           style={{ background: a.aprobado ? '#22c55e10' : '#ef444410', border:`1px solid ${a.aprobado ? '#22c55e30' : '#ef444430'}` }}>
                           <Star size={14} style={{ color: a.aprobado ? '#22c55e' : '#ef4444' }}/>
-                          <span className="text-lg font-black" style={{ color: a.aprobado ? '#22c55e' : '#ef4444' }}>{a.calificacion}</span>
-                          <span className="text-[8px] font-black uppercase tracking-widest opacity-60 text-[var(--color-text)]">
+                          <span className="text-seccion font-black" style={{ color: a.aprobado ? '#22c55e' : '#ef4444' }}>{a.calificacion}</span>
+                          <span className="text-caption font-black uppercase tracking-widest opacity-60 text-[var(--color-text)]">
                             {a.aprobado ? 'Aprobado' : 'Reprobado'}
                           </span>
-                          {a.notas && <span className="text-[8px] italic opacity-40 truncate text-[var(--color-text)]">{a.notas}</span>}
+                          {a.notas && <span className="text-caption italic opacity-40 truncate text-[var(--color-text)]">{a.notas}</span>}
                         </div>
                       )}
 
@@ -658,7 +658,7 @@ const ExamenesView: React.FC = () => {
                         {/* Calificar — bloqueado si no ha pagado */}
                         <button
                           onClick={() => (pagado || sinPago) ? abrirCalificar(a) : setErrorMsg('El alumno debe pagar antes de recibir calificación.')}
-                          className="flex-1 h-8 rounded-xl text-[8px] font-black uppercase tracking-widest border transition-all flex items-center justify-center gap-1.5"
+                          className="flex-1 h-8 rounded-xl text-caption font-black uppercase tracking-widest border transition-all flex items-center justify-center gap-1.5"
                           style={pagado || sinPago
                             ? { background:'var(--color-primary)15', borderColor:'var(--color-primary)40', color:'var(--color-primary)' }
                             : { background:'var(--color-background)', borderColor:'var(--color-border)', color:'var(--color-text-muted)', opacity:0.5 }
@@ -701,7 +701,7 @@ const ExamenesView: React.FC = () => {
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/15 rounded-xl"><GraduationCap size={18}/></div>
                 <div>
-                  <h3 className="text-base font-black uppercase italic tracking-tighter">{editando ? 'Editar Examen' : 'Nuevo Examen'}</h3>
+                  <h3 className="text-datos font-black uppercase italic tracking-tighter">{editando ? 'Editar Examen' : 'Nuevo Examen'}</h3>
                   <p className="text-[6px] font-black uppercase tracking-widest opacity-70">TKW SYSTEM</p>
                 </div>
               </div>
@@ -723,7 +723,7 @@ const ExamenesView: React.FC = () => {
                 onChange={(n,v) => setForm(p => ({ ...p, [n]:v }))} placeholder="Nombre del evaluador (opcional)"/>
 
               <motion.button whileTap={{ scale:0.97 }} onClick={handleGuardarForm} disabled={savingForm}
-                className="w-full h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full h-12 rounded-2xl text-caption font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 disabled:opacity-50"
                 style={{ background:'var(--color-primary)' }}>
                 {savingForm ? <><Loader2 size={16} className="animate-spin"/> Guardando...</> : <><Save size={16}/> {editando ? 'Actualizar' : 'Crear Examen'}</>}
               </motion.button>
@@ -746,8 +746,8 @@ const ExamenesView: React.FC = () => {
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/15 rounded-xl"><UserPlus size={18}/></div>
                 <div>
-                  <h3 className="text-base font-black uppercase italic tracking-tighter">Inscribir Alumnos</h3>
-                  <p className="text-[7px] font-black uppercase tracking-widest opacity-70">{selAlumnos.length} seleccionado(s)</p>
+                  <h3 className="text-datos font-black uppercase italic tracking-tighter">Inscribir Alumnos</h3>
+                  <p className="text-label font-black uppercase tracking-widest opacity-70">{selAlumnos.length} seleccionado(s)</p>
                 </div>
               </div>
               <button onClick={() => setModalInscribir(false)} className="p-1.5 bg-black/20 rounded-full"><X size={16}/></button>
@@ -756,19 +756,19 @@ const ExamenesView: React.FC = () => {
             <div className="p-4 flex-shrink-0">
               <div className="relative">
                 <input type="text" placeholder="Buscar alumno..."
-                  className="w-full h-9 pl-9 pr-3 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] outline-none font-bold text-[11px] text-[var(--color-text)] placeholder:opacity-40"
+                  className="w-full h-9 pl-9 pr-3 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] outline-none font-bold text-label text-[var(--color-text)] placeholder:opacity-40"
                   value={buscarAlu} onChange={e => setBuscarAlu(e.target.value)}/>
                 <Users size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"/>
               </div>
               {/* Selección rápida */}
               <div className="flex gap-2 mt-2">
                 <button onClick={() => setSelAlumnos(alumnosFiltrados.map(a => a.idalumno))}
-                  className="flex-1 h-7 rounded-lg text-[8px] font-black uppercase border transition-all"
+                  className="flex-1 h-7 rounded-lg text-caption font-black uppercase border transition-all"
                   style={{ background:'var(--color-primary)15', borderColor:'var(--color-primary)30', color:'var(--color-primary)' }}>
                   Selec. todos
                 </button>
                 <button onClick={() => setSelAlumnos([])}
-                  className="flex-1 h-7 rounded-lg text-[8px] font-black uppercase border transition-all"
+                  className="flex-1 h-7 rounded-lg text-caption font-black uppercase border transition-all"
                   style={{ background:'var(--color-background)', borderColor:'var(--color-border)', color:'var(--color-text-muted)' }}>
                   Limpiar
                 </button>
@@ -787,11 +787,11 @@ const ExamenesView: React.FC = () => {
                       {sel && <CheckCheck size={10} className="text-white"/>}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-black uppercase italic truncate text-[var(--color-text)]">{a.nombres} {a.apellidopaterno}</p>
+                      <p className="text-label font-black uppercase italic truncate text-[var(--color-text)]">{a.nombres} {a.apellidopaterno}</p>
                       {ci && (
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <MiniCintaBelt colorName={ci.color} stripeName={ci.color_stripe}/>
-                          <span className="text-[7px] font-bold opacity-50">{ci.nivelkupdan}</span>
+                          <span className="text-label font-bold opacity-50">{ci.nivelkupdan}</span>
                         </div>
                       )}
                     </div>
@@ -803,7 +803,7 @@ const ExamenesView: React.FC = () => {
             <div className="p-4 flex-shrink-0">
               <motion.button whileTap={{ scale:0.97 }} onClick={handleInscribir}
                 disabled={!selAlumnos.length || inscribiendo}
-                className="w-full h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full h-12 rounded-2xl text-caption font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 disabled:opacity-50"
                 style={{ background:'var(--color-primary)' }}>
                 {inscribiendo ? <><Loader2 size={16} className="animate-spin"/> Inscribiendo...</> : <><UserPlus size={16}/> Inscribir {selAlumnos.length > 0 ? `(${selAlumnos.length})` : ''}</>}
               </motion.button>
@@ -824,26 +824,26 @@ const ExamenesView: React.FC = () => {
             <button onClick={() => setModalCalificar(null)} className="absolute top-4 right-4 p-2 rounded-full opacity-40 hover:opacity-100"><X size={16}/></button>
 
             <div>
-              <p className="text-[8px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] mb-1">Registrar Calificación</p>
-              <h3 className="text-lg font-black uppercase italic tracking-tighter text-[var(--color-text)]">
+              <p className="text-caption font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] mb-1">Registrar Calificación</p>
+              <h3 className="text-seccion font-black uppercase italic tracking-tighter text-[var(--color-text)]">
                 {modalCalificar.alumnos?.nombres} {modalCalificar.alumnos?.apellidopaterno}
               </h3>
               {modalCalificar.grado_ant && (
                 <div className="flex items-center gap-2 mt-1">
                   <MiniCintaBelt colorName={modalCalificar.grado_ant.color} stripeName={modalCalificar.grado_ant.color_stripe}/>
-                  <span className="text-[9px] font-bold opacity-60">{modalCalificar.grado_ant.nivelkupdan}</span>
+                  <span className="text-caption font-bold opacity-60">{modalCalificar.grado_ant.nivelkupdan}</span>
                 </div>
               )}
             </div>
 
             {/* Calificación */}
             <div className="space-y-1">
-              <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Calificación (0–10) *</label>
+              <label className="text-label font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Calificación (0–10) *</label>
               <input type="number" min="0" max="10" step="0.1" placeholder="Ej. 8.5"
-                className="w-full h-14 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-black text-2xl text-center text-[var(--color-text)] transition-all"
+                className="w-full h-14 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-black text-subtitulo text-center text-[var(--color-text)] transition-all"
                 value={calificacion} onChange={e => setCalificacion(e.target.value)}/>
               {calificacion && (
-                <p className="text-center text-[9px] font-black uppercase tracking-widest mt-1"
+                <p className="text-center text-caption font-black uppercase tracking-widest mt-1"
                   style={{ color: parseFloat(calificacion) >= 6 ? '#22c55e' : '#ef4444' }}>
                   {parseFloat(calificacion) >= 6 ? '✓ Aprobado' : '✗ Reprobado'}
                 </p>
@@ -853,18 +853,18 @@ const ExamenesView: React.FC = () => {
             {/* Grado nuevo — solo si aprueba */}
             {calificacion && parseFloat(calificacion) >= 6 && (
             <div className="space-y-1">
-              <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Grado que obtiene *</label>
+              <label className="text-label font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Grado que obtiene *</label>
               {gradoNuevo && (() => {
                 const sel = cintas.find((c: any) => c.idgrado === Number(gradoNuevo));
                 return sel ? (
                   <div className="flex items-center gap-2 px-3 py-1.5 mb-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-background)]/50">
                     <MiniCintaBelt colorName={sel.color} stripeName={sel.color_stripe}/>
-                    <span className="text-[9px] font-black uppercase" style={{ color: getBeltHex(sel.color) }}>{sel.nivelkupdan}</span>
+                    <span className="text-caption font-black uppercase" style={{ color: getBeltHex(sel.color) }}>{sel.nivelkupdan}</span>
                   </div>
                 ) : null;
               })()}
               <select
-                className="w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-black text-[9px] uppercase text-[var(--color-text)] appearance-none cursor-pointer"
+                className="w-full h-11 px-4 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-black text-caption uppercase text-[var(--color-text)] appearance-none cursor-pointer"
                 value={gradoNuevo} onChange={e => setGradoNuevo(e.target.value ? Number(e.target.value) : '')}>
                 <option value="">— Selecciona grado —</option>
                 {cintas.map((c: any) => (
@@ -878,14 +878,14 @@ const ExamenesView: React.FC = () => {
 
             {/* Notas */}
             <div className="space-y-1">
-              <label className="text-[7px] font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Notas (opcional)</label>
+              <label className="text-label font-black uppercase ml-2 text-[var(--color-text-muted)] tracking-widest">Notas (opcional)</label>
               <textarea placeholder="Observaciones del evaluador..." rows={2}
-                className="w-full px-4 py-3 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-bold text-[11px] text-[var(--color-text)] resize-none transition-all"
+                className="w-full px-4 py-3 bg-[var(--color-background)] rounded-xl border border-[var(--color-border)] focus:border-[var(--color-primary)] outline-none font-bold text-label text-[var(--color-text)] resize-none transition-all"
                 value={notasCal} onChange={e => setNotasCal(e.target.value)}/>
             </div>
 
             <motion.button whileTap={{ scale:0.97 }} onClick={handleCalificar} disabled={savingCal}
-              className="w-full h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full h-12 rounded-2xl text-caption font-black uppercase tracking-widest text-white flex items-center justify-center gap-2 disabled:opacity-50"
               style={{ background:'var(--color-primary)' }}>
               {savingCal ? <><Loader2 size={16} className="animate-spin"/> Guardando...</> : <><Star size={16}/> Registrar Calificación</>}
             </motion.button>
@@ -905,9 +905,9 @@ const ExamenesView: React.FC = () => {
             <button onClick={() => setModalPdf(false)} className="absolute top-4 right-4 p-2 rounded-full opacity-40 hover:opacity-100"><X size={16}/></button>
 
             <div>
-              <p className="text-[8px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] mb-1">Documento del Examen</p>
-              <h3 className="text-lg font-black uppercase italic tracking-tighter text-[var(--color-text)]">Subir PDF</h3>
-              <p className="text-[9px] opacity-50 mt-1 text-[var(--color-text)]">Solo archivos .pdf · Se usará para imprimir o compartir</p>
+              <p className="text-caption font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] mb-1">Documento del Examen</p>
+              <h3 className="text-seccion font-black uppercase italic tracking-tighter text-[var(--color-text)]">Subir PDF</h3>
+              <p className="text-caption opacity-50 mt-1 text-[var(--color-text)]">Solo archivos .pdf · Se usará para imprimir o compartir</p>
             </div>
 
             {examenActivo?.archivo_pdf && (
@@ -915,9 +915,9 @@ const ExamenesView: React.FC = () => {
                 style={{ background:'#22c55e10', borderColor:'#22c55e30' }}>
                 <FileText size={16} style={{ color:'#22c55e' }}/>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[9px] font-black uppercase text-emerald-400">PDF actual</p>
+                  <p className="text-caption font-black uppercase text-emerald-400">PDF actual</p>
                   <a href={examenActivo.archivo_pdf} target="_blank" rel="noreferrer"
-                    className="text-[8px] underline text-emerald-400 opacity-70 truncate block">
+                    className="text-caption underline text-emerald-400 opacity-70 truncate block">
                     Ver PDF actual
                   </a>
                 </div>
@@ -928,8 +928,8 @@ const ExamenesView: React.FC = () => {
               className="w-full h-32 rounded-[2rem] border-2 border-dashed flex flex-col items-center justify-center gap-3 transition-all disabled:opacity-50"
               style={{ borderColor:'var(--color-primary)50', background:'var(--color-primary)05' }}>
               {uploadingPdf
-                ? <><Loader2 size={28} className="animate-spin text-[var(--color-primary)]"/><span className="text-[9px] font-black uppercase tracking-widest opacity-60">Subiendo...</span></>
-                : <><Upload size={28} style={{ color:'var(--color-primary)' }}/><span className="text-[9px] font-black uppercase tracking-widest" style={{ color:'var(--color-primary)' }}>Seleccionar PDF</span></>
+                ? <><Loader2 size={28} className="animate-spin text-[var(--color-primary)]"/><span className="text-caption font-black uppercase tracking-widest opacity-60">Subiendo...</span></>
+                : <><Upload size={28} style={{ color:'var(--color-primary)' }}/><span className="text-caption font-black uppercase tracking-widest" style={{ color:'var(--color-primary)' }}>Seleccionar PDF</span></>
               }
             </button>
             <input type="file" ref={pdfInputRef} className="hidden" accept=".pdf" onChange={handleUploadPdf}/>

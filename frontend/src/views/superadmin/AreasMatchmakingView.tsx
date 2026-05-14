@@ -233,7 +233,7 @@ const AreaCard: React.FC<{
             style={{ color: T.text }}>
             {area.nombre_area}
           </p>
-          <span className="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg"
+          <span className="text-xs font-black uppercase tracking-widest px-2 py-0.5 rounded-lg"
             style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}>
             {area.estatus.replace('_', ' ')}
           </span>
@@ -443,7 +443,7 @@ const MatchmakingPanel: React.FC<{ idtorneo: number; T: Tema }> = ({ idtorneo, T
                       <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg"
                         style={{ background: '#f9731612', border: '1px solid #f9731625' }}>
                         <AlertTriangle size={9} color="#f97316" />
-                        <span className="text-[7px] font-bold" style={{ color: '#f97316' }}>
+                        <span className="text-xs font-bold" style={{ color: '#f97316' }}>
                           {enf.advertencia}
                         </span>
                       </div>
@@ -531,7 +531,7 @@ const CompetidorChip: React.FC<{
         style={{ color: T.text }}>
         {comp?.nombre ?? '—'}
       </p>
-      <p className="text-[7px] font-bold truncate" style={{ color: T.textDim }}>
+      <p className="text-xs font-bold truncate" style={{ color: T.textDim }}>
         {comp?.escuela ?? ''}{comp?.peso ? ` · ${comp.peso}kg` : ''}
       </p>
     </div>
@@ -627,7 +627,7 @@ const AreasMatchmakingView: React.FC<AreasMatchmakingViewProps> = ({ idtorneo, o
             style={{ background: T.card, border: `1px solid ${T.border}` }}>
             <Icon size={13} style={{ color, marginBottom: 6 }} />
             <p className="text-xl font-black tracking-tighter" style={{ color }}>{val}</p>
-            <p className="text-[7px] font-black uppercase tracking-widest mt-0.5"
+            <p className="text-xs font-black uppercase tracking-widest mt-0.5"
               style={{ color: T.textDim }}>{label}</p>
           </div>
         ))}

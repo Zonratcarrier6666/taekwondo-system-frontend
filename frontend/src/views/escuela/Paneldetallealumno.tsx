@@ -119,13 +119,13 @@ export const PanelDetalleAlumno: React.FC<Props> = ({
                 <UserCircle size={28} />
               </div>
               <div className="flex-1 min-w-0 z-10 text-left">
-                <p className="text-[8px] font-black uppercase tracking-[0.3em] text-white/60 leading-none mb-1">
+                <p className="text-caption font-black uppercase tracking-[0.3em] text-white/60 leading-none mb-1">
                   Ficha de Alumno
                 </p>
-                <h2 className="text-xl font-black italic uppercase tracking-tighter text-white leading-tight truncate">
+                <h2 className="text-subtitulo font-black italic uppercase tracking-tighter text-white leading-tight truncate">
                   {nombreCompleto}
                 </h2>
-                <p className="text-[9px] font-bold text-white/50 mt-1">
+                <p className="text-caption font-bold text-white/50 mt-1">
                   ID {pago.idalumno}
                 </p>
               </div>
@@ -144,27 +144,27 @@ export const PanelDetalleAlumno: React.FC<Props> = ({
               {loadingResumen ? (
                 <div className="flex items-center gap-3 px-4 py-5 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)]">
                   <Loader2 className="animate-spin text-[var(--color-primary)]" size={20} />
-                  <span className="text-xs font-bold opacity-50 text-[var(--color-text)]">Cargando resumen...</span>
+                  <span className="text-label font-bold opacity-50 text-[var(--color-text)]">Cargando resumen...</span>
                 </div>
               ) : resumen ? (
                 <div className="space-y-3">
-                  <p className="text-[8px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] px-1">Resumen del Ciclo</p>
+                  <p className="text-caption font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] px-1">Resumen del Ciclo</p>
 
                   <div className="grid grid-cols-2 gap-3">
                     {/* Mensualidades pagadas */}
                     <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 text-left">
                       <CheckCircle2 size={16} className="text-green-400 mb-2" />
-                      <p className="text-2xl font-black text-green-400 leading-none">{resumen.mensualidades_pagadas}</p>
-                      <p className="text-[8px] font-black uppercase tracking-widest text-green-400/70 mt-1">Pagadas</p>
+                      <p className="text-subtitulo font-black text-green-400 leading-none">{resumen.mensualidades_pagadas}</p>
+                      <p className="text-caption font-black uppercase tracking-widest text-green-400/70 mt-1">Pagadas</p>
                     </div>
 
                     {/* Mensualidades pendientes */}
                     <div className="bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 rounded-2xl p-4 text-left">
                       <Clock size={16} style={{ color: 'var(--color-primary)' }} className="mb-2" />
-                      <p className="text-2xl font-black leading-none" style={{ color: 'var(--color-primary)' }}>
+                      <p className="text-subtitulo font-black leading-none" style={{ color: 'var(--color-primary)' }}>
                         {resumen.mensualidades_pendientes}
                       </p>
-                      <p className="text-[8px] font-black uppercase tracking-widest opacity-70 mt-1" style={{ color: 'var(--color-primary)' }}>
+                      <p className="text-caption font-black uppercase tracking-widest opacity-70 mt-1" style={{ color: 'var(--color-primary)' }}>
                         Pendientes
                       </p>
                     </div>
@@ -176,8 +176,8 @@ export const PanelDetalleAlumno: React.FC<Props> = ({
                       <div className="flex items-center gap-3">
                         <AlertTriangle size={18} className="text-red-400 flex-shrink-0" />
                         <div>
-                          <p className="text-[8px] font-black uppercase tracking-widest text-red-400/70">Adeudo Total</p>
-                          <p className="text-xl font-black text-red-400 leading-none mt-0.5">
+                          <p className="text-caption font-black uppercase tracking-widest text-red-400/70">Adeudo Total</p>
+                          <p className="text-subtitulo font-black text-red-400 leading-none mt-0.5">
                             ${resumen.total_adeudo.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                           </p>
                         </div>
@@ -187,31 +187,31 @@ export const PanelDetalleAlumno: React.FC<Props> = ({
 
                   {/* Config del alumno */}
                   <div className="bg-[var(--color-background)] border border-[var(--color-border)] rounded-2xl p-4 space-y-3 text-left">
-                    <p className="text-[8px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)]">Configuración</p>
+                    <p className="text-caption font-black uppercase tracking-widest opacity-40 text-[var(--color-text)]">Configuración</p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 opacity-60">
                         <DollarSign size={13} className="text-[var(--color-text)]" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text)]">Mensualidad</span>
+                        <span className="text-caption font-black uppercase tracking-widest text-[var(--color-text)]">Mensualidad</span>
                       </div>
-                      <span className="text-sm font-black text-[var(--color-text)]">
+                      <span className="text-datos font-black text-[var(--color-text)]">
                         ${resumen.monto_mensualidad.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 opacity-60">
                         <Calendar size={13} className="text-[var(--color-text)]" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text)]">Día de cobro</span>
+                        <span className="text-caption font-black uppercase tracking-widest text-[var(--color-text)]">Día de cobro</span>
                       </div>
-                      <span className="text-sm font-black text-[var(--color-text)]">Día {resumen.dia_cobro}</span>
+                      <span className="text-datos font-black text-[var(--color-text)]">Día {resumen.dia_cobro}</span>
                     </div>
                     {resumen.inscripcion_ciclo_actual && (
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 opacity-60">
                           <FileText size={13} className="text-[var(--color-text)]" />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text)]">Inscripción ciclo</span>
+                          <span className="text-caption font-black uppercase tracking-widest text-[var(--color-text)]">Inscripción ciclo</span>
                         </div>
                         <span
-                          className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full"
+                          className="text-caption font-black uppercase px-2 py-0.5 rounded-full"
                           style={{
                             backgroundColor: resumen.inscripcion_ciclo_actual === 'pagada' ? '#22c55e20' : 'var(--color-primary)20',
                             color: resumen.inscripcion_ciclo_actual === 'pagada' ? '#22c55e' : 'var(--color-primary)',
@@ -224,14 +224,14 @@ export const PanelDetalleAlumno: React.FC<Props> = ({
                   </div>
                 </div>
               ) : (
-                <div className="px-4 py-3 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] text-xs font-bold opacity-40 text-[var(--color-text)] text-left">
+                <div className="px-4 py-3 rounded-2xl bg-[var(--color-background)] border border-[var(--color-border)] text-label font-bold opacity-40 text-[var(--color-text)] text-left">
                   Resumen no disponible
                 </div>
               )}
 
               {/* Pago actual seleccionado — destacado */}
               <div>
-                <p className="text-[8px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] px-1 mb-3">
+                <p className="text-caption font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] px-1 mb-3">
                   Pago Seleccionado
                 </p>
                 <PagoCard
@@ -245,7 +245,7 @@ export const PanelDetalleAlumno: React.FC<Props> = ({
               {/* Otros pagos del mismo alumno en el listado actual */}
               {pagosAlumno.length > 1 && (
                 <div>
-                  <p className="text-[8px] font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] px-1 mb-3">
+                  <p className="text-caption font-black uppercase tracking-widest opacity-40 text-[var(--color-text)] px-1 mb-3">
                     Otros cargos en pantalla ({pagosAlumno.length - 1})
                   </p>
                   <div className="space-y-2">
@@ -292,7 +292,7 @@ const PagoCard: React.FC<PagoCardProps> = ({ p, destacado, onCobrar, onVerTicket
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span
-            className="text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+            className="text-label font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
             style={{
               backgroundColor: `${labelEstatusColor(p.estatus ?? 0)}20`,
               color: labelEstatusColor(p.estatus ?? 0),
@@ -300,20 +300,20 @@ const PagoCard: React.FC<PagoCardProps> = ({ p, destacado, onCobrar, onVerTicket
           >
             {labelEstatus(p.estatus ?? 0)}
           </span>
-          <span className="text-[8px] font-bold uppercase opacity-40 text-[var(--color-text)]">
+          <span className="text-caption font-bold uppercase opacity-40 text-[var(--color-text)]">
             {labelTipoPago(p.id_tipo_pago)}
           </span>
         </div>
-        <p className="text-sm font-black text-[var(--color-text)] truncate leading-tight italic">
+        <p className="text-datos font-black text-[var(--color-text)] truncate leading-tight italic">
           {p.concepto}
         </p>
         {p.mes_correspondiente && (
-          <p className="text-[9px] font-bold opacity-40 text-[var(--color-text)] mt-0.5">
+          <p className="text-caption font-bold opacity-40 text-[var(--color-text)] mt-0.5">
             {p.mes_correspondiente}
           </p>
         )}
       </div>
-      <span className="text-lg font-black leading-none flex-shrink-0" style={{ color: 'var(--color-primary)' }}>
+      <span className="text-seccion font-black leading-none flex-shrink-0" style={{ color: 'var(--color-primary)' }}>
         ${p.monto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
       </span>
     </div>
@@ -321,14 +321,14 @@ const PagoCard: React.FC<PagoCardProps> = ({ p, destacado, onCobrar, onVerTicket
     {p.metodo_pago && (
       <div className="flex items-center gap-2 text-[var(--color-text)]">
         <CreditCard size={12} className="opacity-40" />
-        <span className="text-[9px] font-black uppercase tracking-widest opacity-50">{p.metodo_pago}</span>
+        <span className="text-caption font-black uppercase tracking-widest opacity-50">{p.metodo_pago}</span>
       </div>
     )}
 
     {p.fecha_pago && (
       <div className="flex items-center gap-2 text-[var(--color-text)]">
         <Calendar size={12} className="opacity-40" />
-        <span className="text-[9px] font-bold opacity-40">
+        <span className="text-caption font-bold opacity-40">
           Pagado: {new Date(p.fecha_pago).toLocaleDateString('es-MX')}
         </span>
       </div>
@@ -338,7 +338,7 @@ const PagoCard: React.FC<PagoCardProps> = ({ p, destacado, onCobrar, onVerTicket
       {p.estatus === 0 && (
         <button
           onClick={() => onCobrar(p)}
-          className="flex-1 h-9 rounded-xl text-white text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all hover:brightness-110"
+          className="flex-1 h-9 rounded-xl text-white text-caption font-black uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all hover:brightness-110"
           style={{ backgroundColor: 'var(--color-primary)' }}
         >
           <TrendingUp size={13} /> Cobrar
@@ -346,7 +346,7 @@ const PagoCard: React.FC<PagoCardProps> = ({ p, destacado, onCobrar, onVerTicket
       )}
       <button
         onClick={() => onVerTicket(p)}
-        className="flex-1 h-9 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 border transition-all hover:bg-[var(--color-primary)] hover:text-white hover:border-transparent"
+        className="flex-1 h-9 rounded-xl text-caption font-black uppercase tracking-widest flex items-center justify-center gap-1.5 border transition-all hover:bg-[var(--color-primary)] hover:text-white hover:border-transparent"
         style={{
           borderColor: 'var(--color-border)',
           color: 'var(--color-text-muted)',

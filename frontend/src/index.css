@@ -11,7 +11,46 @@
   --color-danger: #ef4444;
   --color-success: #10b981;
 }
-
+:root {
+  --text-titulo:    clamp(18px, 3vw, 28px);
+  --text-subtitulo: clamp(14px, 2.8vw, 24px);
+  --text-seccion:   clamp(13px, 2.2vw, 20px);
+  --text-datos:     clamp(12px, 1.8vw, 17px);
+  --text-label:     clamp(11px, 1.5vw, 14px);
+  --text-caption:   clamp(10px, 1.3vw, 13px);
+}
+@media (max-width: 640px) {
+  :root,
+  [data-theme="blue-ocean"],
+  [data-theme="default"],
+  [data-theme="light"],
+  [data-theme="sakura-dojo"],
+  [data-theme="forest-dojo"],
+  [data-theme="orange-tiger"],
+  [data-theme="golden-sun"],
+  [data-theme="brown-earth"],
+  [data-theme="dark-martial"],
+  [data-theme="rojo-dragon"],
+  [data-theme="black-gold"],
+  [data-theme="black-red"],
+  [data-theme="black-green"],
+  [data-theme="black-orange"],
+  [data-theme="purple-ninja"],
+  [data-theme="midnight-void"],
+  [data-theme="samurai-armor"],
+  [data-theme="obsidian-flame"],
+  [data-theme="royal-spirit"],
+  [data-theme="desert-wind"],
+  [data-theme="cyan-glacier"],
+  [data-theme="silver-moon"] {
+    --text-titulo:    18px !important;
+    --text-subtitulo: 13px !important;
+    --text-seccion:   12px !important;
+    --text-datos:     11px !important;
+    --text-label:     10px !important;
+    --text-caption:   8px !important;
+  }
+}
 /* --- TEMAS CLAROS --- */
 
 :root, [data-theme="blue-ocean"], [data-theme="default"] {

@@ -308,8 +308,8 @@ export const GestionProfesores: React.FC = () => {
               <GraduationCap size={26} />
             </div>
             <div>
-              <h2 className="text-xl font-black uppercase italic tracking-tighter text-[var(--color-text)] leading-none">Cuerpo Técnico</h2>
-              <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.25em] mt-1.5 opacity-70">Staff Institucional</p>
+              <h2 className="text-subtitulo font-black uppercase italic tracking-tighter text-[var(--color-text)] leading-none">Cuerpo Técnico</h2>
+              <p className="text-caption font-bold text-[var(--color-text-muted)] uppercase tracking-[0.25em] mt-1.5 opacity-70">Staff Institucional</p>
             </div>
           </div>
           <motion.button whileTap={{ scale: 0.9 }} onClick={handleOpenRegistration} className="w-12 h-12 bg-[var(--color-primary)] text-white rounded-2xl flex items-center justify-center shadow-lg active:brightness-110 transition-all">
@@ -318,7 +318,7 @@ export const GestionProfesores: React.FC = () => {
         </div>
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-          <input type="text" placeholder="Buscar por nombre..." className="w-full h-14 pl-12 pr-6 bg-[var(--color-background)]/50 rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] transition-all shadow-inner" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <input type="text" placeholder="Buscar por nombre..." className="w-full h-14 pl-12 pr-6 bg-[var(--color-background)]/50 rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-datos text-[var(--color-text)] transition-all shadow-inner" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
       </div>
 
@@ -327,7 +327,7 @@ export const GestionProfesores: React.FC = () => {
         {loading ? (
           <div className="flex flex-col items-center py-20 gap-3"><Loader2 className="animate-spin text-[var(--color-primary)]" size={32} /></div>
         ) : filtered.length === 0 ? (
-            <div className="p-20 text-center opacity-30 italic font-bold uppercase tracking-widest text-xs text-[var(--color-text-muted)]">Sin registros en el staff</div>
+            <div className="p-20 text-center opacity-30 italic font-bold uppercase tracking-widest text-label text-[var(--color-text-muted)]">Sin registros en el staff</div>
         ) : (
           filtered.map((prof) => (
             <motion.div layout key={prof.idprofesor} className="bg-[var(--color-card)]/80 backdrop-blur-xl p-5 rounded-[2.8rem] border border-[var(--color-border)] shadow-lg flex flex-col gap-4 group hover:border-[var(--color-primary)]/40 transition-all">
@@ -339,15 +339,15 @@ export const GestionProfesores: React.FC = () => {
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-xl border-2 border-[var(--color-card)] flex items-center justify-center shadow-xl bg-black overflow-hidden">
                     <div className="absolute inset-0 bg-yellow-500 opacity-20" />
-                    <span className="text-[10px] font-black italic text-white relative z-10">{prof.idgradodan >= 11 ? prof.idgradodan - 10 : prof.idgradodan}°</span>
+                    <span className="text-caption font-black italic text-white relative z-10">{prof.idgradodan >= 11 ? prof.idgradodan - 10 : prof.idgradodan}°</span>
                   </div>
                   {prof.estatus === 0 && (
-                    <div className="absolute -top-1 -left-1 bg-red-500 text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded-lg leading-none">OFF</div>
+                    <div className="absolute -top-1 -left-1 bg-red-500 text-white text-caption font-black uppercase px-1.5 py-0.5 rounded-lg leading-none">OFF</div>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-sm font-black uppercase italic tracking-tighter text-[var(--color-text)] leading-tight truncate">{prof.nombrecompleto}</h3>
-                  <p className="text-[9px] font-bold text-[var(--color-primary)] uppercase tracking-widest mt-1 flex items-center gap-1.5"><ShieldCheck size={10} className="text-emerald-500" /> Instructor Cinturón Negro</p>
+                  <h3 className="text-datos font-black uppercase italic tracking-tighter text-[var(--color-text)] leading-tight truncate">{prof.nombrecompleto}</h3>
+                  <p className="text-caption font-bold text-[var(--color-primary)] uppercase tracking-widest mt-1 flex items-center gap-1.5"><ShieldCheck size={10} className="text-emerald-500" /> Instructor Cinturón Negro</p>
                 </div>
               </div>
 
@@ -399,10 +399,10 @@ export const GestionProfesores: React.FC = () => {
                     {step === 'form' ? <UserPlus size={26} /> : <Smartphone size={26} />}
                   </div>
                   <div>
-                    <h3 className="text-2xl font-black uppercase italic tracking-tighter leading-none">
+                    <h3 className="text-subtitulo font-black uppercase italic tracking-tighter leading-none">
                       {step === 'form' ? 'Nuevo Maestro' : 'Identidad Staff'}
                     </h3>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] opacity-60 mt-1.5">Matrícula Técnica</p>
+                    <p className="text-caption font-bold uppercase tracking-[0.25em] opacity-60 mt-1.5">Matrícula Técnica</p>
                   </div>
                 </div>
                 <button onClick={closeAndStop} className="p-2.5 bg-black/20 rounded-full hover:bg-black/30 transition-colors relative z-10"><X size={22} /></button>
@@ -412,82 +412,82 @@ export const GestionProfesores: React.FC = () => {
                 {step === 'form' ? (
                   <form onSubmit={handleCreateProfesor} className="space-y-5">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest">Nombre Completo</label>
-                      <input required placeholder="Ej: Kaoru Hanayama" className="w-full h-14 px-6 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] transition-all shadow-inner" value={formData.nombre_completo} onChange={e => setFormData({...formData, nombre_completo: e.target.value})} />
+                      <label className="text-caption font-black uppercase text-slate-500 ml-3 tracking-widest">Nombre Completo</label>
+                      <input required placeholder="Ej: Kaoru Hanayama" className="w-full h-14 px-6 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-datos text-[var(--color-text)] transition-all shadow-inner" value={formData.nombre_completo} onChange={e => setFormData({...formData, nombre_completo: e.target.value})} />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest">Usuario de acceso</label>
-                      <input required placeholder="maestro.pro" className="w-full h-14 px-6 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] shadow-inner" value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} />
+                      <label className="text-caption font-black uppercase text-slate-500 ml-3 tracking-widest">Usuario de acceso</label>
+                      <input required placeholder="maestro.pro" className="w-full h-14 px-6 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-datos text-[var(--color-text)] shadow-inner" value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest">Contraseña</label>
+                      <label className="text-caption font-black uppercase text-slate-500 ml-3 tracking-widest">Contraseña</label>
                       <div className="relative">
                         <input
                           required
                           type={showPass ? 'text' : 'password'}
                           placeholder="Mín. 12 · Mayús · Núm · Especial"
-                          className="w-full h-14 px-6 pr-14 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] shadow-inner transition-all"
+                          className="w-full h-14 px-6 pr-14 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-datos text-[var(--color-text)] shadow-inner transition-all"
                           value={formData.password}
                           onChange={e => setFormData({...formData, password: e.target.value})}
                         />
                         <button type="button" onClick={() => setShowPass(p => !p)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black uppercase tracking-widest text-[var(--color-primary)] opacity-60 hover:opacity-100">
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-caption font-black uppercase tracking-widest text-[var(--color-primary)] opacity-60 hover:opacity-100">
                           {showPass ? 'Ocultar' : 'Ver'}
                         </button>
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest">Confirmar Contraseña</label>
+                      <label className="text-caption font-black uppercase text-slate-500 ml-3 tracking-widest">Confirmar Contraseña</label>
                       <div className="relative">
                         <input
                           required
                           type={showConfirmPass ? 'text' : 'password'}
                           placeholder="Repite la contraseña"
-                          className="w-full h-14 px-6 pr-14 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-sm text-[var(--color-text)] shadow-inner transition-all"
+                          className="w-full h-14 px-6 pr-14 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-bold text-datos text-[var(--color-text)] shadow-inner transition-all"
                           value={confirmPassword}
                           onChange={e => setConfirmPassword(e.target.value)}
                         />
                         <button type="button" onClick={() => setShowConfirmPass(p => !p)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black uppercase tracking-widest text-[var(--color-primary)] opacity-60 hover:opacity-100">
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-caption font-black uppercase tracking-widest text-[var(--color-primary)] opacity-60 hover:opacity-100">
                           {showConfirmPass ? 'Ocultar' : 'Ver'}
                         </button>
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest">Grado Dan Actual</label>
-                      <select className="w-full h-14 px-6 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-black text-[11px] uppercase text-[var(--color-text)] appearance-none cursor-pointer shadow-inner" value={formData.idgradodan} onChange={e => setFormData({...formData, idgradodan: parseInt(e.target.value)})}>
+                      <label className="text-caption font-black uppercase text-slate-500 ml-3 tracking-widest">Grado Dan Actual</label>
+                      <select className="w-full h-14 px-6 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-[var(--color-primary)] outline-none font-black text-label uppercase text-[var(--color-text)] appearance-none cursor-pointer shadow-inner" value={formData.idgradodan} onChange={e => setFormData({...formData, idgradodan: parseInt(e.target.value)})}>
                          {catalogoCintas.filter(c => c.idgrado >= 11).map(g => (
                            <option key={g.idgrado} value={g.idgrado}>{g.nivelkupdan} - {g.color}</option>
                          ))}
                       </select>
                     </div>
-                    {formError && <div className="p-4 bg-red-500/10 rounded-xl border border-red-500/20 flex items-center gap-3 text-red-500 font-bold text-[10px] uppercase tracking-widest"><AlertCircle size={16}/> {formError}</div>}
-                    <motion.button whileTap={{ scale: 0.96 }} type="submit" disabled={saving} className="w-full h-20 bg-[var(--color-text)] text-[var(--color-card)] font-black rounded-[2.5rem] mt-4 shadow-2xl flex items-center justify-center gap-3 transition-all active:brightness-125">{saving ? <Loader2 className="animate-spin" size={24} /> : <><Save size={24}/> <span className="text-base uppercase italic tracking-tighter text-white">Completar Registro</span></>}</motion.button>
+                    {formError && <div className="p-4 bg-red-500/10 rounded-xl border border-red-500/20 flex items-center gap-3 text-red-500 font-bold text-caption uppercase tracking-widest"><AlertCircle size={16}/> {formError}</div>}
+                    <motion.button whileTap={{ scale: 0.96 }} type="submit" disabled={saving} className="w-full h-20 bg-[var(--color-text)] text-[var(--color-card)] font-black rounded-[2.5rem] mt-4 shadow-2xl flex items-center justify-center gap-3 transition-all active:brightness-125">{saving ? <Loader2 className="animate-spin" size={24} /> : <><Save size={24}/> <span className="text-datos uppercase italic tracking-tighter text-white">Completar Registro</span></>}</motion.button>
                   </form>
                 ) : step === 'photo_choice' ? (
                   <div className="text-center space-y-10 py-6">
                     {passwordTemporal && (
                       <div className="p-5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-3xl text-left space-y-2">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">✓ Profesor registrado — Contraseña asignada</p>
+                        <p className="text-caption font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">✓ Profesor registrado — Contraseña asignada</p>
                         <div className="flex items-center gap-3 bg-white dark:bg-black/20 rounded-2xl px-4 py-3 border border-emerald-200 dark:border-emerald-500/20">
-                          <code className="text-lg font-black tracking-widest text-[var(--color-text)] flex-1">{passwordTemporal}</code>
-                          <button type="button" onClick={() => navigator.clipboard.writeText(passwordTemporal)} className="text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 transition-colors">Copiar</button>
+                          <code className="text-seccion font-black tracking-widest text-[var(--color-text)] flex-1">{passwordTemporal}</code>
+                          <button type="button" onClick={() => navigator.clipboard.writeText(passwordTemporal)} className="text-caption font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 transition-colors">Copiar</button>
                         </div>
-                        <p className="text-[10px] text-slate-500 font-semibold">Entrega esta contraseña al profesor de forma segura.</p>
+                        <p className="text-caption text-slate-500 font-semibold">Entrega esta contraseña al profesor de forma segura.</p>
                       </div>
                     )}
                     <div className="grid grid-cols-2 gap-5">
                        <button onClick={() => fileGalleryRef.current?.click()} className="flex flex-col items-center justify-center gap-4 p-10 bg-slate-50 dark:bg-black/20 rounded-[3rem] border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all group shadow-xl">
                          <div className="p-5 bg-white dark:bg-slate-800 rounded-3xl shadow-lg group-hover:scale-110 transition-transform"><ImagePlus className="text-[var(--color-primary)]" size={32} /></div>
-                         <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text)]">Galería</span>
+                         <span className="text-caption font-black uppercase tracking-widest text-[var(--color-text)]">Galería</span>
                        </button>
                        <button onClick={startCamera} className="flex flex-col items-center justify-center gap-4 p-10 bg-slate-50 dark:bg-black/20 rounded-[3rem] border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all group shadow-xl">
                          <div className="p-5 bg-white dark:bg-slate-800 rounded-3xl shadow-lg group-hover:scale-110 transition-transform"><CameraIcon className="text-[var(--color-primary)]" size={32} /></div>
-                         <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text)]">Cámara</span>
+                         <span className="text-caption font-black uppercase tracking-widest text-[var(--color-text)]">Cámara</span>
                        </button>
                     </div>
                     <input type="file" ref={fileGalleryRef} className="hidden" accept="image/*" onChange={handleFileSelect} />
-                    <button onClick={closeAndStop} className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-500 hover:text-[var(--color-primary)] transition-colors">Omitir por ahora</button>
+                    <button onClick={closeAndStop} className="text-label font-black uppercase tracking-[0.4em] text-slate-500 hover:text-[var(--color-primary)] transition-colors">Omitir por ahora</button>
                   </div>
                 ) : step === 'camera_live' ? (
                   <div className="space-y-8 text-center py-4 animate-in zoom-in duration-300">
@@ -499,7 +499,7 @@ export const GestionProfesores: React.FC = () => {
                           <CameraIcon size={40} />
                        </button>
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Encuadra el rostro del maestro</p>
+                    <p className="text-caption font-black uppercase tracking-widest text-slate-500">Encuadra el rostro del maestro</p>
                   </div>
                 ) : (
                   <div className="text-center space-y-10 py-6 animate-in fade-in">
@@ -509,10 +509,10 @@ export const GestionProfesores: React.FC = () => {
                     </div>
                     <div className="flex flex-col gap-4 px-10">
                        <motion.button whileTap={{ scale: 0.95 }} onClick={handleUploadConfirmed} disabled={saving} className="w-full h-20 bg-[var(--color-text)] text-[var(--color-card)] font-black rounded-3xl flex items-center justify-center gap-4 shadow-xl active:brightness-125 disabled:opacity-50">
-                          <CheckCircle2 size={24} /> <span className="text-lg uppercase italic tracking-tighter text-white">Sincronizar Identidad</span>
+                          <CheckCircle2 size={24} /> <span className="text-seccion uppercase italic tracking-tighter text-white">Sincronizar Identidad</span>
                        </motion.button>
                        <button onClick={() => { stopCamera(); setStep('photo_choice'); }} disabled={saving} className="w-full h-14 bg-slate-100 dark:bg-white/5 text-[var(--color-text)] font-black rounded-3xl flex items-center justify-center gap-3 transition-all">
-                          <RotateCcw size={18} /> <span className="text-[11px] uppercase opacity-60 tracking-widest font-bold">Repetir captura</span>
+                          <RotateCcw size={18} /> <span className="text-label uppercase opacity-60 tracking-widest font-bold">Repetir captura</span>
                        </button>
                     </div>
                   </div>
@@ -534,8 +534,8 @@ export const GestionProfesores: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <div className="p-2.5 bg-white/15 rounded-2xl"><Pencil size={20} /></div>
                   <div>
-                    <h3 className="text-lg font-black uppercase italic tracking-tighter leading-none">Editar Maestro</h3>
-                    <p className="text-[9px] font-bold uppercase tracking-widest opacity-60 mt-1">Actualizar datos del staff</p>
+                    <h3 className="text-seccion font-black uppercase italic tracking-tighter leading-none">Editar Maestro</h3>
+                    <p className="text-caption font-bold uppercase tracking-widest opacity-60 mt-1">Actualizar datos del staff</p>
                   </div>
                 </div>
                 <button onClick={() => !editSaving && setEditProfesor(null)} className="p-2 bg-black/20 rounded-full hover:bg-black/30 transition-colors"><X size={18} /></button>
@@ -549,15 +549,15 @@ export const GestionProfesores: React.FC = () => {
                     {editProfesor.foto_url ? <img src={editProfesor.foto_url} className="w-full h-full object-cover" alt="" /> : <User size={24} className="text-slate-400 opacity-40" />}
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Editando perfil</p>
-                    <p className="text-xs font-black italic uppercase tracking-tight text-[var(--color-text)] opacity-60 truncate max-w-[160px]">{editProfesor.nombrecompleto}</p>
+                    <p className="text-caption font-black uppercase tracking-widest text-indigo-500">Editando perfil</p>
+                    <p className="text-label font-black italic uppercase tracking-tight text-[var(--color-text)] opacity-60 truncate max-w-[160px]">{editProfesor.nombrecompleto}</p>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest">Nombre Completo</label>
+                  <label className="text-caption font-black uppercase text-slate-500 ml-3 tracking-widest">Nombre Completo</label>
                   <input
-                    className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-indigo-500 outline-none font-bold text-sm text-[var(--color-text)] transition-all shadow-inner"
+                    className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-indigo-500 outline-none font-bold text-datos text-[var(--color-text)] transition-all shadow-inner"
                     value={editForm.nombrecompleto}
                     onChange={e => setEditForm(f => ({ ...f, nombrecompleto: e.target.value }))}
                     placeholder="Nombre completo"
@@ -565,9 +565,9 @@ export const GestionProfesores: React.FC = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-3 tracking-widest">Grado Dan</label>
+                  <label className="text-caption font-black uppercase text-slate-500 ml-3 tracking-widest">Grado Dan</label>
                   <select
-                    className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-indigo-500 outline-none font-black text-[11px] uppercase text-[var(--color-text)] appearance-none cursor-pointer shadow-inner"
+                    className="w-full h-12 px-5 bg-[var(--color-background)] rounded-2xl border border-transparent focus:border-indigo-500 outline-none font-black text-label uppercase text-[var(--color-text)] appearance-none cursor-pointer shadow-inner"
                     value={editForm.idgradodan}
                     onChange={e => setEditForm(f => ({ ...f, idgradodan: parseInt(e.target.value) }))}
                   >
@@ -578,18 +578,18 @@ export const GestionProfesores: React.FC = () => {
                 </div>
 
                 {editError && (
-                  <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20 flex items-center gap-2 text-red-500 font-bold text-[10px] uppercase tracking-widest">
+                  <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20 flex items-center gap-2 text-red-500 font-bold text-caption uppercase tracking-widest">
                     <AlertCircle size={14} /> {editError}
                   </div>
                 )}
 
                 <div className="flex gap-3 pt-2">
                   <button onClick={() => !editSaving && setEditProfesor(null)} disabled={editSaving}
-                    className="flex-1 h-12 bg-[var(--color-background)] text-[var(--color-text)] font-black rounded-2xl text-[10px] uppercase tracking-widest border border-[var(--color-border)] disabled:opacity-40 active:scale-95 transition-transform">
+                    className="flex-1 h-12 bg-[var(--color-background)] text-[var(--color-text)] font-black rounded-2xl text-caption uppercase tracking-widest border border-[var(--color-border)] disabled:opacity-40 active:scale-95 transition-transform">
                     Cancelar
                   </button>
                   <button onClick={handleSaveEdit} disabled={editSaving}
-                    className="flex-[2] h-12 bg-indigo-500 text-white font-black rounded-2xl text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 active:scale-95 transition-transform hover:bg-indigo-600">
+                    className="flex-[2] h-12 bg-indigo-500 text-white font-black rounded-2xl text-caption uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 active:scale-95 transition-transform hover:bg-indigo-600">
                     {editSaving ? <Loader2 size={16} className="animate-spin" /> : <><Save size={15} /> Guardar cambios</>}
                   </button>
                 </div>

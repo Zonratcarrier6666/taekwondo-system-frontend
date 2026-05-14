@@ -73,7 +73,7 @@ const Avatar: React.FC<{ src: string; name: string; size?: number }> = ({ src, n
     />
   ) : (
     <div
-      className="rounded-2xl flex items-center justify-center text-white font-black text-xs border border-white/10 shadow-lg"
+      className="rounded-2xl flex items-center justify-center text-white font-black text-label border border-white/10 shadow-lg"
       style={{ width: size, height: size, background: 'var(--color-primary)' }}
     >
       {initials}
@@ -115,12 +115,12 @@ const KpiCard: React.FC<{
       )}
     </div>
 
-    <h4 className="text-3xl font-black italic tracking-tighter leading-none text-[var(--color-text)]">{value}</h4>
-    <p className="text-[9px] font-black uppercase tracking-[0.25em] text-[var(--color-text-muted)] mt-1.5">{label}</p>
+    <h4 className="text-titulo font-black italic tracking-tighter leading-none text-[var(--color-text)]">{value}</h4>
+    <p className="text-caption font-black uppercase tracking-[0.25em] text-[var(--color-text-muted)] mt-1.5">{label}</p>
 
     {badge && (
       <span
-        className="mt-2 inline-block text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
+        className="mt-2 inline-block text-caption font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
         style={{ background: `${badgeColor ?? accent}22`, color: badgeColor ?? accent }}
       >
         {badge}
@@ -176,14 +176,33 @@ export const ProfesorDashboard: React.FC = () => {
 
   if (loading)
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--color-background)] text-[var(--color-text)]">
-        <div className="relative">
-          <Loader2 className="animate-spin text-[var(--color-primary)] mb-6" size={60} strokeWidth={1.5} />
-          <div className="absolute inset-0 blur-3xl bg-[var(--color-primary)]/20 animate-pulse" />
-        </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.6em] text-[var(--color-text-muted)] italic">
-          Sincronizando Perfil Técnico...
-        </p>
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-[var(--color-background)] text-[var(--color-text)] z-[100] p-6 text-center">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center"
+        >
+          <div className="relative mb-8">
+            <Loader2 className="animate-spin text-[var(--color-primary)]" size={56} strokeWidth={1.5} />
+            <div className="absolute inset-0 blur-2xl bg-[var(--color-primary)]/30 animate-pulse" />
+          </div>
+          <div className="space-y-3">
+            <h2 className="text-subtitulo font-black italic uppercase tracking-tighter text-[var(--color-text)]">
+              Sincronizando Perfil Técnico
+            </h2>
+            <div className="h-1 w-32 bg-[var(--color-border)] rounded-full overflow-hidden mx-auto">
+              <motion.div 
+                initial={{ x: '-100%' }}
+                animate={{ x: '100%' }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+                className="h-full w-1/2 bg-[var(--color-primary)]"
+              />
+            </div>
+            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[var(--color-text-muted)] opacity-60">
+              Preparando entorno de instructor
+            </p>
+          </div>
+        </motion.div>
       </div>
     );
 
@@ -218,10 +237,10 @@ export const ProfesorDashboard: React.FC = () => {
             </div>
             <div className="text-left flex flex-col justify-center">
               <div className="flex items-center gap-1.5 mb-0.5">
-                <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[var(--color-primary)]">Staff Técnico</span>
+                <span className="text-caption font-black uppercase tracking-[0.3em] text-[var(--color-primary)]">Staff Técnico</span>
                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
               </div>
-              <h1 className="text-sm font-black italic uppercase tracking-tighter leading-none group-hover:text-[var(--color-primary)] transition-colors">
+              <h1 className="text-datos font-black italic uppercase tracking-tighter leading-none group-hover:text-[var(--color-primary)] transition-colors">
                 Prof. {user?.nombre || 'Instructor'}
               </h1>
             </div>
@@ -265,7 +284,7 @@ export const ProfesorDashboard: React.FC = () => {
                     label="Pases Hoy"
                     accent="#10b981"
                     onClick={() => setActiveTab('alumnos')}
-                    badge="Tomar lista →"
+                    badge="Pasar lista"
                     badgeColor="#10b981"
                   />
                 </div>
@@ -286,7 +305,7 @@ export const ProfesorDashboard: React.FC = () => {
                     label="En torneo"
                     accent="#a855f7"
                     onClick={() => setActiveTab('torneos')}
-                    badge="Ver competencias →"
+                    badge="Ver torneos"
                     badgeColor="#a855f7"
                   />
                 </div>
@@ -297,8 +316,8 @@ export const ProfesorDashboard: React.FC = () => {
                     <div className="w-7 h-7 bg-[var(--color-primary)]/10 rounded-lg flex items-center justify-center">
                       <BarChart2 size={14} className="text-[var(--color-primary)]" />
                     </div>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-[var(--color-primary)]">Asistencia</span>
-                    <span className="text-[9px] font-bold uppercase tracking-widest text-[var(--color-text-muted)] opacity-50">— Esta semana</span>
+                    <span className="text-caption font-black uppercase tracking-widest text-[var(--color-primary)]">Asistencia</span>
+                    <span className="text-caption font-bold uppercase tracking-widest text-[var(--color-text-muted)] opacity-50">— Esta semana</span>
                   </div>
                   <div className="flex items-end justify-between gap-2 h-20">
                     {semana.map((dia: any, i: number) => {
@@ -306,7 +325,7 @@ export const ProfesorDashboard: React.FC = () => {
                       const isToday = i === semana.length - 1;
                       return (
                         <div key={dia.fecha} className="flex-1 flex flex-col items-center gap-1.5">
-                          <span className="text-[9px] font-black text-[var(--color-text-muted)]">{dia.presentes}</span>
+                          <span className="text-caption font-black text-[var(--color-text-muted)]">{dia.presentes}</span>
                           <div className="w-full bg-[var(--color-background)] rounded-lg overflow-hidden" style={{ height: 44 }}>
                             <motion.div
                               initial={{ height: 0 }}
@@ -325,7 +344,7 @@ export const ProfesorDashboard: React.FC = () => {
                             />
                           </div>
                           <span
-                            className="text-[8px] font-black uppercase"
+                            className="text-caption font-black uppercase"
                             style={{ color: isToday ? 'var(--color-primary)' : 'var(--color-text-muted)', opacity: isToday ? 1 : 0.6 }}
                           >
                             {dia.label}
@@ -344,13 +363,13 @@ export const ProfesorDashboard: React.FC = () => {
                         <div className="w-7 h-7 bg-indigo-500/10 rounded-lg flex items-center justify-center">
                           <PieIcon size={14} className="text-indigo-400" />
                         </div>
-                        <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400">Análisis Kup/Dan</span>
+                        <span className="text-caption font-black uppercase tracking-widest text-indigo-400">Análisis Kup/Dan</span>
                       </div>
-                      <h3 className="text-xl font-black italic uppercase tracking-tighter">Niveles de Grado</h3>
+                      <h3 className="text-subtitulo font-black italic uppercase tracking-tighter">Niveles de Grado</h3>
                     </div>
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--color-background)] rounded-full border border-[var(--color-border)]">
                       <Sparkles size={12} className="text-amber-400" />
-                      <span className="text-[8px] font-black uppercase tracking-widest opacity-60">Fuerza Técnica</span>
+                      <span className="text-caption font-black uppercase tracking-widest opacity-60">Fuerza Técnica</span>
                     </div>
                   </div>
 
@@ -361,7 +380,7 @@ export const ProfesorDashboard: React.FC = () => {
                       const hex = beltHex(c.color);
                       return (
                         <div key={c.idgrado ?? idx} className="space-y-2">
-                          <div className="flex justify-between text-[10px] font-black uppercase italic tracking-tighter text-[var(--color-text)]">
+                          <div className="flex justify-between text-caption font-black uppercase italic tracking-tighter text-[var(--color-text)]">
                             <span className="flex items-center gap-2">
                               <div
                                 className="relative w-4 h-2.5 rounded-sm overflow-hidden border border-white/10 shadow"
@@ -395,12 +414,12 @@ export const ProfesorDashboard: React.FC = () => {
                         <div className="w-7 h-7 bg-red-500/10 rounded-lg flex items-center justify-center">
                           <UserX size={14} className="text-red-400" />
                         </div>
-                        <span className="text-[9px] font-black uppercase tracking-widest text-red-400">Alerta de Ausencias</span>
+                        <span className="text-caption font-black uppercase tracking-widest text-red-400">Alerta de Ausencias</span>
                       </div>
                       <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setActiveTab('alumnos')}
-                        className="text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors"
+                        className="text-caption font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors"
                       >
                         Ver todos →
                       </motion.button>
@@ -410,16 +429,16 @@ export const ProfesorDashboard: React.FC = () => {
                         <div key={a.idalumno} className="flex items-center gap-3">
                           <Avatar src={a.fotoalumno} name={`${a.nombres} ${a.apellidopaterno}`} size={38} />
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-black uppercase tracking-tight truncate">
+                            <p className="text-label font-black uppercase tracking-tight truncate">
                               {a.nombres} {a.apellidopaterno}
                             </p>
-                            <p className="text-[9px] text-[var(--color-text-muted)] opacity-60">
+                            <p className="text-caption text-[var(--color-text-muted)] opacity-60">
                               Última: {formatDate(a.ultima_asistencia)}
                             </p>
                           </div>
                           <div className="text-right shrink-0">
-                            <span className="text-sm font-black text-red-400">{a.dias_ausente}</span>
-                            <p className="text-[8px] text-[var(--color-text-muted)] opacity-50 uppercase">días</p>
+                            <span className="text-datos font-black text-red-400">{a.dias_ausente}</span>
+                            <p className="text-caption text-[var(--color-text-muted)] opacity-50 uppercase">días</p>
                           </div>
                         </div>
                       ))}
@@ -434,7 +453,7 @@ export const ProfesorDashboard: React.FC = () => {
                       <div className="w-7 h-7 bg-amber-500/10 rounded-lg flex items-center justify-center">
                         <Award size={14} className="text-amber-400" />
                       </div>
-                      <span className="text-[9px] font-black uppercase tracking-widest text-amber-400">Últimas Promociones</span>
+                      <span className="text-caption font-black uppercase tracking-widest text-amber-400">Últimas Promociones</span>
                     </div>
                     <div className="space-y-3">
                       {promociones.map((p: any) => (
@@ -445,15 +464,15 @@ export const ProfesorDashboard: React.FC = () => {
                             <div className="w-3 h-3 rounded-sm border border-white/10 shadow" style={{ background: beltHex(p.grado_nuevo) }} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-black uppercase tracking-tight truncate">
+                            <p className="text-label font-black uppercase tracking-tight truncate">
                               {p.nombres} {p.apellidopaterno}
                             </p>
-                            <p className="text-[9px] text-[var(--color-text-muted)] opacity-60">
+                            <p className="text-caption text-[var(--color-text-muted)] opacity-60">
                               {p.grado_anterior} → <span style={{ color: beltHex(p.grado_nuevo) }} className="font-black">{p.grado_nuevo}</span>
                               {' · '}{p.nivelkupdan}
                             </p>
                           </div>
-                          <span className="text-[8px] text-[var(--color-text-muted)] opacity-40 shrink-0">
+                          <span className="text-caption text-[var(--color-text-muted)] opacity-40 shrink-0">
                             {formatDate(p.fecha_examen)}
                           </span>
                         </div>
@@ -474,10 +493,10 @@ export const ProfesorDashboard: React.FC = () => {
                         <Star size={24} />
                       </div>
                       <div>
-                        <h4 className="text-sm font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">
+                        <h4 className="text-datos font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">
                           Próximos Exámenes
                         </h4>
-                        <p className="text-[10px] font-bold text-[var(--color-primary)] mt-1.5">
+                        <p className="text-caption font-bold text-[var(--color-primary)] mt-1.5">
                           {proxExamenes.length} examen{proxExamenes.length > 1 ? 'es' : ''} programado{proxExamenes.length > 1 ? 's' : ''}
                         </p>
                       </div>
@@ -495,8 +514,8 @@ export const ProfesorDashboard: React.FC = () => {
                         <Star size={24} />
                       </div>
                       <div>
-                        <h4 className="text-sm font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">Exámenes de Grado</h4>
-                        <p className="text-[10px] font-bold text-[var(--color-text-muted)] mt-1.5 opacity-60">Sin exámenes próximos</p>
+                        <h4 className="text-datos font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">Exámenes de Grado</h4>
+                        <p className="text-caption font-bold text-[var(--color-text-muted)] mt-1.5 opacity-60">Sin exámenes próximos</p>
                       </div>
                     </div>
                     <ChevronRight className="text-[var(--color-text-muted)] opacity-20 group-hover:opacity-100 group-hover:translate-x-1 transition-all" size={20} />
@@ -514,8 +533,8 @@ export const ProfesorDashboard: React.FC = () => {
                       <Clock size={24} />
                     </div>
                     <div>
-                      <h4 className="text-sm font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">Cobros Pendientes</h4>
-                      <p className="text-[10px] font-bold text-orange-400 mt-1.5">
+                      <h4 className="text-datos font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">Cobros Pendientes</h4>
+                      <p className="text-caption font-bold text-orange-400 mt-1.5">
                         {pagosPendientes} cargos · {formatCurrency(montoPendiente)}
                       </p>
                     </div>
@@ -534,8 +553,8 @@ export const ProfesorDashboard: React.FC = () => {
                       <Trophy size={24} />
                     </div>
                     <div>
-                      <h4 className="text-sm font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">Arena y Torneos</h4>
-                      <p className="text-[10px] font-bold text-[var(--color-text-muted)] mt-1.5 opacity-60">
+                      <h4 className="text-datos font-black uppercase italic tracking-tighter leading-none text-[var(--color-text)]">Arena y Torneos</h4>
+                      <p className="text-caption font-bold text-[var(--color-text-muted)] mt-1.5 opacity-60">
                         {stats?.alumnos_en_torneo ?? 0} atletas en competencia activa
                       </p>
                     </div>
@@ -550,17 +569,17 @@ export const ProfesorDashboard: React.FC = () => {
                       <div className="w-7 h-7 bg-pink-500/10 rounded-lg flex items-center justify-center">
                         <Calendar size={14} className="text-pink-400" />
                       </div>
-                      <span className="text-[9px] font-black uppercase tracking-widest text-pink-400">Cumpleaños Próximos</span>
+                      <span className="text-caption font-black uppercase tracking-widest text-pink-400">Cumpleaños Próximos</span>
                     </div>
                     <div className="space-y-3">
                       {cumpleanos.map((c: any, i: number) => (
                         <div key={i} className="flex items-center gap-3">
                           <Avatar src={c.fotoalumno ?? ''} name={`${c.nombres} ${c.apellidopaterno}`} size={36} />
                           <div className="flex-1">
-                            <p className="text-xs font-black uppercase tracking-tight">{c.nombres} {c.apellidopaterno}</p>
-                            <p className="text-[9px] text-[var(--color-text-muted)] opacity-60">{formatDate(c.fecha)}</p>
+                            <p className="text-label font-black uppercase tracking-tight">{c.nombres} {c.apellidopaterno}</p>
+                            <p className="text-caption text-[var(--color-text-muted)] opacity-60">{formatDate(c.fecha)}</p>
                           </div>
-                          <span className="text-lg">🎂</span>
+                          <span className="text-seccion">🎂</span>
                         </div>
                       ))}
                     </div>
