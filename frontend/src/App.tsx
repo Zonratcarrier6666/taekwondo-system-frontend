@@ -9,13 +9,19 @@ import { LoginView } from './views/auth/LoginView';
 import { EscuelaDashboard } from './views/escuela/EscuelaDashboard';
 // @ts-ignore
 import { SuperAdminDashboard } from './views/superadmin/SuperAdminDashboard';
-import {ProfesorDashboard} from "./views/profesor/ProfesorDashboard";
+import { ProfesorDashboard } from "./views/profesor/ProfesorDashboard";
 // @ts-ignore
 import { JuezDashboard } from './views/juez/JuezDashboard';
 // @ts-ignore
 import { FormularioInscripcion } from './pages/FormularioInscripcion';
 // @ts-ignore
 import { StaffTorneoApp } from './views/staff/Stafftorneoapp';
+
+// Importación de guardianes de seguridad modulares
+import { IdleTimer } from './components/auth/IdleTimer';
+import { ConnectionGuard } from './components/auth/ConnectionGuard';
+import { NotFoundView } from './views/errors/NotFoundView';
+
 // ─────────────────────────────────────────────────────────────
 //  HELPERS
 // ─────────────────────────────────────────────────────────────
@@ -160,19 +166,24 @@ const AppContent = () => {
       {/* Raíz dinámica */}
       <Route path="/" element={<RootRedirect />} />
 
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* Fallback 404 de Vanguardia */}
+      <Route path="*" element={<NotFoundView />} />
     </Routes>
   );
 };
 
 // ─────────────────────────────────────────────────────────────
 //  ENTRY POINT
+//  Integramos el IdleTimer y el nuevo ConnectionGuard
 // ─────────────────────────────────────────────────────────────
 export const App = () => (
   <AuthProvider>
     <Router>
-      <AppContent />
+      <ConnectionGuard>
+        <IdleTimer>
+          <AppContent />
+        </IdleTimer>
+      </ConnectionGuard>
     </Router>
   </AuthProvider>
 );

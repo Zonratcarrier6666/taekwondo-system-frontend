@@ -371,8 +371,9 @@ export const App: React.FC = () => {
         setIsModalOpen(false);
       } else {
         const res = await alumnoService.registrar(formData);
-        setSelectedAlumno(res);
-        setAlumnos(prev => [...prev, res]);
+        const resConProfesor = { ...res, idprofesor: formData.idprofesor };  // ← agregar esta línea
+        setSelectedAlumno(resConProfesor);
+        setAlumnos(prev => [...prev, resConProfesor]);
         setStep('photo_choice');
       }
     } catch (err) { console.error(err); } 
