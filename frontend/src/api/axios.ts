@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // URL de tu servidor en Render
-const API_URL = "https://taekwondo-system-api.onrender.com";
+const API_URL = "https://almonacisystems.devsweett.com/api";
 
 const api = axios.create({
   baseURL: API_URL,

@@ -6,7 +6,7 @@ import { Alumno, AlumnoCreateDTO, AlumnoUpdateDTO } from '../types/alumno.types'
  * Maneja la comunicación con el API de Render para la gestión de la matrícula.
  */
 const api = axios.create({
-  baseURL: 'https://taekwondo-system-api.onrender.com',
+  baseURL: 'https://almonacisystems.devsweett.com/api',
   headers: {
     'Content-Type': 'application/json'
   }

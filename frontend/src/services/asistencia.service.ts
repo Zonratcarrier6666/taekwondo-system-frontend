@@ -92,7 +92,7 @@ export interface HistorialParams {
 // ─────────────────────────────────────────────────────────────
 
 const api = axios.create({
-  baseURL: 'https://taekwondo-system-api.onrender.com',
+  baseURL: 'https://almonacisystems.devsweett.com/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
